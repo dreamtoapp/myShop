@@ -50,6 +50,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </ThemeProvider>
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID || ''} />
         </NextAuthSessionProvider>
+        {process.env.NODE_ENV !== 'production' && (
+          <div className='fixed left-2 bottom-2 z-[1000] pointer-events-none'>
+            <span className='inline-flex items-center rounded-md bg-yellow-500 px-2 py-1 text-xs font-semibold text-black shadow'>
+              DEV
+            </span>
+          </div>
+        )}
         {/* </NotificationsProvider> */}
       </body>
     </html>

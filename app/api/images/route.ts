@@ -5,6 +5,7 @@ import {
 
 import db from '@/lib/prisma';
 import { uploadImageToCloudinary } from '@/app/api/images/cloudinary/uploadImageToCloudinary';
+import { revalidateTag, revalidatePath } from 'next/cache';
 
 // Allowed models for image updates
 const SUPPORTED_TABLES = {
@@ -150,6 +151,27 @@ export async function POST(req: NextRequest) {
       }
 
       console.log(`[${table.toUpperCase()} UPDATED]`, result);
+      // Revalidate caches relevant to the updated table and homepage
+      switch (table) {
+        case 'product':
+          revalidateTag('products');
+          revalidatePath('/');
+          break;
+        case 'company':
+          revalidateTag('company');
+          revalidatePath('/');
+          break;
+        case 'category':
+          revalidateTag('categories');
+          revalidatePath('/');
+          break;
+        case 'offer':
+          revalidateTag('promotions');
+          revalidatePath('/');
+          break;
+        default:
+          break;
+      }
     } else {
       console.log(`[UPLOAD ONLY MODE] Image uploaded to Cloudinary: ${imageUrl}`);
     }

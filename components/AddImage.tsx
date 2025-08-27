@@ -40,12 +40,14 @@ const AddImage: React.FC<AddImageProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [progress, setProgress] = useState(0);
+  const xhrRef = useRef<XMLHttpRequest | null>(null);
 
   useEffect(() => {
     setPreview(url);
   }, [url]);
 
   const handleImageClick = () => {
+    if (loading) return; // prevent opening picker during upload
     inputRef.current?.click();
   };
 
@@ -91,6 +93,7 @@ const AddImage: React.FC<AddImageProps> = ({
 
 
     const xhr = new XMLHttpRequest();
+    xhrRef.current = xhr;
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {
@@ -100,6 +103,7 @@ const AddImage: React.FC<AddImageProps> = ({
     };
     xhr.onload = () => {
       setLoading(false);
+      xhrRef.current = null;
       try {
         const data = JSON.parse(xhr.responseText);
         if (xhr.status >= 200 && xhr.status < 300 && data.imageUrl) {
@@ -117,11 +121,27 @@ const AddImage: React.FC<AddImageProps> = ({
 
     xhr.onerror = () => {
       setLoading(false);
+      xhrRef.current = null;
       setError('Upload failed due to a network error.');
+    };
+
+    xhr.onabort = () => {
+      setLoading(false);
+      xhrRef.current = null;
+      setError('تم إلغاء الرفع');
+      setProgress(0);
     };
 
     xhr.open('POST', `/api/images`);
     xhr.send(formData);
+  };
+
+  const cancelUpload = () => {
+    try {
+      xhrRef.current?.abort();
+    } catch (_) {
+      // noop
+    }
   };
 
   return (
@@ -176,7 +196,39 @@ const AddImage: React.FC<AddImageProps> = ({
         </button>
       )}
 
-      {/* Progress bar */}
+      {/* Upload overlay and progress */}
+      {loading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 backdrop-blur-sm pointer-events-none">
+          <div className="pointer-events-auto flex flex-col items-center gap-3 rounded-md bg-background/90 px-3 py-2 shadow border border-border">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Icon name="Loader2" className="h-4 w-4 animate-spin" />
+              <span aria-live="polite">جارٍ الرفع</span>
+            </div>
+            <div
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={progress}
+              className="w-32 h-2 rounded bg-muted overflow-hidden"
+            >
+              <div
+                className="h-full bg-primary transition-all duration-200"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <div className="text-xs text-muted-foreground">{progress}%</div>
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); cancelUpload(); }}
+              className="mt-1 text-[11px] px-2 py-1 rounded border border-border hover:bg-muted/50"
+            >
+              إلغاء
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Progress bar (existing) */}
       {loading && (
         <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-200 rounded overflow-hidden">
           <div
@@ -186,10 +238,29 @@ const AddImage: React.FC<AddImageProps> = ({
         </div>
       )}
 
-      {/* Error message */}
+      {/* Error message with retry */}
       {error && (
-        <div className="absolute top-2 left-2 right-2 bg-destructive text-destructive-foreground text-xs p-2 rounded shadow">
-          {error}
+        <div className="absolute top-2 left-2 right-2 bg-destructive text-destructive-foreground text-xs p-2 rounded shadow flex items-center justify-between gap-2">
+          <span className="truncate">{error}</span>
+          <div className="flex items-center gap-2">
+            {file && !loading && (
+              <button
+                type="button"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); handleUpload(file); }}
+                className="px-2 py-0.5 rounded bg-background text-foreground border border-border hover:bg-background/80"
+              >
+                إعادة المحاولة
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); }}
+              aria-label="إغلاق"
+              className="px-2 py-0.5 rounded border border-border hover:bg-background/30"
+            >
+              ×
+            </button>
+          </div>
         </div>
       )}
     </div>
