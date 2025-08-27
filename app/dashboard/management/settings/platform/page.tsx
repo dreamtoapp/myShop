@@ -252,6 +252,8 @@ export default function PlatformPage() {
                     </div>
                 </div>
 
+                {/* Refresh moved to Maintenance page */}
+
                 {/* Business Hours Section */}
                 <Card className="shadow-sm border-0 bg-gradient-to-br from-background to-muted/50">
                     <CardHeader className="pb-4">

@@ -1,114 +1,187 @@
+'use client';
 // SaaS Admin/Owner Maintenance Dashboard
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/icons/Icon';
+import { useState } from 'react';
+import { refreshAllCaches } from '../../management/settings/actions/refreshCaches';
+import { dbHealthCheck } from '../actions/dbHealthCheck';
+import { pusherHealthCheck } from '../actions/pusherHealthCheck';
+import { sendTestEmail } from '../actions/sendTestEmail';
+import { getAtlasClusterInfo } from '../actions/getAtlasClusterInfo';
 
 export default function AdminMaintenanceDashboard() {
-  // Placeholder action handlers (replace with real backend integration)
-  const handleRefreshHealth = () => alert('Refreshing global health...');
-  const handleManageTenants = () => alert('Tenant management opened!');
-  const handleDownloadLogs = () => alert('Platform logs downloaded!');
-  const handleBackup = () => alert('Platform backup started!');
-  const handleSendNotification = () => alert('Send notification dialog opened!');
-  const handleAdvancedTools = () => alert('Advanced tools opened!');
-  const handleViewStatus = () => alert('Viewing global status...');
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshDone, setRefreshDone] = useState<'idle' | 'ok' | 'err'>('idle');
+  const [dbLatency, setDbLatency] = useState<number | null>(null);
+  const [dbName, setDbName] = useState<string | null>(null);
+  const [dbPlan, setDbPlan] = useState<string | null>(null);
+  const [atlasPlan, setAtlasPlan] = useState<string | null>(null);
+  const [atlasProvider, setAtlasProvider] = useState<string | null>(null);
+  const [pusherConfigured, setPusherConfigured] = useState<boolean | null>(null);
+  const [missingKeys, setMissingKeys] = useState<string[]>([]);
+
+  const handleRefreshHealth = async () => {
+    setRefreshing(true);
+    setRefreshDone('idle');
+    const res = await refreshAllCaches();
+    setRefreshing(false);
+    setRefreshDone(res.ok ? 'ok' : 'err');
+  };
+  const handleCheckDb = async () => {
+    const db = await dbHealthCheck();
+    setDbLatency(db.ok ? db.latencyMs ?? null : null);
+    setDbName(db.ok ? (db as any).dbName ?? null : null);
+    setDbPlan(db.ok ? (db as any).plan ?? null : null);
+    const atlas = await getAtlasClusterInfo();
+    if (atlas.ok) {
+      setAtlasPlan((atlas as any).instanceSizeName ?? null);
+      setAtlasProvider((atlas as any).providerName ?? null);
+    }
+  };
+  const handleCheckPusher = async () => {
+    const p = await pusherHealthCheck();
+    setPusherConfigured(p.ok && p.configured);
+    setMissingKeys(Array.isArray((p as any).missing) ? (p as any).missing : []);
+  };
 
   return (
     <div className="max-w-5xl mx-auto py-10 space-y-8">
-      <h1 className="text-3xl font-bold mb-6">Platform Maintenance & Admin Tools</h1>
-      {/* Global System Health */}
-      <Card className="p-6 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2 text-lg font-semibold">
-            <Icon name="Server" className="text-green-500" />
-            Global System Health
-            <Badge color="success">Healthy</Badge>
-          </div>
-          <div className="text-gray-500 text-sm mt-1">All platform services are operational.</div>
-        </div>
-        <Button variant="outline" onClick={handleRefreshHealth}>
-          <Icon name="RefreshCw" className="mr-2" /> Refresh
-        </Button>
-      </Card>
-      {/* Tenant Management */}
-      <Card className="p-6 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2 text-lg font-semibold">
-            <Icon name="Users" className="text-blue-500" />
-            Tenant Management
-          </div>
-          <div className="text-gray-500 text-sm mt-1">View, suspend, or support tenants. Manage onboarding and offboarding.</div>
-        </div>
-        <Button variant="outline" onClick={handleManageTenants}>
-          Manage Tenants
-        </Button>
-      </Card>
-      {/* Platform Logs */}
-      <Card className="p-6 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2 text-lg font-semibold">
-            <Icon name="Bug" className="text-red-500" />
-            Platform Logs
-          </div>
-          <div className="text-gray-500 text-sm mt-1">Access error, audit, and activity logs across all tenants.</div>
-        </div>
-        <Button variant="outline" onClick={handleDownloadLogs}>
-          <Icon name="Download" className="mr-2" /> Download Logs
-        </Button>
-      </Card>
-      {/* Database & Backups */}
+      <h1 className="text-3xl font-bold mb-6">لوحة صيانة النظام</h1>
+      {/* Database Health */}
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
             <Icon name="Database" className="text-purple-500" />
-            Database & Backups
+            صحة قاعدة البيانات
+            <Badge color="success">{dbLatency !== null ? 'تم الفحص' : 'خامل'}</Badge>
           </div>
-          <div className="text-gray-500 text-sm mt-1">Monitor DB health, run backups, and restore data if needed.</div>
+          <ul className="text-gray-500 text-sm mt-2 space-y-1 list-disc list-inside">
+            <li>
+              {dbLatency !== null ? (
+                <>
+                  زمن الاستجابة: <span className="font-medium">{dbLatency}ms</span>
+                </>
+              ) : (
+                'اضغط فحص لعرض الحالة.'
+              )}
+            </li>
+            {dbName && (
+              <li>
+                قاعدة البيانات:
+                <Badge variant="secondary" className="ml-2 px-2 py-0.5 text-xs">{dbName}</Badge>
+              </li>
+            )}
+            {(atlasPlan || dbPlan) && (
+              <li>
+                الخطة: <span className="font-medium">{atlasPlan ?? dbPlan}</span>
+                {atlasProvider && <span className="ml-2">({atlasProvider})</span>}
+              </li>
+            )}
+          </ul>
         </div>
-        <Button variant="outline" onClick={handleBackup}>
-          Run Backup
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={handleCheckDb}>
+            <Icon name="Info" className="mr-2" /> فحص
+          </Button>
+        </div>
       </Card>
-      {/* Platform Notifications */}
+
+      {/* Realtime (Pusher) Status */}
       <Card className="p-6 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <Icon name="Bell" className="text-yellow-500" />
-            Platform Notifications
+            <Icon name="Radio" className="text-green-500" />
+            الحالة الفورية (Pusher)
+            <Badge color={pusherConfigured === false ? 'destructive' : 'success'}>
+              {pusherConfigured === null ? 'خامل' : pusherConfigured ? 'مُفعّل' : 'غير مُعد'}
+            </Badge>
           </div>
-          <div className="text-gray-500 text-sm mt-1">Send announcements or maintenance alerts to all tenants.</div>
+          <div className="text-gray-500 text-sm mt-1">
+            {pusherConfigured === null && 'اضغط فحص لعرض الحالة.'}
+            {pusherConfigured === true && 'Pusher مُفعّل (مفاتيح البيئة موجودة).'}
+            {pusherConfigured === false && (
+              <span>
+                Pusher غير مُعد، تحقق من مفاتيح البيئة.
+                {missingKeys.length > 0 && (
+                  <span className="ml-2">المفقود: <span className="font-medium">{missingKeys.join(', ')}</span></span>
+                )}
+              </span>
+            )}
+          </div>
         </div>
-        <Button variant="outline" onClick={handleSendNotification}>
-          Send Notification
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={handleCheckPusher}>
+            <Icon name="Info" className="mr-2" /> فحص
+          </Button>
+        </div>
       </Card>
-      {/* Advanced Tools */}
-      <Card className="p-6 flex items-center justify-between">
-        <div>
+
+      {/* Cache & Revalidation */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <Icon name="Tools" className="text-gray-700" />
-            Advanced Tools
+            <Icon name="RefreshCw" className="text-primary" />
+            التخزين المؤقت وإعادة التحقق
           </div>
-          <div className="text-gray-500 text-sm mt-1">Access platform settings, feature toggles, and system upgrades.</div>
+          <Button onClick={handleRefreshHealth} disabled={refreshing}>
+            <Icon name="Bolt" className="mr-2" /> تحديث شامل
+          </Button>
         </div>
-        <Button variant="outline" onClick={handleAdvancedTools}>
-          Open Tools
-        </Button>
+        <div className="space-y-2">
+          <div className="h-2 w-full rounded bg-neutral-200" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={refreshing ? 70 : refreshDone === 'ok' ? 100 : 0}>
+            <div className={`h-2 rounded ${refreshDone === 'err' ? 'bg-red-500' : 'bg-primary'} transition-all duration-500`} style={{ width: `${refreshing ? 70 : refreshDone === 'ok' ? 100 : 0}%` }} />
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {refreshing && 'جاري التحديث…'}
+            {refreshDone === 'ok' && 'تم التحديث بنجاح.'}
+            {refreshDone === 'err' && 'فشل التحديث.'}
+            {refreshDone === 'idle' && !refreshing && 'خامل'}
+          </div>
+        </div>
       </Card>
-      {/* Global Status */}
-      <Card className="p-6 flex items-center justify-between">
-        <div>
+
+      {/* Cloudinary Status */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <Icon name="Globe" className="text-indigo-500" />
-            Global Status
+            <Icon name="Image" className="text-amber-600" />
+            حالة الوسائط (Cloudinary)
           </div>
-          <div className="text-gray-500 text-sm mt-1">Monitor platform-wide incidents, uptime, and SLA compliance.</div>
+          <Button variant="outline" onClick={() => window.open('/dashboard/management/settings/advanced', '_self')}>
+            فتح الإعدادات
+          </Button>
         </div>
-        <Button variant="outline" onClick={handleViewStatus}>
-          View Status
-        </Button>
+        <div className="text-sm text-muted-foreground">
+          الحالة التفصيلية متوفرة في صفحة الإعدادات المتقدمة (تتضمن الاستهلاك والحصة). استخدم هذا القسم لمراجعة المفاتيح عند وجود مشاكل رفع.
+        </div>
       </Card>
+
+      {/* Email Test */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 text-lg font-semibold">
+            <Icon name="Mail" className="text-emerald-600" />
+            اختبار البريد
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={async () => {
+              const to = prompt('أدخل بريداً لتجربة الإرسال:');
+              if (!to) return;
+              const res = await sendTestEmail(to);
+              alert(res.ok ? 'تم الإرسال بنجاح' : `فشل: ${res.message}`);
+            }}
+          >
+            إرسال بريد تجريبي
+          </Button>
+          <div className="text-xs text-muted-foreground">يحتاج EMAIL_USER/EMAIL_PASS مهيّأة في البيئة.</div>
+        </div>
+      </Card>
+
     </div>
   );
 }

@@ -76,6 +76,7 @@ export const navigationItems = [
       { label: 'الروابط الاجتماعية', href: '/dashboard/management/settings/social-media', icon: 'Share2' },
       { label: 'الشعار والهوية', href: '/dashboard/management/settings/branding', icon: 'Palette' },
       { label: 'إعدادات المنصة', href: '/dashboard/management/settings/platform', icon: 'Settings' },
+      { label: 'تحديث البيانات', href: '/dashboard/management/settings/platform#refresh', icon: 'RefreshCw' },
       { label: 'إعدادات متقدمة', href: '/dashboard/management/settings/advanced', icon: 'Wrench' },
       { label: '---', href: '#', icon: 'Minus', key: 'divider-1' },
       { label: 'سياسة الموقع', href: '/dashboard/management/policies/website', icon: 'Globe' },
@@ -98,7 +99,7 @@ export const navigationItems = [
       { label: 'تحسين المحركات', href: '/dashboard/management-seo', icon: 'Search' },
       { label: 'المالية', href: '/dashboard/management-expenses', icon: 'DollarSign' },
       { label: 'التقارير', href: '/dashboard/management-reports', icon: 'BarChart3' },
-      // { label: 'الصيانة', href: '/dashboard/management-maintinance', icon: 'Wrench' },
+      { label: 'الصيانة', href: '/dashboard/management-maintinance', icon: 'Wrench' },
       // { label: 'البيانات', href: '/dashboard/dataSeed', icon: 'Database' }
     ]
   }
