@@ -8,6 +8,8 @@ import db from '@/lib/prisma';
 import AppVersion from '../AppVersion';
 import LazyFooterContactIcons from './LazyFooterContactIcons';
 import NewsletterClientWrapper from './NewsletterClientWrapper';
+import Image from 'next/image';
+import BadgeDialog from './BadgeDialog';
 
 interface FooterProps {
   aboutus?: string;
@@ -369,6 +371,56 @@ const Footer = async ({
             <div className="text-xs text-muted-foreground text-center sm:text-right">
               صُنع بـ ❤️ في المملكة العربية السعودية
             </div>
+          </div>
+          {/* Trust/Compliance badges - accessible, consistent sizing */}
+          <div className="mt-4" aria-label="شارات الثقة والاعتمادات">
+            <ul className="flex flex-wrap items-center justify-center sm:justify-end gap-4">
+              <li className="shrink-0">
+                <BadgeDialog
+                  src="/assets/sa_busnees.avif"
+                  alt="Saudi Business"
+                  width={96}
+                  height={36}
+                  sizes="(min-width: 1024px) 96px, 72px"
+                  title="المركز السعودي للاعمال"
+                  qrPayload="7001234567"
+                />
+              </li>
+              <li className="shrink-0">
+                <BadgeDialog
+                  src="/assets/cr.avif"
+                  alt="Commercial Registration"
+                  width={96}
+                  height={36}
+                  sizes="(min-width: 1024px) 96px, 72px"
+                  title="السجل التجاري"
+                  qrPayload="1010123456"
+                />
+              </li>
+              <li className="shrink-0">
+                <BadgeDialog
+                  src="/assets/Vat.svg"
+                  alt="VAT"
+                  width={80}
+                  height={36}
+                  sizes="(min-width: 1024px) 80px, 64px"
+                  title="الرقم الضريبي"
+                  qrPayload="310123456700003"
+                />
+              </li>
+              <li className="shrink-0">
+                <Link href="https://www.vision2030.gov.sa/" target="_blank" rel="noopener noreferrer" aria-label="Saudi Vision 2030 (opens in a new tab)">
+                  <Image
+                    src="/assets/visionlogo.svg"
+                    alt="Saudi Vision 2030"
+                    width={108}
+                    height={36}
+                    sizes="(min-width: 1024px) 108px, 84px"
+                    className="h-7 sm:h-9 w-auto opacity-80 grayscale hover:opacity-100 hover:grayscale-0 transition"
+                  />
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
