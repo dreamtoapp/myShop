@@ -10,6 +10,12 @@ import { dbHealthCheck } from '../actions/dbHealthCheck';
 import { pusherHealthCheck } from '../actions/pusherHealthCheck';
 import { sendTestEmail } from '../actions/sendTestEmail';
 import { getAtlasClusterInfo } from '../actions/getAtlasClusterInfo';
+import { cloudinaryHealthCheck } from '../actions/cloudinaryHealthCheck';
+import { whatsappCloudTest } from '../actions/whatsappTest';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { whatsappCheckCredentials } from '../actions/whatsappCheckCredentials';
+import { Input } from '@/components/ui/input';
+import { whatsappSalesTest } from '../actions/whatsappSalesTest';
 
 export default function AdminMaintenanceDashboard() {
   const [refreshing, setRefreshing] = useState(false);
@@ -21,6 +27,17 @@ export default function AdminMaintenanceDashboard() {
   const [atlasProvider, setAtlasProvider] = useState<string | null>(null);
   const [pusherConfigured, setPusherConfigured] = useState<boolean | null>(null);
   const [missingKeys, setMissingKeys] = useState<string[]>([]);
+  const [cloudStatus, setCloudStatus] = useState<'idle' | 'ok' | 'err'>('idle');
+  const [cloudMsg, setCloudMsg] = useState<string>('');
+  const [waOpen, setWaOpen] = useState(false);
+  const [waTo, setWaTo] = useState('0502699023');
+  const [waOtp, setWaOtp] = useState('123456');
+  // Language is fixed to ar_SA per KSA default
+  const [waInlineMsg, setWaInlineMsg] = useState<string | null>(null);
+  const [waInlineOk, setWaInlineOk] = useState<boolean | null>(null);
+  const [waTokenOk, setWaTokenOk] = useState<boolean | null>(null);
+  const [waPhoneOk, setWaPhoneOk] = useState<boolean | null>(null);
+  const [waKeyChecking, setWaKeyChecking] = useState(false);
 
   const handleRefreshHealth = async () => {
     setRefreshing(true);
@@ -46,8 +63,21 @@ export default function AdminMaintenanceDashboard() {
     setMissingKeys(Array.isArray((p as any).missing) ? (p as any).missing : []);
   };
 
+  const handleTestCloudinary = async () => {
+    setCloudStatus('idle');
+    setCloudMsg('');
+    const res = await cloudinaryHealthCheck();
+    if (res.ok) {
+      setCloudStatus('ok');
+      setCloudMsg('تم التحقق من مفاتيح Cloudinary بنجاح');
+    } else {
+      setCloudStatus('err');
+      setCloudMsg(res.message || 'فشل التحقق من Cloudinary');
+    }
+  };
+
   return (
-    <div className="max-w-5xl mx-auto py-10 space-y-8">
+    <div className="w-full py-10 space-y-8">
       <h1 className="text-3xl font-bold mb-6">لوحة صيانة النظام</h1>
       {/* Database Health */}
       <Card className="p-6 flex items-center justify-between">
@@ -97,6 +127,7 @@ export default function AdminMaintenanceDashboard() {
             <Badge color={pusherConfigured === false ? 'destructive' : 'success'}>
               {pusherConfigured === null ? 'خامل' : pusherConfigured ? 'مُفعّل' : 'غير مُعد'}
             </Badge>
+            <Badge variant="secondary" className="px-2 py-0.5 text-[10px]">onProgress</Badge>
           </div>
           <div className="text-gray-500 text-sm mt-1">
             {pusherConfigured === null && 'اضغط فحص لعرض الحالة.'}
@@ -149,14 +180,117 @@ export default function AdminMaintenanceDashboard() {
             <Icon name="Image" className="text-amber-600" />
             حالة الوسائط (Cloudinary)
           </div>
-          <Button variant="outline" onClick={() => window.open('/dashboard/management/settings/advanced', '_self')}>
-            فتح الإعدادات
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleTestCloudinary}>
+              <Icon name="Info" className="mr-2" /> اختبار
+            </Button>
+          </div>
         </div>
         <div className="text-sm text-muted-foreground">
-          الحالة التفصيلية متوفرة في صفحة الإعدادات المتقدمة (تتضمن الاستهلاك والحصة). استخدم هذا القسم لمراجعة المفاتيح عند وجود مشاكل رفع.
+          {cloudStatus === 'idle' && 'اختبر الاتصال للتأكد أن المفاتيح صحيحة.'}
+          {cloudStatus === 'ok' && <span className="text-emerald-500">{cloudMsg}</span>}
+          {cloudStatus === 'err' && <span className="text-red-500">{cloudMsg}</span>}
         </div>
       </Card>
+
+      {/* WhatsApp Cloud API Test */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 text-lg font-semibold">
+            <Icon name="MessageSquare" className="text-green-600" />
+            اختبار WhatsApp Cloud API
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" disabled={waKeyChecking} onClick={async () => {
+              try {
+                setWaKeyChecking(true);
+                setWaInlineMsg(null);
+                const res = await whatsappCheckCredentials();
+                if (res.ok) {
+                  setWaInlineOk(true);
+                  setWaInlineMsg(`Valid ✅ | Number: ${res.displayPhone ?? 'Unknown'}`);
+                  setWaTokenOk(res.tokenPresent);
+                  setWaPhoneOk(res.phoneIdPresent);
+                } else {
+                  const miss = res.missing?.length ? ` - مفقود: ${res.missing.join(', ')}` : '';
+                  setWaInlineOk(false);
+                  setWaInlineMsg(`خطأ المفاتيح (${res.status ?? ''}) ${res.message}${miss}`);
+                  setWaTokenOk(res.tokenPresent ?? false);
+                  setWaPhoneOk(res.phoneIdPresent ?? false);
+                }
+              } finally {
+                setWaKeyChecking(false);
+              }
+            }}>
+              {waKeyChecking ? (
+                <span className="flex items-center">
+                  <Icon name="RefreshCw" className="mr-2 animate-spin" /> يفحص...
+                </span>
+              ) : (
+                'فحص المفاتيح'
+              )}
+            </Button>
+            <Button onClick={() => setWaOpen(true)}>اختبار الـ OTP</Button>
+            <Button variant="outline" onClick={async () => {
+              const phone = (waTo && waTo.trim()) || '0502699023';
+              await whatsappSalesTest(phone, 'A12345');
+            }}>فحص Order Submit</Button>
+          </div>
+        </div>
+        <div className="text-xs text-muted-foreground flex items-center gap-6">
+          <span className="flex items-center gap-1">
+            <Icon name={waTokenOk ? 'Check' : 'AlertTriangle'} className={`${waTokenOk === null ? 'text-muted-foreground' : waTokenOk ? 'text-emerald-500' : 'text-red-500'}`} />
+            <span>WHATSAPP_ACCESS_TOKEN</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <Icon name={waPhoneOk ? 'Check' : 'AlertTriangle'} className={`${waPhoneOk === null ? 'text-muted-foreground' : waPhoneOk ? 'text-emerald-500' : 'text-red-500'}`} />
+            <span>WHATSAPP_PHONE_NUMBER_ID</span>
+          </span>
+        </div>
+        {waInlineMsg && (
+          <div className={`mt-2 text-sm ${waInlineOk ? 'text-emerald-500' : 'text-red-500'}`}>{waInlineMsg}</div>
+        )}
+      </Card>
+
+      <Dialog open={waOpen} onOpenChange={setWaOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>اختبار الـ OTP عبر واتساب</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <label className="text-sm">رقم واتساب الدولي</label>
+            <Input placeholder="9665xxxxxxxx" value={waTo} onChange={(e) => setWaTo(e.target.value)} />
+            <label className="text-sm">رمز OTP (اختياري)</label>
+            <Input placeholder="123456" value={waOtp} onChange={(e) => setWaOtp(e.target.value)} />
+            <span className="text-sm text-muted-foreground">اللغة: ar_SA (افتراضي للسعودية)</span>
+            {waInlineMsg && (
+              <div className={`text-sm ${waInlineOk ? 'text-emerald-500' : 'text-red-500'}`}>{waInlineMsg}</div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              onClick={async () => {
+                if (!waTo.trim()) return;
+                setWaInlineMsg(null);
+                setWaInlineOk(null);
+                const res = await whatsappCloudTest(waTo.trim(), waOtp.trim() || '123456');
+                if (res.ok) {
+                  setWaInlineOk(true);
+                  setWaInlineMsg(`تم الإرسال ✔️${res.id ? ` (ID: ${res.id})` : ''}`);
+                } else {
+                  const missing = res.missing?.length ? ` - مفقود: ${res.missing.join(', ')}` : '';
+                  setWaInlineOk(false);
+                  setWaInlineMsg(`فشل (${res.message})${missing}`);
+                }
+              }}
+            >
+              إرسال
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
 
       {/* Email Test */}
       <Card className="p-6">
