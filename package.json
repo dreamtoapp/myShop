@@ -81,6 +81,7 @@
     "react-use": "^17.6.0",
     "recharts": "^2.15.3",
     "sharp": "^0.34.1",
+    "qrcode": "^1.5.4",
     "sonner": "^1.7.4",
     "sweetalert2": "^11.17.2",
     "sweetalert2-react-content": "^5.1.0",
