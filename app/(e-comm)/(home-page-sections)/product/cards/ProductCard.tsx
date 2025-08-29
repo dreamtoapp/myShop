@@ -1,13 +1,11 @@
 'use client';
 import { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
-import { Icon } from '@/components/icons/Icon';
 import { Product } from '@/types/databaseTypes';
 import ProductCardMedia from './ProductCardMedia';
 import ProductCardActions from './ProductCardActions';
 import { useRouter } from 'next/navigation';
 import { Eye, MessageCircle, Star } from 'lucide-react';
-import Link from '@/components/link';
 
 
 interface ProductCardProps {
@@ -141,16 +139,6 @@ const ProductCard = memo(({
                         </div>
                     </div>
 
-                    {/* Enhanced Product Page Link */}
-                    <div className="pt-2 text-center">
-                        <Link
-                            href={`/product/${product.slug}`}
-                            className="inline-flex items-center gap-2 rounded-lg border border-primary text-primary px-3 py-2 text-xs font-semibold shadow-sm bg-transparent focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:outline-none"
-                        >
-                            <Icon name="Package" className="w-4 h-4 text-green-600" />
-                            <span>صفحة المنتج</span>
-                        </Link>
-                    </div>
                     {/* Analytics Footer: Enhanced UI/UX with Micro-interactions */}
                     <div className="pt-2 text-center border-t border-border/20">
                         <div className="flex items-center justify-center gap-4 text-sm py-2">
@@ -169,7 +157,7 @@ const ProductCard = memo(({
                                 </span>
                             )}
                             {/* Preview count */}
-                            <span className="flex items-center gap-1 text-primary">
+                            <span className="flex items-center gap-1 text-primary-foreground">
                                 <Eye className="w-4 h-4" />
                                 <span className="font-medium">{product.previewCount}</span>
                             </span>

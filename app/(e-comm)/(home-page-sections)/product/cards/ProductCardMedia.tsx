@@ -69,12 +69,12 @@ function ProductImage({
     priority?: boolean;
 }) {
     return (
-        <div className="relative w-full h-full overflow-hidden">
+        <div className="relative w-full h-full overflow-hidden group">
             <Image
                 src={src}
                 alt={alt}
                 fill
-                className={`object-cover transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+                className={`object-cover transition-all duration-300 group-hover:scale-105 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 loading={priority ? 'eager' : 'lazy'}
                 onError={onError}
