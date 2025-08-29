@@ -18,9 +18,10 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
+
 import { cn } from '@/lib/utils';
 import { navigationItems, type NavigationItem } from '../helpers/navigationMenu';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type NavigationChild = NonNullable<NavigationItem['children']>[0];
 
@@ -67,47 +68,56 @@ export default function MobileNavigation({ pendingOrdersCount: _pendingOrdersCou
                                             <div className="flex items-center gap-3 w-full">
                                                 {item.icon && <Icon name={item.icon} className="h-4 w-4" />}
                                                 <span>{item.label}</span>
-                                                {item.badge && (
-                                                    <Badge variant="secondary" className="text-xs">{item.badge}</Badge>
-                                                )}
                                             </div>
                                         </AccordionTrigger>
                                         <AccordionContent>
-                                            <div className="flex flex-col gap-1 pr-6">
-                                                {item.children?.map((child: NavigationChild, index) => {
-                                                    const isChildActive = isActive(child.href);
+                                            <ScrollArea className="max-h-[calc(100vh-200px)] h-auto">
+                                                <div className="flex flex-col gap-1">
+                                                    {item.children?.map((child: NavigationChild, index) => {
+                                                        const isChildActive = child.href ? isActive(child.href) : false;
 
-                                                    // Handle divider
-                                                    if (child.label === '---') {
+                                                        // Handle divider
+                                                        if (child.label === '---') {
+                                                            return (
+                                                                <div
+                                                                    key={child.key || `divider-${index}`}
+                                                                    className="border-t border-border my-2"
+                                                                />
+                                                            );
+                                                        }
+
+                                                        // Skip items without href
+                                                        if (!child.href) {
+                                                            return null;
+                                                        }
+
                                                         return (
-                                                            <div
-                                                                key={child.key || `divider-${index}`}
-                                                                className="border-t border-border my-2"
-                                                            />
+                                                            <Link
+                                                                key={child.key || `${child.href}-${index}`}
+                                                                href={child.href}
+                                                                onClick={() => setIsOpen(false)}
+                                                                className={cn(
+                                                                    "flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors",
+                                                                    isChildActive
+                                                                        ? "bg-primary text-primary-foreground"
+                                                                        : "hover:bg-accent hover:text-accent-foreground"
+                                                                )}
+                                                            >
+                                                                <Icon name={child.icon || 'Dot'} className="h-4 w-4" />
+                                                                <span>{child.label}</span>
+                                                            </Link>
                                                         );
-                                                    }
-
-                                                    return (
-                                                        <Link
-                                                            key={child.key || `${child.href}-${index}`}
-                                                            href={child.href}
-                                                            onClick={() => setIsOpen(false)}
-                                                            className={cn(
-                                                                "flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors",
-                                                                isChildActive
-                                                                    ? "bg-primary text-primary-foreground"
-                                                                    : "hover:bg-accent hover:text-accent-foreground"
-                                                            )}
-                                                        >
-                                                            <Icon name={child.icon} className="h-4 w-4" />
-                                                            <span>{child.label}</span>
-                                                        </Link>
-                                                    );
-                                                })}
-                                            </div>
+                                                    })}
+                                                </div>
+                                            </ScrollArea>
                                         </AccordionContent>
                                     </AccordionItem>
                                 );
+                            }
+
+                            // Skip items without href
+                            if (!item.href) {
+                                return null;
                             }
 
                             return (
@@ -124,9 +134,6 @@ export default function MobileNavigation({ pendingOrdersCount: _pendingOrdersCou
                                 >
                                     {item.icon && <Icon name={item.icon} className="h-4 w-4" />}
                                     <span>{item.label}</span>
-                                    {item.badge && (
-                                        <Badge variant="secondary" className="text-xs">{item.badge}</Badge>
-                                    )}
                                 </Link>
                             );
                         })}

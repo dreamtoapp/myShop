@@ -35,7 +35,7 @@ export default function AboutAdminClient({ aboutPage }: { aboutPage: any }) {
 
             <Tabs defaultValue="about" className="w-full" dir="rtl">
                 <TabsList className="mb-6 w-full justify-start" dir="rtl">
-                    <TabsTrigger value="about">عن الشركة</TabsTrigger>
+                    <TabsTrigger value="about">عن المتجر</TabsTrigger>
                     <TabsTrigger value="features">المميزات</TabsTrigger>
                     <TabsTrigger value="faq">الأسئلة الشائعة</TabsTrigger>
                 </TabsList>

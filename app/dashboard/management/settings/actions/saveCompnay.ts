@@ -56,7 +56,7 @@ export async function saveCompany(rawData: unknown) {
       message:
         error instanceof z.ZodError
           ? 'بيانات غير صالحة. يرجى مراجعة الحقول.'
-          : 'حدث خطأ أثناء حفظ بيانات الشركة.',
+          : 'حدث خطأ أثناء حفظ بيانات المتجر.',
       details: error instanceof z.ZodError ? error.flatten() : null,
     };
   }

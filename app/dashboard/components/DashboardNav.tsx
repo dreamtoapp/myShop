@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { Icon } from '@/components/icons/Icon';
-import { Badge } from '@/components/ui/badge';
 import NavigationMenu from './NavigationMenu';
 import MobileNavigation from './MobileNavigation';
 import DashboardClientHeader from '../management-dashboard/components/DashboardClientHeader';

@@ -97,7 +97,7 @@ export function InventoryTable({ products }: InventoryTableProps) {
             <TableHeader>
               <TableRow>
                 <TableHead className="text-right">المنتج</TableHead>
-                <TableHead className="text-right">الشركة</TableHead>
+                <TableHead className="text-right">المتجر</TableHead>
                 <TableHead className="text-right">السعر</TableHead>
                 <TableHead className="text-right">الحالة</TableHead>
                 <TableHead className="text-right">تاريخ الإضافة</TableHead>

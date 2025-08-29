@@ -88,13 +88,9 @@ export default function DashboardHomePage({ summary: initialSummary }: Dashboard
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">مرحباً بك في لوحة التحكم</h1>
-          <p className="text-muted-foreground">نظرة عامة على أداء المتجر</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="bg-success/10 text-success border-success/20">
-            <Icon name="CheckCircle" className="h-3 w-3 ml-1" />
-            متصل
-          </Badge>
+          {/* Dashboard actions can go here */}
         </div>
       </div>
 
@@ -189,43 +185,7 @@ export default function DashboardHomePage({ summary: initialSummary }: Dashboard
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Icon name="Zap" className="h-5 w-5" />
-            إجراءات سريعة
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button asChild variant="outline" className="h-auto p-4 flex-col gap-2">
-              <Link href="/dashboard/management-orders/status/pending">
-                <Icon name="Clock" className="h-5 w-5" />
-                <span className="text-sm">الطلبات المعلقة</span>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-auto p-4 flex-col gap-2">
-              <Link href="/dashboard/management-products">
-                <Icon name="Package" className="h-5 w-5" />
-                <span className="text-sm">إدارة المنتجات</span>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-auto p-4 flex-col gap-2">
-              <Link href="/dashboard/management-users/customer">
-                <Icon name="Users" className="h-5 w-5" />
-                <span className="text-sm">العملاء</span>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-auto p-4 flex-col gap-2">
-              <Link href="/dashboard/management-users/drivers">
-                <Icon name="Truck" className="h-5 w-5" />
-                <span className="text-sm">السائقون</span>
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Quick Actions section removed */}
 
       {/* Recent Orders & Top Products */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

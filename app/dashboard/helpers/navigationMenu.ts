@@ -35,7 +35,8 @@ export const navigationItems = [
     children: [
       { label: 'المنتجات', href: '/dashboard/management-products', icon: 'Package' },
       { label: 'التصنيفات', href: '/dashboard/management-categories', icon: 'Tags' },
-      { label: 'الموردين', href: '/dashboard/management-suppliers', icon: 'Warehouse' }
+      { label: 'الموردين', href: '/dashboard/management-suppliers', icon: 'Warehouse' },
+      { label: 'العروض', href: '/dashboard/management-offer', icon: 'Megaphone' }
     ]
   },
   {
@@ -59,45 +60,85 @@ export const navigationItems = [
     ]
   },
   {
-    label: 'الإعدادات',
-    href: '/dashboard/management/settings',
-    icon: 'Settings',
+    label: 'معلومات المتجر',
+    href: '/dashboard/management/settings/company-profile',
+    icon: 'Building2',
     children: [
-      {
-        label: 'بيانات الشركة',
-        icon: 'Folder',
-        children: [
-          { label: 'معلومات الشركة', href: '/dashboard/management/settings/company-profile', icon: 'Building2' },
-          { label: 'الموقع والعنوان', href: '/dashboard/management/settings/location', icon: 'MapPin' },
-          { label: 'الروابط الاجتماعية', href: '/dashboard/management/settings/social-media', icon: 'Share2' },
-          { label: 'الشعار والهوية', href: '/dashboard/management/settings/branding', icon: 'Palette' },
-          { label: 'الامتثال (VAT/CR/رقم التعريف)', href: '/dashboard/management/settings/compliance', icon: 'ShieldCheck' },
-          // السياسات ضمن بيانات الشركة
-          { label: 'سياسة الموقع', href: '/dashboard/management/policies/website', icon: 'Globe' },
-          { label: 'سياسة الإرجاع', href: '/dashboard/management/policies/return', icon: 'Undo' },
-          { label: 'سياسة الخصوصية', href: '/dashboard/management/policies/privacy', icon: 'Shield' },
-          { label: 'سياسة الشحن', href: '/dashboard/management/policies/shipping', icon: 'Truck' },
-          // عناصر إضافية مطلوبة ضمن بيانات الشركة
-          { label: 'المناوبات', href: '/dashboard/shifts', icon: 'Clock' },
-          { label: 'من نحن', href: '/dashboard/management/about', icon: 'Info' },
-        ],
-      },
-      {
-        label: 'إعدادات المنصة',
-        icon: 'Settings',
-        children: [
-          { label: 'إعدادات المنصة', href: '/dashboard/management/settings/platform', icon: 'Settings' },
-          { label: 'تحديث البيانات', href: '/dashboard/management/settings/platform#refresh', icon: 'RefreshCw' },
-          { label: 'إعدادات متقدمة', href: '/dashboard/management/settings/advanced', icon: 'Wrench' },
-          { label: 'الدليل', href: '/dashboard/guidelines', icon: 'BookOpen' },
-          { label: 'التسويق', href: '/dashboard/management-offer', icon: 'Megaphone' },
-          { label: 'تحسين المحركات', href: '/dashboard/management-seo', icon: 'Search' },
-          { label: 'المالية', href: '/dashboard/management-expenses', icon: 'DollarSign' },
-          { label: 'التقارير', href: '/dashboard/management-reports', icon: 'BarChart3' },
-          { label: 'الصيانة', href: '/dashboard/management-maintinance', icon: 'Wrench' },
-        ],
-      },
+      { label: 'معلومات المتجر', href: '/dashboard/management/settings/company-profile', icon: 'Building2' },
+      { label: 'الموقع والعنوان', href: '/dashboard/management/settings/location', icon: 'MapPin' },
+      { label: 'الروابط الاجتماعية', href: '/dashboard/management/settings/social-media', icon: 'Share2' },
+      { label: 'الشعار والهوية', href: '/dashboard/management/settings/branding', icon: 'Palette' },
+      { label: 'الامتثال (VAT/CR/رقم التعريف)', href: '/dashboard/management/settings/compliance', icon: 'ShieldCheck' },
+      // السياسات ضمن معلومات المتجر
+      { label: 'سياسة الموقع', href: '/dashboard/management/policies/website', icon: 'Globe' },
+      { label: 'سياسة الإرجاع', href: '/dashboard/management/policies/return', icon: 'Undo' },
+      { label: 'سياسة الخصوصية', href: '/dashboard/management/policies/privacy', icon: 'Shield' },
+      { label: 'سياسة الشحن', href: '/dashboard/management/policies/shipping', icon: 'Truck' },
+      // عناصر إضافية مطلوبة ضمن معلومات المتجر
+      { label: 'المناوبات', href: '/dashboard/shifts', icon: 'Clock' },
+      { label: 'من نحن', href: '/dashboard/management/about', icon: 'Info' },
+    ]
+  },
+  {
+    label: 'المالية',
+    href: '/dashboard/management-expenses',
+    icon: 'DollarSign',
+    children: [
+      { label: 'المصروفات', href: '/dashboard/management-expenses', icon: 'DollarSign' },
+      { label: 'الإيرادات', href: '/dashboard/management-expenses/revenue', icon: 'TrendingUp' },
+      { label: 'التقارير المالية', href: '/dashboard/management-expenses/reports', icon: 'BarChart3' }
+    ]
+  },
+  {
+    label: 'التقارير',
+    href: '/dashboard/management-reports',
+    icon: 'BarChart3',
+    children: [
+      // 📊 تقارير المبيعات والربحية
+      { label: '📊 المبيعات والربحية', href: '', icon: 'TrendingUp', key: 'category-header-1' },
+      { label: 'تقرير المبيعات', href: '/dashboard/management-reports/sales', icon: 'TrendingUp' },
+      { label: 'التقارير المالية', href: '/dashboard/management-reports/finance', icon: 'DollarSign' },
+      { label: 'أداء المنتجات', href: '/dashboard/management-reports/product-performance', icon: 'BarChart2' },
 
+      // Separator
+      { label: '---', href: '', icon: 'Minus', key: 'separator-1' },
+
+      // 📋 تقارير العمليات والمخزون
+      { label: '📋 العمليات والمخزون', href: '', icon: 'ClipboardList', key: 'category-header-2' },
+      { label: 'تحليلات الطلبات', href: '/dashboard/management-reports/orders', icon: 'Activity' },
+      { label: 'تقرير المخزون', href: '/dashboard/management-reports/inventory', icon: 'ClipboardList' },
+      { label: 'تقرير السائقين والتوصيل', href: '/dashboard/management-reports/drivers', icon: 'Truck' },
+
+      // Separator
+      { label: '---', href: '', icon: 'Minus', key: 'separator-2' },
+
+      // 👥 تقارير العملاء والتسويق
+      { label: '👥 العملاء والتسويق', href: '', icon: 'UserCheck', key: 'category-header-3' },
+      { label: 'تقرير العملاء', href: '/dashboard/management-reports/customers', icon: 'UserCheck' },
+      { label: 'تقرير العروض والتخفيضات', href: '/dashboard/management-reports/promotions', icon: 'Gift' },
+      { label: 'تقرير التقييمات والمراجعات', href: '/dashboard/management-reports/reviews', icon: 'Star' },
+
+      // Separator
+      { label: '---', href: '', icon: 'Minus', key: 'separator-3' },
+
+      // 🏆 تقارير عامة وإنجازات
+      { label: '🏆 الإنجازات والأرقام', href: '', icon: 'Award', key: 'category-header-4' },
+      { label: 'الإنجازات والأرقام القياسية', href: '/dashboard/management-reports/milestones', icon: 'Award' },
+    ]
+  },
+  {
+    label: 'إعدادات المنصة',
+    href: '/dashboard/management/settings/platform',
+    icon: 'Settings',
+    iconOnly: true,
+    children: [
+      { label: 'إعدادات المنصة', href: '/dashboard/management/settings/platform', icon: 'Settings' },
+      { label: 'تحديث البيانات', href: '/dashboard/management/settings/platform#refresh', icon: 'RefreshCw' },
+      { label: 'إعدادات متقدمة', href: '/dashboard/management/settings/advanced', icon: 'Wrench' },
+      { label: 'الدليل', href: '/dashboard/guidelines', icon: 'BookOpen' },
+      { label: 'System Log', href: '/dashboard/management/settings/errors', icon: 'Bug' },
+      { label: 'تحسين المحركات', href: '/dashboard/management-seo', icon: 'Search' },
+      { label: 'الصيانة', href: '/dashboard/management-maintinance', icon: 'Wrench' },
     ]
   }
 ];

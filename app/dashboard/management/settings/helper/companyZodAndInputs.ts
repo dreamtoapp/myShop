@@ -90,7 +90,7 @@ export const getCompanyFields = (
         { name: 'phoneNumber', type: 'tel', placeholder: 'رقم الهاتف', register: register('phoneNumber'), error: errors.phoneNumber?.message },
 
         { name: 'whatsappNumber', type: 'tel', placeholder: 'رقم الواتساب', register: register('whatsappNumber'), error: errors.whatsappNumber?.message },
-        { name: 'bio', type: 'text', placeholder: 'نبذة عن الشركة (اختياري)', register: register('bio'), error: errors.bio?.message, className: 'col-span-2', fullWidith: true, },
+        { name: 'bio', type: 'text', placeholder: 'نبذة عن المتجر (اختياري)', register: register('bio'), error: errors.bio?.message, className: 'col-span-2', fullWidith: true, },
 
         { name: 'address', type: 'text', placeholder: 'العنوان', register: register('address'), error: errors.address?.message, className: 'col-span-2', fullWidith: true },
 

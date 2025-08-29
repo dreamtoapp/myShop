@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { navigationItems, type NavigationItem } from '../helpers/navigationMenu';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type NavigationChild = NonNullable<NavigationItem['children']>[0];
 
@@ -91,72 +92,93 @@ export default function NavigationMenu({ pendingOrdersCount: _pendingOrdersCount
                                 >
                                     {item.icon && <Icon name={item.icon} className="h-4 w-4 order-2" />}
                                     {!item.iconOnly && <span className="order-1">{item.label}</span>}
-                                    {item.badge && (
-                                        <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                                            {item.badge}
-                                        </span>
-                                    )}
                                     <Icon name="ChevronDown" className="h-3 w-3" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                                 align="start"
-                                className="w-56 bg-background border shadow-lg"
+                                className="w-56 bg-background border shadow-lg p-0"
                                 sideOffset={8}
                             >
-                                {item.children?.map((child: NavigationChild, index) => {
-                                    const isChildActive = bestMatch && bestMatch.item === item && bestMatch.child === child;
+                                <ScrollArea className="max-h-[400px] h-auto">
+                                    <div className="py-1">
+                                        {item.children?.map((child: NavigationChild, index) => {
+                                            const isChildActive = bestMatch && bestMatch.item === item && bestMatch.child === child;
 
-                                    // Nested submenu (second level) using Radix Sub
-                                    if (child.children && child.children.length > 0) {
-                                        return (
-                                            <DropdownMenuSub key={`submenu-${child.label}`}>
-                                                <DropdownMenuSubTrigger className="flex items-center gap-2 cursor-default">
-                                                    <Icon name={child.icon || 'Folder'} className="h-4 w-4" />
-                                                    <span>{child.label}</span>
-                                                </DropdownMenuSubTrigger>
-                                                <DropdownMenuSubContent side="right" alignOffset={-2} sideOffset={8}>
-                                                    {child.children.map((grand) => {
-                                                        const active = bestMatch && bestMatch.child?.href === grand.href;
-                                                        return (
-                                                            <DropdownMenuItem key={grand.href} asChild>
-                                                                <Link
-                                                                    href={grand.href!}
-                                                                    className={cn(
-                                                                        'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
-                                                                        active
-                                                                            ? 'bg-primary text-primary-foreground'
-                                                                            : 'hover:bg-accent hover:text-accent-foreground'
-                                                                    )}
-                                                                >
-                                                                    <Icon name={grand.icon || 'Dot'} className="h-4 w-4" />
-                                                                    <span>{grand.label}</span>
-                                                                </Link>
-                                                            </DropdownMenuItem>
-                                                        );
-                                                    })}
-                                                </DropdownMenuSubContent>
-                                            </DropdownMenuSub>
-                                        );
-                                    }
+                                            // Handle separators for better visual grouping
+                                            if (child.label === '---' || child.key?.startsWith('separator')) {
+                                                return (
+                                                    <div
+                                                        key={child.key || `separator-${index}`}
+                                                        className="my-2 border-t border-border/50"
+                                                    />
+                                                );
+                                            }
 
-                                    return (
-                                        <DropdownMenuItem key={child.href} asChild>
-                                            <Link
-                                                href={child.href!}
-                                                className={cn(
-                                                    'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
-                                                    isChildActive
-                                                        ? 'bg-primary text-primary-foreground'
-                                                        : 'hover:bg-accent hover:text-accent-foreground'
-                                                )}
-                                            >
-                                                <Icon name={child.icon} className="h-4 w-4" />
-                                                <span>{child.label}</span>
-                                            </Link>
-                                        </DropdownMenuItem>
-                                    );
-                                })}
+                                            // Handle category headers (non-clickable)
+                                            if (child.key?.startsWith('category-header') || child.href === '') {
+                                                return (
+                                                    <div
+                                                        key={child.key || `header-${index}`}
+                                                        className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted/30 rounded-sm mx-2 my-1"
+                                                    >
+                                                        {child.label}
+                                                    </div>
+                                                );
+                                            }
+
+                                            // Nested submenu (second level) using Radix Sub
+                                            if (child.children && child.children.length > 0) {
+                                                return (
+                                                    <DropdownMenuSub key={`submenu-${child.label}`}>
+                                                        <DropdownMenuSubTrigger className="flex items-center gap-2 cursor-default">
+                                                            <Icon name={child.icon || 'Folder'} className="h-4 w-4" />
+                                                            <span>{child.label}</span>
+                                                        </DropdownMenuSubTrigger>
+                                                        <DropdownMenuSubContent alignOffset={-2} sideOffset={8}>
+                                                            {child.children.map((grand) => {
+                                                                const active = bestMatch && bestMatch.child?.href === grand.href;
+                                                                return (
+                                                                    <DropdownMenuItem key={grand.href} asChild>
+                                                                        <Link
+                                                                            href={grand.href!}
+                                                                            className={cn(
+                                                                                'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
+                                                                                active
+                                                                                    ? 'bg-primary text-primary-foreground'
+                                                                                    : 'hover:bg-accent hover:text-accent-foreground'
+                                                                            )}
+                                                                        >
+                                                                            <Icon name={grand.icon || 'Dot'} className="h-4 w-4" />
+                                                                            <span>{grand.label}</span>
+                                                                        </Link>
+                                                                    </DropdownMenuItem>
+                                                                );
+                                                            })}
+                                                        </DropdownMenuSubContent>
+                                                    </DropdownMenuSub>
+                                                );
+                                            }
+
+                                            return (
+                                                <DropdownMenuItem key={child.href} asChild>
+                                                    <Link
+                                                        href={child.href!}
+                                                        className={cn(
+                                                            'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
+                                                            isChildActive
+                                                                ? 'bg-primary text-primary-foreground'
+                                                                : 'hover:bg-accent hover:text-accent-foreground'
+                                                        )}
+                                                    >
+                                                        <Icon name={child.icon || 'Dot'} className="h-4 w-4" />
+                                                        <span>{child.label}</span>
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                            );
+                                        })}
+                                    </div>
+                                </ScrollArea>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     );
@@ -175,11 +197,6 @@ export default function NavigationMenu({ pendingOrdersCount: _pendingOrdersCount
                         <Link href={item.href}>
                             {item.icon && <Icon name={item.icon} className="h-4 w-4 order-2" />}
                             {!item.iconOnly && <span className="order-1">{item.label}</span>}
-                            {item.badge && (
-                                <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                                    {item.badge}
-                                </span>
-                            )}
                         </Link>
                     </Button>
                 );

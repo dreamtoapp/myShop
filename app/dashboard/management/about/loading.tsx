@@ -7,7 +7,7 @@ export default function Loading() {
             <div className="h-8 w-1/3 bg-muted rounded mb-4" />
             <Tabs defaultValue="about" className="w-full">
                 <TabsList className="mb-6">
-                    <TabsTrigger value="about">عن الشركة</TabsTrigger>
+                    <TabsTrigger value="about">عن المتجر</TabsTrigger>
                     <TabsTrigger value="features">المميزات</TabsTrigger>
                     <TabsTrigger value="faq">الأسئلة الشائعة</TabsTrigger>
                 </TabsList>

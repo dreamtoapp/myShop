@@ -24,7 +24,7 @@ export default function AboutTabClient({ defaultValues, onSubmit, status, error 
     return (
         <Card className="w-full" dir="rtl">
             <CardHeader className="text-right">
-                <CardTitle>معلومات الشركة الأساسية</CardTitle>
+                <CardTitle>معلومات المتجر الأساسية</CardTitle>
             </CardHeader>
             <CardContent className="text-right">
                 {error && (

@@ -1,3 +1,7 @@
+// ⚠️ EMAIL CONFIGURATION REQUIRED - See TODO.md for setup instructions
+// This file requires EMAIL_USER and EMAIL_PASS environment variables to work
+// Current status: NOT CONFIGURED - Error notifications will fail
+
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -108,12 +112,12 @@ function createErrorEmailTemplate(errorData: ErrorEmailData): string {
 
 export async function sendErrorNotificationEmail(errorData: ErrorEmailData): Promise<boolean> {
   try {
-    const subject = `🚨 خطأ ${errorData.severity} في النظام - ${errorData.errorId}`;
+    const subject = `myShop-DreamToApp-Error: ${errorData.severity} - ${errorData.errorId}`;
     const emailContent = createErrorEmailTemplate(errorData);
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: 'dreamto@gmail.com',
+      to: process.env.ADMIN_EMAIL,
       subject,
       html: emailContent,
     });

@@ -16,7 +16,7 @@ import { z } from "zod";
 // Zod schema for company profile only
 const CompanyProfileSchema = z.object({
     id: z.string().optional(),
-    fullName: z.string().min(2, 'اسم الشركة مطلوب'),
+    fullName: z.string().min(2, 'اسم المتجر مطلوب'),
     email: z.string().email('صيغة البريد الإلكتروني غير صحيحة'),
     phoneNumber: z.string().min(8, 'رقم الهاتف مطلوب'),
     whatsappNumber: z.string().min(8, 'رقم الواتساب مطلوب'),
@@ -67,7 +67,7 @@ export default function CompanyProfileForm({ company }: CompanyProfileFormProps)
 
             await saveCompany(updatedData);
             setIsComplete(true);
-            toast.success("تم حفظ معلومات الشركة بنجاح ✅");
+            toast.success("تم حفظ معلومات المتجر بنجاح ✅");
             reset(data); // Reset form with new values
         } catch (error) {
             console.error("❌ Failed to save company profile:", error);
@@ -95,12 +95,12 @@ export default function CompanyProfileForm({ company }: CompanyProfileFormProps)
                     {/* Company Name */}
                     <div className="space-y-2">
                         <Label htmlFor="fullName" className="text-sm font-medium text-right block">
-                            اسم الشركة *
+                            اسم المتجر *
                         </Label>
                         <Input
                             id="fullName"
                             type="text"
-                            placeholder="أدخل اسم الشركة"
+                            placeholder="أدخل اسم المتجر"
                             {...register('fullName')}
                             className="text-right"
                             dir="rtl"
@@ -180,7 +180,7 @@ export default function CompanyProfileForm({ company }: CompanyProfileFormProps)
                 {/* Company Bio */}
                 <div className="space-y-2">
                     <Label htmlFor="bio" className="text-sm font-medium text-right block">
-                        نبذة عن الشركة (اختياري)
+                        نبذة عن المتجر (اختياري)
                     </Label>
                     <Textarea
                         id="bio"
@@ -231,7 +231,7 @@ export default function CompanyProfileForm({ company }: CompanyProfileFormProps)
                     />
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                    الحقول المطلوبة: اسم الشركة، البريد الإلكتروني، رقم الهاتف
+                    الحقول المطلوبة: اسم المتجر، البريد الإلكتروني، رقم الهاتف
                 </p>
             </div>
         </div>

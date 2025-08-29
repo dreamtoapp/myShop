@@ -55,7 +55,7 @@ export default function CompanyProfileForm({ company }: CompanyProfileFormProps)
   const onSubmit = async (data: CompanyFormData) => {
     try {
       await saveCompany(data)
-      toast.success("تم حفظ بيانات الشركة بنجاح ✅")
+      toast.success("تم حفظ بيانات المتجر بنجاح ✅")
     } catch (error) {
       console.error("❌ Failed to save company:", error)
       toast.error("حدث خطأ أثناء الحفظ، الرجاء المحاولة مرة أخرى.")
@@ -165,7 +165,7 @@ export default function CompanyProfileForm({ company }: CompanyProfileFormProps)
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold text-foreground">ملف الشركة</h1>
+        <h1 className="text-2xl font-bold text-foreground">ملف المتجر</h1>
         <p className="text-muted-foreground">أدخل معلومات شركتك بدقة لضمان أفضل تجربة</p>
       </div>
 
@@ -203,7 +203,7 @@ export default function CompanyProfileForm({ company }: CompanyProfileFormProps)
                   <div className="md:col-span-1">
                     <AddImage
                       url={company?.taxQrImage || ''}
-                      alt={`${company?.fullName || 'الشركة'} شعار`}
+                      alt={`${company?.fullName || 'المتجر'} شعار`}
                       recordId={company?.id || ''}
                       table="company"
                       tableField="taxQrImage"

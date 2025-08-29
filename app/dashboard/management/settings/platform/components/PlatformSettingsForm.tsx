@@ -88,7 +88,7 @@ export default function PlatformSettingsForm() {
             // Get current company data
             const currentCompany = await fetchCompany();
             if (!currentCompany) {
-                toast.error('لم يتم العثور على بيانات الشركة');
+                toast.error('لم يتم العثور على بيانات المتجر');
                 return;
             }
 
