@@ -15,16 +15,9 @@ export async function getPendingOrdersCount(): Promise<number> {
 
 export const navigationItems = [
   {
-    label: 'لوحة التحكم',
-    href: '/dashboard',
-    icon: 'LayoutDashboard',
-    badge: 'live'
-  },
-  {
     label: 'الطلبات',
     href: '/dashboard/management-orders',
     icon: 'ClipboardList',
-    badge: 'pending', // This will be replaced with actual count
     children: [
       { label: 'جميع الطلبات', href: '/dashboard/management-orders', icon: 'ClipboardList' },
       { label: 'قيد المراجعة', href: '/dashboard/management-orders/status/pending', icon: 'Clock' },
@@ -70,51 +63,51 @@ export const navigationItems = [
     href: '/dashboard/management/settings',
     icon: 'Settings',
     children: [
-      { label: 'معلومات الشركة', href: '/dashboard/management/settings/company-profile', icon: 'Building2' },
-      { label: 'الموقع والعنوان', href: '/dashboard/management/settings/location', icon: 'MapPin' },
-      // { label: 'المعلومات الضريبية', href: '/dashboard/management/settings/tax-info', icon: 'Receipt' },
-      { label: 'الروابط الاجتماعية', href: '/dashboard/management/settings/social-media', icon: 'Share2' },
-      { label: 'الشعار والهوية', href: '/dashboard/management/settings/branding', icon: 'Palette' },
-      { label: 'إعدادات المنصة', href: '/dashboard/management/settings/platform', icon: 'Settings' },
-      { label: 'تحديث البيانات', href: '/dashboard/management/settings/platform#refresh', icon: 'RefreshCw' },
-      { label: 'إعدادات متقدمة', href: '/dashboard/management/settings/advanced', icon: 'Wrench' },
-      { label: '---', href: '#', icon: 'Minus', key: 'divider-1' },
-      { label: 'سياسة الموقع', href: '/dashboard/management/policies/website', icon: 'Globe' },
-      { label: 'سياسة الإرجاع', href: '/dashboard/management/policies/return', icon: 'Undo' },
-      { label: 'سياسة الخصوصية', href: '/dashboard/management/policies/privacy', icon: 'Shield' },
-      { label: 'سياسة الشحن', href: '/dashboard/management/policies/shipping', icon: 'Truck' },
-      { label: '---', href: '#', icon: 'Minus', key: 'divider-2' },
-      { label: 'التنبيهات', href: '/dashboard/management-notification', icon: 'Bell' },
-      { label: 'المناوبات', href: '/dashboard/shifts', icon: 'Clock' },
-      { label: 'من نحن', href: '/dashboard/management/about', icon: 'Info' },
-      { label: 'الدليل', href: '/dashboard/guidelines', icon: 'BookOpen' }
-    ]
-  },
-  {
-    label: 'المزيد',
-    href: '#',
-    icon: 'MoreHorizontal',
-    children: [
-      { label: 'التسويق', href: '/dashboard/management-offer', icon: 'Megaphone' },
-      { label: 'تحسين المحركات', href: '/dashboard/management-seo', icon: 'Search' },
-      { label: 'المالية', href: '/dashboard/management-expenses', icon: 'DollarSign' },
-      { label: 'التقارير', href: '/dashboard/management-reports', icon: 'BarChart3' },
-      { label: 'الصيانة', href: '/dashboard/management-maintinance', icon: 'Wrench' },
-      // { label: 'البيانات', href: '/dashboard/dataSeed', icon: 'Database' }
+      {
+        label: 'بيانات الشركة',
+        icon: 'Folder',
+        children: [
+          { label: 'معلومات الشركة', href: '/dashboard/management/settings/company-profile', icon: 'Building2' },
+          { label: 'الموقع والعنوان', href: '/dashboard/management/settings/location', icon: 'MapPin' },
+          { label: 'الروابط الاجتماعية', href: '/dashboard/management/settings/social-media', icon: 'Share2' },
+          { label: 'الشعار والهوية', href: '/dashboard/management/settings/branding', icon: 'Palette' },
+          { label: 'الامتثال (VAT/CR/رقم التعريف)', href: '/dashboard/management/settings/compliance', icon: 'ShieldCheck' },
+          // السياسات ضمن بيانات الشركة
+          { label: 'سياسة الموقع', href: '/dashboard/management/policies/website', icon: 'Globe' },
+          { label: 'سياسة الإرجاع', href: '/dashboard/management/policies/return', icon: 'Undo' },
+          { label: 'سياسة الخصوصية', href: '/dashboard/management/policies/privacy', icon: 'Shield' },
+          { label: 'سياسة الشحن', href: '/dashboard/management/policies/shipping', icon: 'Truck' },
+          // عناصر إضافية مطلوبة ضمن بيانات الشركة
+          { label: 'المناوبات', href: '/dashboard/shifts', icon: 'Clock' },
+          { label: 'من نحن', href: '/dashboard/management/about', icon: 'Info' },
+        ],
+      },
+      {
+        label: 'إعدادات المنصة',
+        icon: 'Settings',
+        children: [
+          { label: 'إعدادات المنصة', href: '/dashboard/management/settings/platform', icon: 'Settings' },
+          { label: 'تحديث البيانات', href: '/dashboard/management/settings/platform#refresh', icon: 'RefreshCw' },
+          { label: 'إعدادات متقدمة', href: '/dashboard/management/settings/advanced', icon: 'Wrench' },
+          { label: 'الدليل', href: '/dashboard/guidelines', icon: 'BookOpen' },
+          { label: 'التسويق', href: '/dashboard/management-offer', icon: 'Megaphone' },
+          { label: 'تحسين المحركات', href: '/dashboard/management-seo', icon: 'Search' },
+          { label: 'المالية', href: '/dashboard/management-expenses', icon: 'DollarSign' },
+          { label: 'التقارير', href: '/dashboard/management-reports', icon: 'BarChart3' },
+          { label: 'الصيانة', href: '/dashboard/management-maintinance', icon: 'Wrench' },
+        ],
+      },
+
     ]
   }
 ];
 
 export type NavigationItem = {
   label: string;
-  href: string;
+  href?: string;
   icon?: string; // Made optional since some parent items may not need icons
   badge?: string;
   key?: string;
-  children?: {
-    label: string;
-    href: string;
-    icon: string;
-    key?: string;
-  }[];
-}; 
+  iconOnly?: boolean;
+  children?: NavigationItem[];
+};

@@ -1,6 +1,6 @@
 'use client';
 
-import { Users, Package, BarChart3, Zap, ClipboardList, Truck } from 'lucide-react';
+import { Users, Package, BarChart3, Zap, ClipboardList, Truck, Bell } from 'lucide-react';
 import Link from '@/components/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,6 +12,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const quickActions = [
+    {
+        id: 'notifications',
+        title: 'التنبيهات',
+        href: '/dashboard/management-notification',
+        icon: Bell,
+        color: 'text-cyan-600',
+    },
     {
         id: 'products',
         title: 'إدارة المنتجات',
@@ -52,12 +59,17 @@ const quickActions = [
 export default function QuickActions() {
     return (
         <div className="flex items-center gap-2">
+            {/* Notifications Bell beside quick action */}
+            <Link href="/dashboard/management-notification" aria-label="التنبيهات">
+                <Button variant="ghost" size="icon" className="hover:bg-accent">
+                    <Bell className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                </Button>
+            </Link>
             {/* Quick Actions Dropdown */}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="hover:bg-feature-analytics-soft hover:border-feature-analytics transition-colors duration-200">
-                        <Zap className="h-4 w-4 text-blue-600 icon-enhanced" />
-                        <span className="hidden md:inline mr-1">إجراءات سريعة</span>
+                    <Button variant="ghost" size="icon" className="group hover:bg-accent transition-colors duration-200">
+                        <Zap className="h-5 w-5 text-muted-foreground group-hover:text-primary icon-enhanced transition-colors" />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-80 p-2">

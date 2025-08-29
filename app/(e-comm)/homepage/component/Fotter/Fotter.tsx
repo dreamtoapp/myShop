@@ -298,6 +298,7 @@ const Footer = async ({
   clientCount,
   userId
 }: FooterProps) => {
+  const compliance = await db.company.findFirst({ select: { taxNumber: true, commercialRegistrationNumber: true, saudiBusinessId: true } });
   return (
     <footer
       className="bg-background border-t border-border text-foreground pb-20 md:pb-6"
@@ -375,39 +376,45 @@ const Footer = async ({
           {/* Trust/Compliance badges - accessible, consistent sizing */}
           <div className="mt-4" aria-label="شارات الثقة والاعتمادات">
             <ul className="flex flex-wrap items-center justify-center sm:justify-end gap-4">
-              <li className="shrink-0">
-                <BadgeDialog
-                  src="/assets/sa_busnees.avif"
-                  alt="Saudi Business"
-                  width={96}
-                  height={36}
-                  sizes="(min-width: 1024px) 96px, 72px"
-                  title="المركز السعودي للاعمال"
-                  qrPayload="7001234567"
-                />
-              </li>
-              <li className="shrink-0">
-                <BadgeDialog
-                  src="/assets/cr.avif"
-                  alt="Commercial Registration"
-                  width={96}
-                  height={36}
-                  sizes="(min-width: 1024px) 96px, 72px"
-                  title="السجل التجاري"
-                  qrPayload="1010123456"
-                />
-              </li>
-              <li className="shrink-0">
-                <BadgeDialog
-                  src="/assets/Vat.svg"
-                  alt="VAT"
-                  width={80}
-                  height={36}
-                  sizes="(min-width: 1024px) 80px, 64px"
-                  title="الرقم الضريبي"
-                  qrPayload="310123456700003"
-                />
-              </li>
+              {compliance?.saudiBusinessId && (
+                <li className="shrink-0">
+                  <BadgeDialog
+                    src="/assets/sa_busnees.avif"
+                    alt="Saudi Business"
+                    width={96}
+                    height={36}
+                    sizes="(min-width: 1024px) 96px, 72px"
+                    title="المركز السعودي للاعمال"
+                    qrPayload={compliance.saudiBusinessId}
+                  />
+                </li>
+              )}
+              {compliance?.commercialRegistrationNumber && (
+                <li className="shrink-0">
+                  <BadgeDialog
+                    src="/assets/cr.avif"
+                    alt="Commercial Registration"
+                    width={96}
+                    height={36}
+                    sizes="(min-width: 1024px) 96px, 72px"
+                    title="السجل التجاري"
+                    qrPayload={compliance.commercialRegistrationNumber}
+                  />
+                </li>
+              )}
+              {compliance?.taxNumber && (
+                <li className="shrink-0">
+                  <BadgeDialog
+                    src="/assets/Vat.svg"
+                    alt="VAT"
+                    width={80}
+                    height={36}
+                    sizes="(min-width: 1024px) 80px, 64px"
+                    title="الرقم الضريبي"
+                    qrPayload={compliance.taxNumber}
+                  />
+                </li>
+              )}
               <li className="shrink-0">
                 <Link href="https://www.vision2030.gov.sa/" target="_blank" rel="noopener noreferrer" aria-label="Saudi Vision 2030 (opens in a new tab)">
                   <Image

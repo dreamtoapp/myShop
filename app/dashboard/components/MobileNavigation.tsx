@@ -28,7 +28,7 @@ interface MobileNavigationProps {
     pendingOrdersCount?: number;
 }
 
-export default function MobileNavigation({ pendingOrdersCount = 0 }: MobileNavigationProps) {
+export default function MobileNavigation({ pendingOrdersCount: _pendingOrdersCount = 0 }: MobileNavigationProps) {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -68,11 +68,7 @@ export default function MobileNavigation({ pendingOrdersCount = 0 }: MobileNavig
                                                 {item.icon && <Icon name={item.icon} className="h-4 w-4" />}
                                                 <span>{item.label}</span>
                                                 {item.badge && (
-                                                    <Badge variant="secondary" className="text-xs">
-                                                        {item.badge === 'pending'
-                                                            ? (pendingOrdersCount > 0 ? pendingOrdersCount : '😔')
-                                                            : item.badge}
-                                                    </Badge>
+                                                    <Badge variant="secondary" className="text-xs">{item.badge}</Badge>
                                                 )}
                                             </div>
                                         </AccordionTrigger>
@@ -129,9 +125,7 @@ export default function MobileNavigation({ pendingOrdersCount = 0 }: MobileNavig
                                     {item.icon && <Icon name={item.icon} className="h-4 w-4" />}
                                     <span>{item.label}</span>
                                     {item.badge && (
-                                        <Badge variant="secondary" className="text-xs">
-                                            {item.badge === 'pending' ? pendingOrdersCount : item.badge}
-                                        </Badge>
+                                        <Badge variant="secondary" className="text-xs">{item.badge}</Badge>
                                     )}
                                 </Link>
                             );

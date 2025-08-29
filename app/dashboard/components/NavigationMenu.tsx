@@ -10,6 +10,9 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
+    DropdownMenuSub,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { navigationItems, type NavigationItem } from '../helpers/navigationMenu';
@@ -20,7 +23,7 @@ interface NavigationMenuProps {
     pendingOrdersCount?: number;
 }
 
-export default function NavigationMenu({ pendingOrdersCount = 0 }: NavigationMenuProps) {
+export default function NavigationMenu({ pendingOrdersCount: _pendingOrdersCount = 0 }: NavigationMenuProps) {
     const pathname = usePathname();
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
@@ -29,7 +32,7 @@ export default function NavigationMenu({ pendingOrdersCount = 0 }: NavigationMen
         let best: { item: NavigationItem; child?: NavigationChild } | null = null;
         let bestLength = 0;
         for (const item of items) {
-            if (pathname === item.href || pathname.startsWith(item.href)) {
+            if (item.href && (pathname === item.href || pathname.startsWith(item.href))) {
                 if (item.href.length > bestLength) {
                     best = { item };
                     bestLength = item.href.length;
@@ -37,7 +40,7 @@ export default function NavigationMenu({ pendingOrdersCount = 0 }: NavigationMen
             }
             if (item.children) {
                 for (const child of item.children) {
-                    if (pathname === child.href || pathname.startsWith(child.href)) {
+                    if (child.href && (pathname === child.href || pathname.startsWith(child.href))) {
                         if (child.href.length > bestLength) {
                             best = { item, child };
                             bestLength = child.href.length;
@@ -86,13 +89,11 @@ export default function NavigationMenu({ pendingOrdersCount = 0 }: NavigationMen
                                         isItemActive && 'bg-primary text-primary-foreground'
                                     )}
                                 >
-                                    {item.icon && <Icon name={item.icon} className="h-4 w-4" />}
-                                    <span>{item.label}</span>
+                                    {item.icon && <Icon name={item.icon} className="h-4 w-4 order-2" />}
+                                    {!item.iconOnly && <span className="order-1">{item.label}</span>}
                                     {item.badge && (
                                         <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                                            {item.badge === 'pending'
-                                                ? (pendingOrdersCount > 0 ? pendingOrdersCount : '😔')
-                                                : item.badge}
+                                            {item.badge}
                                         </span>
                                     )}
                                     <Icon name="ChevronDown" className="h-3 w-3" />
@@ -106,26 +107,43 @@ export default function NavigationMenu({ pendingOrdersCount = 0 }: NavigationMen
                                 {item.children?.map((child: NavigationChild, index) => {
                                     const isChildActive = bestMatch && bestMatch.item === item && bestMatch.child === child;
 
-                                    // Handle divider
-                                    if (child.label === '---') {
+                                    // Nested submenu (second level) using Radix Sub
+                                    if (child.children && child.children.length > 0) {
                                         return (
-                                            <div key={child.key || `divider-${index}`} className="border-t border-border my-1" />
-                                        );
-                                    }
-
-                                    // Handle section header
-                                    if (child.label.startsWith('//')) {
-                                        return (
-                                            <div key={`header-${child.label}`} className="px-3 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                                {child.label.replace('//', '')}
-                                            </div>
+                                            <DropdownMenuSub key={`submenu-${child.label}`}>
+                                                <DropdownMenuSubTrigger className="flex items-center gap-2 cursor-default">
+                                                    <Icon name={child.icon || 'Folder'} className="h-4 w-4" />
+                                                    <span>{child.label}</span>
+                                                </DropdownMenuSubTrigger>
+                                                <DropdownMenuSubContent side="right" alignOffset={-2} sideOffset={8}>
+                                                    {child.children.map((grand) => {
+                                                        const active = bestMatch && bestMatch.child?.href === grand.href;
+                                                        return (
+                                                            <DropdownMenuItem key={grand.href} asChild>
+                                                                <Link
+                                                                    href={grand.href!}
+                                                                    className={cn(
+                                                                        'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
+                                                                        active
+                                                                            ? 'bg-primary text-primary-foreground'
+                                                                            : 'hover:bg-accent hover:text-accent-foreground'
+                                                                    )}
+                                                                >
+                                                                    <Icon name={grand.icon || 'Dot'} className="h-4 w-4" />
+                                                                    <span>{grand.label}</span>
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                        );
+                                                    })}
+                                                </DropdownMenuSubContent>
+                                            </DropdownMenuSub>
                                         );
                                     }
 
                                     return (
                                         <DropdownMenuItem key={child.href} asChild>
                                             <Link
-                                                href={child.href}
+                                                href={child.href!}
                                                 className={cn(
                                                     'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
                                                     isChildActive
@@ -155,11 +173,11 @@ export default function NavigationMenu({ pendingOrdersCount = 0 }: NavigationMen
                         )}
                     >
                         <Link href={item.href}>
-                            {item.icon && <Icon name={item.icon} className="h-4 w-4" />}
-                            <span>{item.label}</span>
+                            {item.icon && <Icon name={item.icon} className="h-4 w-4 order-2" />}
+                            {!item.iconOnly && <span className="order-1">{item.label}</span>}
                             {item.badge && (
                                 <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                                    {item.badge === 'pending' ? pendingOrdersCount : item.badge}
+                                    {item.badge}
                                 </span>
                             )}
                         </Link>

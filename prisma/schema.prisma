@@ -312,6 +312,10 @@ model Company {
   taxNumber  String @default("") // Tax number
   taxQrImage String @default("") // URL of the tax QR image
 
+  // --- Compliance IDs ---
+  commercialRegistrationNumber String? // CR number (optional)
+  saudiBusinessId              String? // Saudi Business/Enterprise ID (optional)
+
   workingHours String @default("")
   minShipping  Int    @default(0)
   shippingFee  Int    @default(0)
