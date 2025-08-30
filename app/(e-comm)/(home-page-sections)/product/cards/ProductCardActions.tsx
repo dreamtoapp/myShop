@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon } from '@/components/icons/Icon';
 import QuantityControls from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/CartQuantityControls';
 import { Product } from '@/types/databaseTypes';
@@ -22,6 +22,11 @@ const ProductCardActions = React.memo(function ProductCardActions({
 }: ProductCardActionsProps) {
     const [modalOpen, setModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    // ✅ SAFE STATE GUARD - Prevents modal from showing when quantity is 0
+    useEffect(() => {
+        if (quantity === 0) setModalOpen(false);
+    }, [quantity]);
 
     const handleOpenModal = () => {
         if (isDeleting) return; // Prevent modal from opening during delete
