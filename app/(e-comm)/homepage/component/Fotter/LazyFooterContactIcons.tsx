@@ -7,6 +7,7 @@ import CustomSvgIcon from './CustomSvgIcon';
 interface LazyFooterContactIconsProps {
     email?: string;
     phone?: string;
+    whatsappNumber?: string;
     address?: string;
     facebook?: string;
     instagram?: string;
@@ -17,6 +18,7 @@ interface LazyFooterContactIconsProps {
 export default function LazyFooterContactIcons({
     email,
     phone,
+    whatsappNumber,
     address,
     facebook,
     instagram,
@@ -51,6 +53,7 @@ export default function LazyFooterContactIcons({
             <div ref={containerRef} className="space-y-4 md:space-y-6">
                 {email && <div className="h-8 w-8 rounded-full bg-primary/10 animate-pulse" />}
                 {phone && <div className="h-8 w-8 rounded-full bg-primary/10 animate-pulse" />}
+                {whatsappNumber && <div className="h-8 w-8 rounded-full bg-green-600/20 animate-pulse" />}
                 {address && <div className="h-8 w-8 rounded-full bg-primary/10 animate-pulse" />}
                 {(facebook || instagram || twitter || linkedin) && (
                     <div className="pt-4 border-t border-border flex gap-3 flex-wrap">
@@ -92,6 +95,22 @@ export default function LazyFooterContactIcons({
                         aria-label={`الاتصال بالرقم ${phone}`}
                     >
                         {phone}
+                    </a>
+                </div>
+            )}
+            {whatsappNumber && (
+                <div className="group flex items-center gap-3">
+                    <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center group-hover:bg-green-700 transition-colors duration-200 shrink-0">
+                        <CustomSvgIcon name="whatsapp" className="h-4 w-4 text-white" />
+                    </div>
+                    <a
+                        href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('مرحباً! كيف يمكنني مساعدتك؟')}`}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+                        aria-label="تواصل معنا عبر واتساب"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        تواصل عبر واتساب
                     </a>
                 </div>
             )}

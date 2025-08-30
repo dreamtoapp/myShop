@@ -29,6 +29,14 @@ export default function NotificationBellClient({
             return;
         }
 
+        // 🚨 PRODUCTION SAFETY: Disable automatic refresh to prevent 404 errors
+        // The notification count is already provided by the server via initialCount
+        // This prevents unnecessary API calls that could fail in production
+        console.log('🔒 Automatic notification refresh disabled for production safety');
+        return;
+
+        // Original code commented out for safety
+        /*
         // Initial refresh after a short delay
         const timer = setTimeout(refreshCount, 1000);
 
@@ -39,10 +47,18 @@ export default function NotificationBellClient({
             clearTimeout(timer);
             clearInterval(interval);
         };
+        */
     }, [refreshCount, session?.user?.id]);
 
     // Listen for notification changes from other tabs/windows
     useEffect(() => {
+        // 🚨 PRODUCTION SAFETY: Disable storage listener to prevent 404 errors
+        // This prevents unnecessary API calls that could fail in production
+        console.log('🔒 Storage event listener disabled for production safety');
+        return;
+
+        // Original code commented out for safety
+        /*
         const handleStorageChange = (e: StorageEvent) => {
             if (e.key === 'notification-update') {
                 refreshCount();
@@ -51,6 +67,7 @@ export default function NotificationBellClient({
 
         window.addEventListener('storage', handleStorageChange);
         return () => window.removeEventListener('storage', handleStorageChange);
+        */
     }, [refreshCount]);
 
     return (

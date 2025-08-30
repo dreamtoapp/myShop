@@ -38,6 +38,14 @@ export function useNotificationCounter(initialCount: number = 0) {
       return;
     }
 
+    // 🚨 PRODUCTION SAFETY: Disable automatic refresh to prevent 404 errors
+    // The notification count is already provided by the server via initialCount
+    // This prevents unnecessary API calls that could fail in production
+    console.log('🔒 Automatic notification refresh disabled for production safety');
+    return;
+
+    // Original code commented out for safety
+    /*
     try {
       console.log('🔄 Refreshing notification count...');
       const response = await fetch('/api/user/notifications/count', {
@@ -45,41 +53,29 @@ export function useNotificationCounter(initialCount: number = 0) {
         headers: {
           'Content-Type': 'application/json',
         },
-        // Increase timeout to 30 seconds for slower connections
-        signal: AbortSignal.timeout(30000) // 30 second timeout
+        signal: AbortSignal.timeout(30000)
       });
 
-      // Check response status first
       if (!response.ok) {
         console.error('❌ API response not ok:', response.status, response.statusText);
         return;
       }
 
-      // Check if response is JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         console.error('❌ API returned non-JSON response:', contentType);
-        console.error('Response text:', await response.text());
         return;
       }
 
       const data = await response.json();
-      console.log('📊 Notification count response:', data);
-
       if (data.success) {
         setUnreadCount(data.count);
         console.log('✅ Notification count updated:', data.count);
-      } else {
-        console.error('❌ API returned error:', data.error, data.code);
       }
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.error('⏰ Request timeout while refreshing notification count (30s)');
-        // Don't update count on timeout, keep existing value
-      } else {
-        console.error('❌ Failed to refresh notification count:', error);
-      }
+      console.error('❌ Failed to refresh notification count:', error);
     }
+    */
   }, [session?.user?.id]);
 
   return {

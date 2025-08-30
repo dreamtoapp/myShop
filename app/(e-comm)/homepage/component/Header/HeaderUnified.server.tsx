@@ -15,6 +15,7 @@ interface HeaderUnifiedServerProps {
     unreadCount?: number;
     defaultAlerts?: any[];
     isLoggedIn?: boolean;
+    whatsappNumber?: string;
 }
 
 export default async function HeaderUnifiedServer(props: HeaderUnifiedServerProps) {

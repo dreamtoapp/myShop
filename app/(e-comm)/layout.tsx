@@ -30,6 +30,7 @@ export default async function EcommerceLayout({ children }: { children: React.Re
           logo={typedCompanyData?.logo || ''}
           logoAlt={typedCompanyData?.fullName || 'Dream to app'}
           isLoggedIn={!!session}
+          whatsappNumber={typedCompanyData?.whatsappNumber}
         />
         <FilterAlert />
         <CustomMobileBottomNav />
@@ -47,6 +48,7 @@ export default async function EcommerceLayout({ children }: { children: React.Re
           aboutus={typedCompanyData?.bio}
           email={typedCompanyData?.email}
           phone={typedCompanyData?.phoneNumber}
+          whatsappNumber={typedCompanyData?.whatsappNumber}
           address={typedCompanyData?.address}
           facebook={typedCompanyData?.facebook}
           instagram={typedCompanyData?.instagram}

@@ -15,6 +15,7 @@ interface FooterProps {
   aboutus?: string;
   email?: string;
   phone?: string;
+  whatsappNumber?: string;
   address?: string;
   companyName?: string;
   facebook?: string;
@@ -250,6 +251,7 @@ async function ServicesSection({ userId }: { userId?: string }) {
 function EnhancedContact({
   email,
   phone,
+  whatsappNumber,
   address,
   facebook,
   instagram,
@@ -258,6 +260,7 @@ function EnhancedContact({
 }: {
   email?: string;
   phone?: string;
+  whatsappNumber?: string;
   address?: string;
   facebook?: string;
   instagram?: string;
@@ -273,6 +276,7 @@ function EnhancedContact({
       <LazyFooterContactIcons
         email={email}
         phone={phone}
+        whatsappNumber={whatsappNumber}
         address={address}
         facebook={facebook}
         instagram={instagram}
@@ -288,6 +292,7 @@ const Footer = async ({
   aboutus,
   email,
   phone,
+  whatsappNumber,
   address,
   facebook,
   instagram,
@@ -336,6 +341,7 @@ const Footer = async ({
             <EnhancedContact
               email={email}
               phone={phone}
+              whatsappNumber={whatsappNumber}
               address={address}
               facebook={facebook}
               instagram={instagram}

@@ -11,6 +11,7 @@ import { ReactNode } from 'react';
 import { CarFront, Focus } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import NotificationBellClient from '@/components/NotificationBellClient';
+import WhatsappMetaButton from './WhatsappMetaButton';
 
 
 interface User {
@@ -29,6 +30,7 @@ interface HeaderUnifiedProps {
     notificationBell?: ReactNode;
     wishlistIcon?: ReactNode;
     unreadCount?: number;
+    whatsappNumber?: string;
 }
 
 function UserMenuOrLogin({ isLoggedIn, user }: { isLoggedIn: boolean; user: User | null }) {
@@ -39,7 +41,7 @@ function UserMenuOrLogin({ isLoggedIn, user }: { isLoggedIn: boolean; user: User
     );
 }
 
-function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wishlistIcon, unreadCount }: {
+function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wishlistIcon, unreadCount, whatsappNumber }: {
     logo: string;
     logoAlt: string;
     isLoggedIn: boolean;
@@ -47,6 +49,7 @@ function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wish
     notificationBell?: ReactNode;
     wishlistIcon?: ReactNode;
     unreadCount?: number;
+    whatsappNumber?: string;
 }) {
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-background/98 backdrop-blur-md border-b border-border/30 shadow-sm transition-all duration-300">
@@ -73,6 +76,17 @@ function DesktopHeader({ logo, logoAlt, isLoggedIn, user, notificationBell, wish
                     <SearchBar />
                     {wishlistIcon}
                     <CartIconClient />
+
+                    {/* WhatsApp Contact Button - Professional UX placement */}
+                    {whatsappNumber && (
+                        <WhatsappMetaButton
+                            phone={whatsappNumber}
+                            defaultMessage="مرحباً! كيف يمكنني مساعدتك؟"
+                            className="p-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                            aria-label="تواصل معنا عبر واتساب"
+                        />
+                    )}
+
                     {/* Use reactive notification bell for logged-in users */}
                     {isLoggedIn ? (
                         <NotificationBellClient
@@ -139,7 +153,8 @@ export default function HeaderUnified({
     notificationBell,
     wishlistIcon,
     unreadCount,
-}: HeaderUnifiedProps & { wishlistIcon?: ReactNode }) {
+    whatsappNumber,
+}: HeaderUnifiedProps) {
     const isDesktop = useMediaQuery('(min-width: 768px)');
 
     return isDesktop ? (
@@ -151,6 +166,7 @@ export default function HeaderUnified({
             notificationBell={notificationBell}
             wishlistIcon={wishlistIcon}
             unreadCount={unreadCount}
+            whatsappNumber={whatsappNumber}
         />
     ) : (
         <MobileHeader
