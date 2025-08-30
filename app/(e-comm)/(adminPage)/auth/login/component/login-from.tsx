@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { log } from '@/utils/logger';
 import { userLogin } from '../action/userLogin';
+import { checkPhoneExists } from '../action/checkPhoneExists';
+import { sendPasswordViaWhatsApp } from '../action/sendPasswordViaWhatsApp';
 import { syncCartOnLogin } from '@/app/(e-comm)/(cart-flow)/cart/helpers/cartSyncHelper';
 import { useRouter } from 'next/navigation';
 import { Label } from '@/components/ui/label';
@@ -39,6 +41,13 @@ function ForgotPasswordDialog({
   phoneNumber: string;
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [validationResult, setValidationResult] = useState<{
+    success: boolean;
+    exists: boolean;
+    message: string;
+    user?: any;
+  } | null>(null);
+  const [step, setStep] = useState<'validation' | 'success' | 'error' | 'sending' | 'completed'>('validation');
 
   if (!isOpen) return null;
 
@@ -49,18 +58,65 @@ function ForgotPasswordDialog({
 
   const handleConfirm = async () => {
     setIsLoading(true);
+    setValidationResult(null);
+
     try {
-      // TODO: Implement forgot password logic here
-      // This would typically send an SMS with reset code
-      console.log('Forgot password requested for:', phoneNumber);
+      console.log('🔍 Validating phone number:', phoneNumber);
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Check if phone number exists in database
+      const result = await checkPhoneExists(phoneNumber);
+      setValidationResult(result);
 
-      // Close dialog after success
-      onClose();
+      if (result.success && result.exists) {
+        setStep('success');
+        console.log('✅ Phone validation successful:', result.user);
+
+        // Now proceed to send password via WhatsApp
+        setStep('sending');
+        setIsLoading(true);
+
+        try {
+          console.log('📱 Sending password via WhatsApp...');
+          if (!result.user?.name) {
+            throw new Error('User name not found');
+          }
+
+          const whatsappResult = await sendPasswordViaWhatsApp(phoneNumber, result.user.name);
+
+          if (whatsappResult.success) {
+            setStep('completed');
+            console.log('✅ Password sent successfully:', whatsappResult);
+          } else {
+            setStep('error');
+            setValidationResult({
+              success: false,
+              exists: false,
+              message: whatsappResult.message
+            });
+          }
+        } catch (whatsappError) {
+          console.error('❌ WhatsApp sending error:', whatsappError);
+          setStep('error');
+          setValidationResult({
+            success: false,
+            exists: false,
+            message: 'فشل في إرسال كلمة المرور عبر الواتس اب'
+          });
+        }
+
+      } else {
+        setStep('error');
+        console.log('❌ Phone validation failed:', result.message);
+      }
+
     } catch (error) {
-      console.error('Forgot password error:', error);
+      console.error('❌ Error during phone validation:', error);
+      setValidationResult({
+        success: false,
+        exists: false,
+        message: 'حدث خطأ أثناء التحقق من رقم الهاتف'
+      });
+      setStep('error');
     } finally {
       setIsLoading(false);
     }
@@ -92,64 +148,190 @@ function ForgotPasswordDialog({
 
         {/* Content */}
         <div className="space-y-6">
-          <div className="text-center">
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              سنرسل كلمة المرور إلى رقم هاتفك عبر الواتس اب
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              تأكد من أن رقم الهاتف صحيح قبل المتابعة
-            </p>
-          </div>
+          {step === 'validation' && (
+            <>
+              <div className="text-center">
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  سنرسل كلمة المرور إلى رقم هاتفك عبر الواتس اب
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  تأكد من أن رقم الهاتف صحيح قبل المتابعة
+                </p>
+              </div>
 
-          {/* Phone Number Display */}
-          <div className="bg-gradient-to-br from-muted/10 to-muted/30 border border-border/50 rounded-xl p-6 text-center shadow-sm">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <p className="text-sm text-muted-foreground font-medium">رقم الهاتف</p>
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            </div>
-            <div className="bg-background/80 border border-border/30 rounded-lg p-4 backdrop-blur-sm">
-              <p className="text-2xl font-mono font-bold text-foreground tracking-wider">
-                {maskedNumber}
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                آخر رقمين للتحقق
-              </p>
-            </div>
-          </div>
+              {/* Phone Number Display */}
+              <div className="bg-gradient-to-br from-muted/10 to-muted/30 border border-border/50 rounded-xl p-6 text-center shadow-sm">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <p className="text-sm text-muted-foreground font-medium">رقم الهاتف</p>
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                </div>
+                <div className="bg-background/80 border border-border/30 rounded-lg p-4 backdrop-blur-sm">
+                  <p className="text-2xl font-mono font-bold text-foreground tracking-wider">
+                    {maskedNumber}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    آخر رقمين للتحقق
+                  </p>
+                </div>
+              </div>
 
-          <p className="text-xs text-muted-foreground text-center">
-            تأكد من أن هذا هو رقم هاتفك الصحيح
-          </p>
+              <p className="text-xs text-muted-foreground text-center">
+                تأكد من أن هذا هو رقم هاتفك الصحيح
+              </p>
+            </>
+          )}
+
+          {step === 'success' && validationResult?.user && (
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold text-foreground mb-2">تم التحقق من رقم الهاتف</h4>
+                <p className="text-sm text-muted-foreground">
+                  مرحباً {validationResult.user.name}! سنرسل كلمة المرور الجديدة عبر الواتس اب
+                </p>
+              </div>
+            </div>
+          )}
+
+          {step === 'error' && validationResult && (
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold text-foreground mb-2">خطأ في التحقق</h4>
+                <p className="text-sm text-muted-foreground">
+                  {validationResult.message}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {step === 'sending' && (
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto animate-pulse">
+                <svg className="w-8 h-8 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold text-foreground mb-2">جاري الإرسال...</h4>
+                <p className="text-sm text-muted-foreground">
+                  جاري إرسال كلمة المرور الجديدة عبر الواتس اب
+                </p>
+              </div>
+            </div>
+          )}
+
+          {step === 'completed' && (
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold text-foreground mb-2">تم الإرسال بنجاح!</h4>
+                <p className="text-sm text-muted-foreground">
+                  تم إرسال كلمة المرور الجديدة عبر الواتس اب
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  تحقق من رسائل الواتس اب الخاصة بك
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Actions */}
         <div className="flex gap-3 mt-8">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="flex-1 h-12 border-2 hover:bg-muted/50 transition-all duration-200"
-            disabled={isLoading}
-          >
-            إلغاء
-          </Button>
-          <Button
-            onClick={handleConfirm}
-            disabled={isLoading}
-            className="flex-1 h-12 bg-green-500 hover:bg-green-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin ml-2" />
-                جارٍ الإرسال...
-              </>
-            ) : (
-              <>
-                <WhatsAppIcon className="h-4 w-4 ml-2" />
-                إرسال عبر الواتس اب
-              </>
-            )}
-          </Button>
+          {step === 'validation' && (
+            <>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                className="flex-1 h-12 border-2 hover:bg-muted/50 transition-all duration-200"
+                disabled={isLoading}
+              >
+                إلغاء
+              </Button>
+              <Button
+                onClick={handleConfirm}
+                disabled={isLoading}
+                className="flex-1 h-12 bg-green-500 hover:bg-green-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                    جارٍ التحقق...
+                  </>
+                ) : (
+                  <>
+                    <WhatsAppIcon className="h-4 w-4 ml-2" />
+                    تأكيد
+                  </>
+                )}
+              </Button>
+            </>
+          )}
+
+          {step === 'success' && (
+            <>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                className="flex-1 h-12 border-2 hover:bg-muted/50 transition-all duration-200"
+              >
+                إلغاء
+              </Button>
+              <Button
+                onClick={handleConfirm}
+                className="flex-1 h-12 bg-green-500 hover:bg-green-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+              >
+                <>
+                  <WhatsAppIcon className="h-4 w-4 ml-2" />
+                  إرسال كلمة المرور
+                </>
+              </Button>
+            </>
+          )}
+
+          {(step === 'sending' || step === 'completed') && (
+            <Button
+              onClick={onClose}
+              className="w-full h-12 bg-green-500 hover:bg-green-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              إغلاق
+            </Button>
+          )}
+
+          {step === 'error' && (
+            <>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                className="flex-1 h-12 border-2 hover:bg-muted/50 transition-all duration-200"
+              >
+                إغلاق
+              </Button>
+              <Button
+                onClick={() => {
+                  setStep('validation');
+                  setValidationResult(null);
+                }}
+                className="flex-1 h-12 bg-green-500 hover:bg-green-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                المحاولة مرة أخرى
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
