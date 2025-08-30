@@ -5,6 +5,7 @@ import { Icon } from '@/components/icons/Icon';
 import { useNotificationCounter } from '@/hooks/useNotificationCounter';
 import { useEffect } from 'react';
 import clsx from 'clsx';
+import { useSession } from 'next-auth/react';
 
 interface NotificationBellClientProps {
     initialCount?: number;
@@ -17,10 +18,17 @@ export default function NotificationBellClient({
     showWarning = false,
     className
 }: NotificationBellClientProps) {
+    const { data: session } = useSession();
     const { unreadCount, refreshCount } = useNotificationCounter(initialCount);
 
     // Refresh count when component mounts and periodically
     useEffect(() => {
+        // ✅ SAFETY CHECK: Only refresh if user is authenticated
+        if (!session?.user?.id) {
+            console.log('🔒 User not authenticated, skipping notification refresh');
+            return;
+        }
+
         // Initial refresh after a short delay
         const timer = setTimeout(refreshCount, 1000);
 
@@ -31,7 +39,7 @@ export default function NotificationBellClient({
             clearTimeout(timer);
             clearInterval(interval);
         };
-    }, [refreshCount]);
+    }, [refreshCount, session?.user?.id]);
 
     // Listen for notification changes from other tabs/windows
     useEffect(() => {

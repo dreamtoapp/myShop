@@ -32,7 +32,11 @@ export function useNotificationCounter(initialCount: number = 0) {
 
   // Fetch fresh count from server
   const refreshCount = useCallback(async () => {
-    if (!session?.user?.id) return;
+    // ✅ SAFETY CHECK: Only proceed if user is authenticated
+    if (!session?.user?.id) {
+      console.log('🔒 User not authenticated, skipping notification count refresh');
+      return;
+    }
 
     try {
       console.log('🔄 Refreshing notification count...');

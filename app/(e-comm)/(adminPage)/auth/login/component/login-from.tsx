@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 import { log } from '@/utils/logger';
 import { userLogin } from '../action/userLogin';
 import { syncCartOnLogin } from '@/app/(e-comm)/(cart-flow)/cart/helpers/cartSyncHelper';
-import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { Label } from '@/components/ui/label';
 
@@ -157,47 +156,21 @@ export default function LoginPe({ redirect = '/' }: LoginFormProps) {
   // Debug form state changes
   console.log('🔍 DEBUG: Login form state changed:', { state, isPending });
 
-  // Trigger cart sync and redirect after successful login
+  // ✅ SILENT CART SYNC - NO NOTIFICATIONS
   useEffect(() => {
-    console.log('🔍 DEBUG: useEffect triggered, state:', state);
-
     if (state?.success) {
-      console.log('✅ DEBUG: Login successful, state.success is true');
-      console.log('🔄 DEBUG: About to trigger cart sync...');
-
-      // Remove the setTimeout delay - trigger sync immediately
-      console.log('⏰ DEBUG: Calling syncCartOnLogin immediately...');
-      const loadingToast = toast.loading('جاري مزامنة السلة...');
-
-      console.log('🚀 DEBUG: syncCartOnLogin() called');
+      // Silent cart sync - no loading toast, no success message
       syncCartOnLogin()
-        .then((result) => {
-          console.log('✅ DEBUG: syncCartOnLogin resolved with result:', result);
-          toast.dismiss(loadingToast);
-          if (result.success) {
-            toast.success(result.message, {
-              description: `${result.itemCount} منتج تمت المزامنة`
-            });
-          } else {
-            toast.error(result.message);
-          }
-
-          // Redirect after cart sync completes
-          console.log('🚀 DEBUG: Redirecting to:', redirect);
+        .then(() => {
+          // Redirect immediately - no waiting, no notifications
           router.push(redirect);
         })
         .catch((error) => {
-          console.error('❌ DEBUG: syncCartOnLogin rejected with error:', error);
-          toast.dismiss(loadingToast);
-          toast.error('فشل في المزامنة، تم الاحتفاظ بالمنتجات الحالية');
+          // Only show error if sync actually fails
           console.error('Cart sync error:', error);
-
-          // Redirect even if cart sync fails
-          console.log('🚀 DEBUG: Redirecting to:', redirect);
+          // Still redirect - don't block user experience
           router.push(redirect);
         });
-    } else {
-      console.log('❌ DEBUG: Login not successful, state:', state);
     }
   }, [state, redirect, router]);
 
