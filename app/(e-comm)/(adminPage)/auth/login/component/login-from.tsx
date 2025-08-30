@@ -1,6 +1,6 @@
 'use client';
 import { useActionState } from 'react';
-import { Eye, EyeOff, Loader2, Shield, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Shield, ArrowRight, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,147 @@ import { Label } from '@/components/ui/label';
 
 interface LoginFormProps {
   redirect?: string;
+}
+
+// WhatsApp Icon Component
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="currentColor"
+    >
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+    </svg>
+  );
+}
+
+// Forgot Password Dialog Component
+function ForgotPasswordDialog({
+  isOpen,
+  onClose,
+  phoneNumber
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  phoneNumber: string;
+}) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  if (!isOpen) return null;
+
+  // Get last 2 digits of phone number with proper masking
+  const lastTwoDigits = phoneNumber.slice(-2);
+  const firstDigits = phoneNumber.slice(0, -2);
+  const maskedNumber = `${firstDigits.replace(/\d/g, '•')}${lastTwoDigits}`;
+
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    try {
+      // TODO: Implement forgot password logic here
+      // This would typically send an SMS with reset code
+      console.log('Forgot password requested for:', phoneNumber);
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Close dialog after success
+      onClose();
+    } catch (error) {
+      console.error('Forgot password error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-background border border-border rounded-lg p-6 w-full max-w-md mx-4">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+              <WhatsAppIcon className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-foreground">نسيت كلمة المرور</h3>
+              <p className="text-sm text-muted-foreground">إعادة تعيين عبر الواتس اب</p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 p-0 hover:bg-muted rounded-full"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Content */}
+        <div className="space-y-6">
+          <div className="text-center">
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              سنرسل كلمة المرور إلى رقم هاتفك عبر الواتس اب
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              تأكد من أن رقم الهاتف صحيح قبل المتابعة
+            </p>
+          </div>
+
+          {/* Phone Number Display */}
+          <div className="bg-gradient-to-br from-muted/10 to-muted/30 border border-border/50 rounded-xl p-6 text-center shadow-sm">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <p className="text-sm text-muted-foreground font-medium">رقم الهاتف</p>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            </div>
+            <div className="bg-background/80 border border-border/30 rounded-lg p-4 backdrop-blur-sm">
+              <p className="text-2xl font-mono font-bold text-foreground tracking-wider">
+                {maskedNumber}
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                آخر رقمين للتحقق
+              </p>
+            </div>
+          </div>
+
+          <p className="text-xs text-muted-foreground text-center">
+            تأكد من أن هذا هو رقم هاتفك الصحيح
+          </p>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 mt-8">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="flex-1 h-12 border-2 hover:bg-muted/50 transition-all duration-200"
+            disabled={isLoading}
+          >
+            إلغاء
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            disabled={isLoading}
+            className="flex-1 h-12 bg-green-500 hover:bg-green-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                جارٍ الإرسال...
+              </>
+            ) : (
+              <>
+                <WhatsAppIcon className="h-4 w-4 ml-2" />
+                إرسال عبر الواتس اب
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // Login Header Component (15 lines)
@@ -29,10 +170,14 @@ function LoginHeader() {
 // Form Fields Component (35 lines)
 function FormFields({
   showPassword,
-  setShowPassword
+  setShowPassword,
+  phoneNumber,
+  setPhoneNumber
 }: {
   showPassword: boolean;
   setShowPassword: (show: boolean) => void;
+  phoneNumber: string;
+  setPhoneNumber: (phone: string) => void;
 }) {
   return (
     <div className="space-y-6">
@@ -42,6 +187,8 @@ function FormFields({
         <Input
           type="tel"
           name="phone"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
           placeholder="رقم الهاتف (05XXXXXXXX)"
           maxLength={10}
           className="h-12 text-base border-2 focus:border-feature-users transition-colors duration-300 text-center"
@@ -55,27 +202,30 @@ function FormFields({
       {/* Password Input */}
       <div className="relative flex flex-col gap-2">
         <Label>كلمة المرور</Label>
-        <Input
-          type={showPassword ? 'text' : 'password'}
-          name="password"
-          placeholder="كلمة المرور"
-          className="h-12 text-base border-2 focus:border-feature-users transition-colors duration-300 pl-12"
-          required
-          minLength={6}
-        />
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
-          onClick={() => setShowPassword(!showPassword)}
-        >
-          {showPassword ? (
-            <EyeOff className="h-4 w-4 text-muted-foreground" />
-          ) : (
-            <Eye className="h-4 w-4 text-muted-foreground" />
-          )}
-        </Button>
+        <div className="relative">
+          <Input
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            placeholder="كلمة المرور"
+            className="h-12 text-base border-2 focus:border-feature-users transition-colors duration-300 pr-12"
+            required
+            minLength={6}
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent focus:outline-none focus:ring-2 focus:ring-feature-users focus:ring-offset-2 rounded-md"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Eye className="h-4 w-4 text-muted-foreground" />
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -124,7 +274,13 @@ function FormActions({
 }
 
 // Footer Links Component (20 lines)
-function FooterLinks() {
+function FooterLinks({
+  onForgotPassword,
+  phoneNumber
+}: {
+  onForgotPassword: () => void;
+  phoneNumber: string;
+}) {
   return (
     <div className="space-y-4 text-center">
       <div className="flex items-center gap-4">
@@ -137,9 +293,14 @@ function FooterLinks() {
         <a href="/auth/register" className="flex-1 text-feature-users hover:underline">
           إنشاء حساب جديد
         </a>
-        <a href="/auth/forgot-password" className="flex-1 text-muted-foreground hover:text-foreground">
+        <button
+          onClick={onForgotPassword}
+          disabled={!phoneNumber || phoneNumber.length < 10}
+          className="flex-1 text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          title={!phoneNumber || phoneNumber.length < 10 ? "أدخل رقم الهاتف أولاً" : "انقر لإعادة تعيين كلمة المرور"}
+        >
           نسيت كلمة المرور؟
-        </a>
+        </button>
       </div>
     </div>
   );
@@ -151,6 +312,8 @@ export default function LoginPe({ redirect = '/' }: LoginFormProps) {
 
   const [state, addAction, isPending] = useActionState(userLogin, { success: false, message: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
   const router = useRouter();
 
   // Debug form state changes
@@ -174,6 +337,14 @@ export default function LoginPe({ redirect = '/' }: LoginFormProps) {
     }
   }, [state, redirect, router]);
 
+  const handleForgotPassword = () => {
+    setShowForgotPassword(true);
+  };
+
+  const handleCloseForgotPassword = () => {
+    setShowForgotPassword(false);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-8">
@@ -191,6 +362,8 @@ export default function LoginPe({ redirect = '/' }: LoginFormProps) {
             <FormFields
               showPassword={showPassword}
               setShowPassword={setShowPassword}
+              phoneNumber={phoneNumber}
+              setPhoneNumber={setPhoneNumber}
             />
 
             <FormActions
@@ -199,9 +372,19 @@ export default function LoginPe({ redirect = '/' }: LoginFormProps) {
             />
           </form>
 
-          <FooterLinks />
+          <FooterLinks
+            onForgotPassword={handleForgotPassword}
+            phoneNumber={phoneNumber}
+          />
         </div>
       </div>
+
+      {/* Forgot Password Dialog */}
+      <ForgotPasswordDialog
+        isOpen={showForgotPassword}
+        onClose={handleCloseForgotPassword}
+        phoneNumber={phoneNumber}
+      />
     </div>
   );
 }
