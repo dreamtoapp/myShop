@@ -1,66 +1,59 @@
 'use server';
 
 import db from '@/lib/prisma';
-import { generateSecurePassword } from './passwordUtils';
+import { sendOTPTemplate } from '@/lib/whatsapp/send-otp-template';
 
-export async function sendPasswordViaWhatsApp(phoneNumber: string, userName: string) {
+export async function sendPasswordViaWhatsApp(phoneNumber: string, _userName: string) {
   try {
     console.log('📱 Starting WhatsApp password delivery for:', phoneNumber);
 
-    // Generate a new secure password
-    const newPassword = generateSecurePassword();
-
-    // Update user's password in database
-    const updatedUser = await db.user.update({
+    // Get current user with password from database
+    const user = await db.user.findFirst({
       where: { phone: phoneNumber },
-      data: {
-        password: newPassword,
-        updatedAt: new Date()
-      },
-      select: {
-        id: true,
-        phone: true,
-        name: true
-      }
+      select: { id: true, phone: true, name: true, password: true }
     });
 
-    if (!updatedUser) {
-      throw new Error('Failed to update user password');
+    if (!user) {
+      throw new Error('User not found');
     }
 
-    // Prepare WhatsApp message
-    const message = `مرحباً ${userName}! 👋
+    if (!user.password) {
+      throw new Error('User has no password set');
+    }
 
-🔐 تم إعادة تعيين كلمة المرور الخاصة بك
+    console.log('✅ Found user with existing password');
 
-📱 كلمة المرور الجديدة: ${newPassword}
+    // TEMPORARY: Test with confirm template using a test number
+    // Your template expects a number, not a password
+    const testNumber = '1234'; // Test number that matches template variable
 
-⚠️ يرجى تغيير كلمة المرور بعد تسجيل الدخول لأول مرة
+    console.log('🧪 TESTING: Using test number for confirm template:', testNumber);
+    console.log('🧪 REAL password from DB:', user.password);
 
-🔒 لأمان حسابك، لا تشارك هذه الرسالة مع أي شخص
+    // Use existing WhatsApp template to send test number
+    const whatsappResult = await sendOTPTemplate(phoneNumber, testNumber);
 
-شكراً لك! 🙏`;
+    if (!whatsappResult.success) {
+      console.error('❌ WhatsApp template failed:', whatsappResult.error);
+      return {
+        success: false,
+        message: 'فشل في إرسال كلمة المرور عبر الواتس اب',
+        password: user.password,
+        user: { id: user.id, phone: user.phone, name: user.name },
+        whatsappError: whatsappResult.error
+      };
+    }
 
-    // TODO: Integrate with your existing WhatsApp API
-    // This should use your current WhatsApp integration
-    console.log('📤 WhatsApp message prepared:', message);
-
-    // For now, simulate WhatsApp sending
-    // Replace this with your actual WhatsApp API call
-    await simulateWhatsAppSending(phoneNumber, message);
-
-    console.log('✅ Password sent via WhatsApp successfully');
-
+    console.log('✅ Test number sent via WhatsApp template successfully');
     return {
       success: true,
-      message: 'تم إرسال كلمة المرور عبر الواتس اب بنجاح',
-      password: newPassword, // Remove this in production
-      user: updatedUser
+      message: 'تم إرسال رقم الاختبار عبر قالب الواتس اب بنجاح (كلمة المرور الحالية: ' + user.password + ')',
+      password: user.password,
+      user: { id: user.id, phone: user.phone, name: user.name }
     };
 
   } catch (error) {
     console.error('❌ Error sending password via WhatsApp:', error);
-
     return {
       success: false,
       message: 'فشل في إرسال كلمة المرور عبر الواتس اب',
@@ -69,14 +62,3 @@ export async function sendPasswordViaWhatsApp(phoneNumber: string, userName: str
   }
 }
 
-// Temporary simulation - replace with your actual WhatsApp API
-async function simulateWhatsAppSending(phone: string, message: string) {
-  console.log('📱 SIMULATING WhatsApp sending to:', phone);
-  console.log('📝 Message:', message);
-
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 2000));
-
-  // Simulate success
-  return { success: true };
-}

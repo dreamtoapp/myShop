@@ -13,6 +13,35 @@ export function convertToInternationalFormat(phoneNumber: string): string {
   return raw;
 }
 
+// WhatsApp API phone formatting - Official requirement: 966XXXXXXXXX (NO + symbol)
+export function formatPhoneForWhatsAppAPI(phoneNumber: string): string {
+  const raw = phoneNumber.trim();
+  const digits = raw.replace(/\D/g, '');
+
+  // Handle KSA numbers (05XXXXXXXX)
+  if (digits.startsWith('05') && digits.length === 10) {
+    return `966${digits.slice(1)}`; // 05XXXXXXXX → 966XXXXXXXX
+  }
+
+  // Handle KSA numbers without 0 (5XXXXXXXX)
+  if (digits.length === 9 && digits.startsWith('5')) {
+    return `966${digits}`; // 5XXXXXXXX → 966XXXXXXXX
+  }
+
+  // Handle already formatted numbers (966XXXXXXXX)
+  if (digits.startsWith('966') && digits.length === 12) {
+    return digits; // 966XXXXXXXX → 966XXXXXXXX
+  }
+
+  // Handle international numbers with + (+966XXXXXXXX)
+  if (raw.startsWith('+966') && raw.length === 13) {
+    return raw.slice(1); // +966XXXXXXXX → 966XXXXXXXX
+  }
+
+  console.warn(`⚠️ Unknown phone number format for WhatsApp API: ${phoneNumber}, returning as is`);
+  return digits;
+}
+
 // Generate WhatsApp URL to prompt user to message business first
 export async function generateWhatsAppGuidanceURL(_phoneNumber: string): Promise<string> {
   const businessPhone = process.env.WHATSAPP_BUSINESS_PHONE || '+966XXXXXXXXX';

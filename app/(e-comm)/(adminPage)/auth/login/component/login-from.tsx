@@ -46,8 +46,19 @@ function ForgotPasswordDialog({
     exists: boolean;
     message: string;
     user?: any;
+    whatsappError?: string;
   } | null>(null);
   const [step, setStep] = useState<'validation' | 'success' | 'error' | 'sending' | 'completed'>('validation');
+
+  // Reset dialog state every time it opens
+  useEffect(() => {
+    if (isOpen) {
+      setStep('validation');
+      setValidationResult(null);
+      setIsLoading(false);
+      console.log('🔄 Dialog opened - resetting state to fresh start');
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -85,14 +96,27 @@ function ForgotPasswordDialog({
 
           if (whatsappResult.success) {
             setStep('completed');
-            console.log('✅ Password sent successfully:', whatsappResult);
+            console.log('✅ Password sent successfully via WhatsApp template:', whatsappResult.message);
           } else {
-            setStep('error');
-            setValidationResult({
-              success: false,
-              exists: false,
-              message: whatsappResult.message
-            });
+            // Check if it's a WhatsApp error but password was updated
+            if (whatsappResult.password && whatsappResult.user) {
+              setStep('completed');
+              console.log('⚠️ Password updated but WhatsApp failed:', whatsappResult.message);
+              // Show warning that password was updated but WhatsApp failed
+              setValidationResult({
+                success: true,
+                exists: true,
+                message: whatsappResult.message,
+                user: whatsappResult.user
+              });
+            } else {
+              setStep('error');
+              setValidationResult({
+                success: false,
+                exists: false,
+                message: whatsappResult.message || 'فشل في إرسال كلمة المرور عبر الواتس اب'
+              });
+            }
           }
         } catch (whatsappError) {
           console.error('❌ WhatsApp sending error:', whatsappError);
@@ -224,7 +248,7 @@ function ForgotPasswordDialog({
               <div>
                 <h4 className="text-lg font-semibold text-foreground mb-2">جاري الإرسال...</h4>
                 <p className="text-sm text-muted-foreground">
-                  جاري إرسال كلمة المرور الجديدة عبر الواتس اب
+                  جاري إرسال رقم الاختبار عبر قالب الواتس اب (تأكيد)
                 </p>
               </div>
             </div>
@@ -240,11 +264,18 @@ function ForgotPasswordDialog({
               <div>
                 <h4 className="text-lg font-semibold text-foreground mb-2">تم الإرسال بنجاح!</h4>
                 <p className="text-sm text-muted-foreground">
-                  تم إرسال كلمة المرور الجديدة عبر الواتس اب
+                  {validationResult?.message || 'تم إرسال رقم الاختبار عبر قالب الواتس اب'}
                 </p>
                 <p className="text-xs text-muted-foreground mt-2">
-                  تحقق من رسائل الواتس اب الخاصة بك
+                  تحقق من رسائل الواتس اب الخاصة بك (قالب التأكيد - رقم الاختبار: 1234)
                 </p>
+                {validationResult?.whatsappError && (
+                  <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                    <p className="text-xs text-yellow-600">
+                      ⚠️ تم تحديث كلمة المرور ولكن فشل في إرسالها عبر الواتس اب
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -1,7 +1,7 @@
 'use server';
 
 import { getWhatsAppConfig, buildApiEndpoint, getApiHeaders } from '@/lib/whatsapp/config';
-import { convertToInternationalFormat } from '@/lib/whatsapp/whatsapp';
+import { formatPhoneForWhatsAppAPI } from '@/lib/whatsapp/whatsapp';
 
 export interface TemplateMessageResponse {
   success: boolean;
@@ -18,57 +18,54 @@ export async function sendOTPTemplate(
     const { accessToken, phoneNumberId } = await getWhatsAppConfig();
     if (!accessToken || !phoneNumberId) return { success: false, error: 'Server configuration error' };
 
-    // Force KSA MSISDN formatting (966) if number starts with local 05xx
-    let internationalPhone = convertToInternationalFormat(phoneNumber);
-    if (/^0?5\d{8}$/.test(phoneNumber)) {
-      // e.g., 05xxxxxxxx or 5xxxxxxxx → 9665xxxxxxxx
-      const local = phoneNumber.replace(/^0/, '');
-      internationalPhone = `966${local}`;
-    }
+    // Use proper WhatsApp API phone formatting (966XXXXXXXXX format)
+    const internationalPhone = formatPhoneForWhatsAppAPI(phoneNumber);
+    console.log(`📱 Phone formatting: ${phoneNumber} → ${internationalPhone}`);
+
     const endpoint = await buildApiEndpoint('/messages');
     const headers = await getApiHeaders();
 
-    async function sendWithLanguage(lang: string) {
-      const body = {
-        messaging_product: 'whatsapp',
-        to: internationalPhone,
-        type: 'template',
-        template: {
-          name: 'confirm',
-          language: { code: lang },
-          components: [
-            {
-              type: 'body',
-              parameters: [{ type: 'text', text: otp }],
-            },
-          ],
-        },
-      } as const;
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(body),
-      });
-      const json = await res.json();
-      return { ok: res.ok, json } as const;
+    // Use 'ar' directly since template only exists in generic Arabic
+    const body = {
+      messaging_product: 'whatsapp',
+      to: internationalPhone,
+      type: 'template',
+      template: {
+        name: 'confirm',
+        language: { code: 'ar' }, // ✅ Use 'ar' directly - template exists here
+        components: [
+          {
+            type: 'body',
+            parameters: [{
+              type: 'number',     // ✅ FIXED: Template expects NUMBER, not text
+              text: otp           // ✅ This will be converted to number by WhatsApp
+            }],
+          },
+        ],
+      },
+    } as const;
+
+    console.log(`📤 Sending WhatsApp template to ${internationalPhone} with language ar`);
+    console.log(`📤 Request body:`, JSON.stringify(body, null, 2));
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    const json = await res.json();
+    console.log(`📡 WhatsApp API response (${res.status}):`, JSON.stringify(json, null, 2));
+
+    if (res.ok) {
+      return { success: true, data: json };
+    } else {
+      return { success: false, error: json?.error?.message || 'Failed to send template' };
     }
-
-    // Try KSA locale first; if missing translation (132001), fallback to generic Arabic
-    const first = await sendWithLanguage('ar_SA');
-    if (first.ok) return { success: true, data: first.json };
-
-    const errMsg = first.json?.error?.message as string | undefined;
-    if (errMsg && (errMsg.includes('132001') || errMsg.toLowerCase().includes('translation'))) {
-      const second = await sendWithLanguage('ar');
-      return second.ok
-        ? { success: true, data: second.json }
-        : { success: false, error: second.json?.error?.message || 'Failed to send template' };
-    }
-
-    return { success: false, error: errMsg || 'Failed to send template' };
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('❌ Error in sendOTPTemplate:', error);
     return { success: false, error: errorMessage };
   }
 }
