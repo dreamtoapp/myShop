@@ -368,6 +368,9 @@ model Company {
   vapidSubject    String @default("")
   vapidEmail      String @default("")
 
+
+  googleMapsApiKey String @default("")
+
   // Authentication
   authCallbackUrl String @default("")
   // Auth behavior toggles
@@ -844,23 +847,7 @@ enum ErrorStatus {
   IGNORED
 }
 
-// model PushSubscription {
-//   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-//   userId    String   @db.ObjectId
-//   user      User     @relation(fields: [userId], references: [id])
-//   userName  String?
-//   role      String? // Store the user's role (ADMIN, DRIVER, etc.)
-//   endpoint  String   @unique
-//   p256dh    String
-//   auth      String
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//
-//   // @@map("push_subscriptions")
-// }
-// ☝️ PushSubscription model removed - web push notifications disabled
 
-// --- WhatsApp Webhook Persistence ---
 model WhatsappMessage {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   companyId    String?  @db.ObjectId

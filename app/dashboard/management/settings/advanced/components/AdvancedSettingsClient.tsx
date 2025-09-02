@@ -66,7 +66,7 @@ export default function AdvancedSettingsClient({ company }: AdvancedSettingsClie
 
       <Collapsible defaultOpen={false}>
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold">إعدادات التحليلات (GTM)</h3>
+          <h3 className="font-semibold">إعدادات جوجل</h3>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="sm" className="group gap-2">
               <span className="group-data-[state=open]:hidden">عرض</span>

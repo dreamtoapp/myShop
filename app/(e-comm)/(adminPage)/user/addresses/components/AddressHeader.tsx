@@ -23,6 +23,11 @@ export default function AddressHeader({ onAddAddress }: AddressHeaderProps) {
           <Plus className="h-4 w-4 ml-2" />
           إضافة عنوان
         </Button>
+
+        <Button onClick={onAddAddress} className="bg-destructive">
+          <Plus className="h-4 w-4 ml-2" />
+          إضافة عنوان
+        </Button>
       </div>
     </div>
   );

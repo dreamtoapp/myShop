@@ -10,7 +10,7 @@ export default async function AdvancedSettingsPage() {
     'cloudinaryCloudName', 'cloudinaryApiKey', 'cloudinaryApiSecret', 'cloudinaryUploadPreset', 'cloudinaryClientFolder',
     'whatsappPermanentToken', 'whatsappPhoneNumberId', 'whatsappApiVersion', 'whatsappBusinessAccountId', 'whatsappWebhookVerifyToken', 'whatsappAppSecret', 'whatsappNumber',
     'emailUser', 'emailPass', 'smtpHost', 'smtpPort', 'smtpUser', 'smtpPass', 'smtpFrom',
-    'gtmContainerId',
+    'gtmContainerId', 'googleMapsApiKey',
     // Pusher & VAPID forms are hidden, exclude from progress calculation
     'authCallbackUrl'
   ];

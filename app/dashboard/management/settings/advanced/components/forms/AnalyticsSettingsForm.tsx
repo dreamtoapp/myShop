@@ -12,23 +12,25 @@ import Swal from 'sweetalert2';
 
 import { updateCompany } from '../../actions/updateCompany';
 
-const AnalyticsSchema = z.object({
+const GoogleSettingsSchema = z.object({
   gtmContainerId: z.string().trim().optional(),
+  googleMapsApiKey: z.string().trim().optional(),
 });
 
-type AnalyticsForm = z.infer<typeof AnalyticsSchema>;
+type GoogleSettingsForm = z.infer<typeof GoogleSettingsSchema>;
 
 export default function AnalyticsSettingsForm({ company }: { company: any }) {
   const [isSaving, setIsSaving] = useState(false);
 
-  const { register, handleSubmit, reset } = useForm<AnalyticsForm>({
-    resolver: zodResolver(AnalyticsSchema),
+  const { register, handleSubmit, reset } = useForm<GoogleSettingsForm>({
+    resolver: zodResolver(GoogleSettingsSchema),
     defaultValues: {
       gtmContainerId: company?.gtmContainerId || '',
+      googleMapsApiKey: company?.googleMapsApiKey || '',
     },
   });
 
-  const onSubmit = async (values: AnalyticsForm) => {
+  const onSubmit = async (values: GoogleSettingsForm) => {
     try {
       setIsSaving(true);
       const payload = Object.fromEntries(
@@ -36,7 +38,7 @@ export default function AnalyticsSettingsForm({ company }: { company: any }) {
       );
       const result = await updateCompany(payload);
       if (result?.success) {
-        await Swal.fire({ icon: 'success', title: 'تم الحفظ', text: 'تم حفظ إعدادات التحليلات (GTM) بنجاح' });
+        await Swal.fire({ icon: 'success', title: 'تم الحفظ', text: 'تم حفظ إعدادات جوجل بنجاح' });
       } else {
         await Swal.fire({ icon: 'error', title: 'تعذر الحفظ', text: result?.message || 'فشل في حفظ الإعدادات' });
       }
@@ -50,18 +52,32 @@ export default function AnalyticsSettingsForm({ company }: { company: any }) {
   return (
     <Card className="border">
       <CardHeader>
-        <CardTitle>إعدادات التحليلات (GTM)</CardTitle>
+        <CardTitle>إعدادات جوجل</CardTitle>
         <p className="text-sm text-muted-foreground">
-          استخدم معرّف الحاوية بالشكل GTM-XXXXXXX. للتفاصيل راجع
+          إعدادات خدمات جوجل المختلفة مثل التحليلات والخرائط. للتفاصيل راجع
           {' '}
-          <a href="https://tagmanager.google.com/" className="underline underline-offset-2" target="_blank" rel="noreferrer">Google Tag Manager</a>.
+          <a href="https://tagmanager.google.com/" className="underline underline-offset-2" target="_blank" rel="noreferrer">Google Tag Manager</a>
+          {' '}و
+          {' '}
+          <a href="https://developers.google.com/maps" className="underline underline-offset-2" target="_blank" rel="noreferrer">Google Maps Platform</a>.
         </p>
       </CardHeader>
       <CardContent>
         <form className="grid gap-4 max-w-2xl" onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-2">
+            <Label htmlFor="googleMapsApiKey">Google Maps API Key</Label>
+            <Input id="googleMapsApiKey" placeholder="AIza..." {...register('googleMapsApiKey')} />
+            <p className="text-xs text-muted-foreground">
+              مفتاح API للخرائط والخدمات الجغرافية من Google Cloud Console.
+            </p>
+          </div>
+
+          <div className="grid gap-2">
             <Label htmlFor="gtmContainerId">GTM Container ID</Label>
             <Input id="gtmContainerId" placeholder="GTM-XXXXXXX" {...register('gtmContainerId')} />
+            <p className="text-xs text-muted-foreground">
+              استخدم معرّف الحاوية بالشكل GTM-XXXXXXX من Google Tag Manager.
+            </p>
           </div>
 
           <div className="flex gap-3">
