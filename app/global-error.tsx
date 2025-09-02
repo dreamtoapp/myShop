@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from '@/components/link';
 
 export default function GlobalError({
@@ -80,12 +81,12 @@ export default function GlobalError({
         flexDirection: 'column',
         alignItems: 'center'
       }}>
-        <img
+        <Image
           src="/fallback/dreamToApp2-dark.png"
           alt="DreamToApp Logo"
+          width={60}
+          height={60}
           style={{
-            height: '60px',
-            width: '60px',
             borderRadius: '12px',
             objectFit: 'cover',
             filter: 'drop-shadow(0 4px 8px hsl(var(--foreground) / 0.15))',

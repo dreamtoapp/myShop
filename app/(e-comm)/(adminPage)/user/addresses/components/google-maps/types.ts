@@ -2,16 +2,17 @@
 export interface GoogleMapsMap {
   setCenter: (center: { lat: number; lng: number }) => void;
   setZoom: (zoom: number) => void;
-  addListener: (event: string, callback: (event: any) => void) => void;
+  addListener: (event: string, callback: (event: unknown) => void) => void;
+  setMapTypeId?: (mapType: string) => void;
 }
 
 export interface GoogleMapsMarker {
   setMap: (map: GoogleMapsMap | null) => void;
-  setIcon: (icon: any) => void;
-  setAnimation: (animation: any) => void;
-  addListener: (event: string, callback: (event: any) => void) => void;
-  get: (key: string) => any;
-  set: (key: string, value: any) => void;
+  setIcon: (icon: unknown) => void;
+  setAnimation: (animation: unknown) => void;
+  addListener: (event: string, callback: (event: unknown) => void) => void;
+  get: (key: string) => unknown;
+  set: (key: string, value: unknown) => void;
 }
 
 export interface GoogleMapsMapMouseEvent {
@@ -30,6 +31,7 @@ export interface LocationData {
   address: string;
   landmark: string;
   deliveryNote: string;
+  title?: string;
 }
 
 // Accuracy information type
@@ -61,46 +63,40 @@ export interface GeolocationResult {
 export interface GoogleMapProps {
   className?: string;
   clientName?: string;
-  // Optional Google Maps API key passed from parent; falls back to env when absent
-  googleMapsApiKey?: string;
-  // Optional controlled initial values
-  initialLatitude?: string;
-  initialLongitude?: string;
-  initialAddress?: string;
-  initialLandmark?: string;
-  initialDeliveryNote?: string;
-  // Notify parent whenever any of the values change inside the map component
-  onLocationChange?: (data: {
-    latitude: string;
-    longitude: string;
-    address: string;
-    landmark: string;
-    deliveryNote: string;
-  }) => void;
-  // Optional external save handler invoked when user presses Save
+  apiKey?: string;
+  clientTitle?: string;
+  clientAddress?: string;
+  clientLandmark?: string;
+  clientDeliveryNote?: string;
+  clientLocation?: Location;
   onSave?: (data: LocationData) => void;
-  // If true, skip auto geolocation detection
-  disableAutoLocation?: boolean;
 }
 
 export interface AutoLocationRowProps {
   userLocation: Location | null;
   onRecenter: () => void;
   locationProgress?: LocationProgress | null;
+  inline?: boolean;
 }
 
 export interface SelectedLocationHeaderProps {
   selectedLocation: Location | null;
+  compact?: boolean;
+  inline?: boolean;
 }
 
 export interface LocationFormProps {
   selectedLocation: Location | null;
+  userLocation: Location | null;
+  title: string;
+  setTitle: (title: string) => void;
   editableAddress: string;
   setEditableAddress: (address: string) => void;
   landmark: string;
   setLandmark: (landmark: string) => void;
   deliveryNote: string;
   setDeliveryNote: (note: string) => void;
+  onRecenter: () => void;
   onSave: () => void;
   onClear: () => void;
 }
@@ -108,6 +104,8 @@ export interface LocationFormProps {
 export interface LocationCardProps {
   userLocation: Location | null;
   selectedLocation: Location | null;
+  title: string;
+  setTitle: (title: string) => void;
   editableAddress: string;
   setEditableAddress: (address: string) => void;
   landmark: string;
@@ -123,7 +121,7 @@ export interface LocationCardProps {
 // Global type declarations
 declare global {
   interface Window {
-    google?: any;
+    google?: unknown;
     initMap?: () => void;
   }
 }

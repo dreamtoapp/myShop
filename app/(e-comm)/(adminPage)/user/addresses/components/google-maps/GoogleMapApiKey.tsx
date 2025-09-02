@@ -1,11 +1,34 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from 'react';
-import { Card } from "@/components/ui/card";
-import { GoogleMapProps, Location, GoogleMapsMap, GoogleMapsMarker, GoogleMapsMapMouseEvent, LocationData, LocationProgress } from './types';
-import { useGoogleMaps, useGeocoding, useMarkerCreation, useGeolocation } from './hooks';
-import { MapLoadingSkeleton, LocationCardSkeleton } from './skeletons';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
+import { Card } from '@/components/ui/card';
+
+import {
+  useGeocoding,
+  useGeolocation,
+  useGoogleMaps,
+  useMarkerCreation,
+} from './hooks';
 import { LocationCard } from './location-card';
+import {
+  LocationCardSkeleton,
+  MapLoadingSkeleton,
+} from './skeletons';
+import {
+  GoogleMapProps,
+  GoogleMapsMap,
+  GoogleMapsMapMouseEvent,
+  GoogleMapsMarker,
+  Location,
+  LocationData,
+  LocationProgress,
+} from './types';
 
 // Map Overlay Loader Component
 const MapOverlayLoader = ({ progress }: { progress: LocationProgress | null }) => {
@@ -58,18 +81,51 @@ const MapOverlayLoader = ({ progress }: { progress: LocationProgress | null }) =
   );
 };
 
+// Map Type Control Component
+const MapTypeControl = ({ mapInstance }: { mapInstance: GoogleMapsMap | null }) => {
+  const [mapType, setMapType] = useState<'roadmap' | 'satellite'>('roadmap');
+
+  const toggleMapType = useCallback(() => {
+    if (!mapInstance) return;
+
+    const newMapType = mapType === 'roadmap' ? 'satellite' : 'roadmap';
+    setMapType(newMapType);
+
+    // Update map type
+    if (mapInstance.setMapTypeId) {
+      mapInstance.setMapTypeId(newMapType);
+    }
+  }, [mapInstance, mapType]);
+
+  if (!mapInstance) return null;
+
+  return (
+    <div className="absolute top-4 right-4 z-20">
+      <button
+        onClick={toggleMapType}
+        className="bg-background/95 backdrop-blur-sm border border-border rounded-lg px-3 py-2 text-sm font-medium shadow-lg hover:bg-background transition-all duration-200 flex items-center gap-2 text-foreground"
+      >
+        <span className="text-xs">
+          {mapType === 'roadmap' ? '🗺️' : '🛰️'}
+        </span>
+        <span className="text-xs">
+          {mapType === 'roadmap' ? 'خريطة' : 'قمر صناعي'}
+        </span>
+      </button>
+    </div>
+  );
+};
+
 export default function GoogleMapSimple({
   className = "w-full h-96",
   clientName = "DreamToApp",
-  googleMapsApiKey,
-  initialLatitude,
-  initialLongitude,
-  initialAddress,
-  initialLandmark,
-  initialDeliveryNote,
-  onLocationChange,
-  onSave,
-  disableAutoLocation,
+  apiKey,
+  clientTitle,
+  clientAddress,
+  clientLandmark,
+  clientDeliveryNote,
+  clientLocation,
+  onSave
 }: GoogleMapProps) {
   // Refs
   const mapRef = useRef<HTMLDivElement>(null);
@@ -85,14 +141,13 @@ export default function GoogleMapSimple({
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [selectedMarker, setSelectedMarker] = useState<GoogleMapsMarker | null>(null);
 
-  // Address states
-  const [userAddress, setUserAddress] = useState<string | null>(initialAddress || null);
-  const [selectedAddress, setSelectedAddress] = useState<string | null>(initialAddress || null);
-  const [editableAddress, setEditableAddress] = useState<string>(initialAddress || "");
+  // Address states (removed unused address display to satisfy lint)
+  const [editableAddress, setEditableAddress] = useState<string>(clientAddress ?? "");
 
   // Form states
-  const [landmark, setLandmark] = useState<string>(initialLandmark || "");
-  const [deliveryNote, setDeliveryNote] = useState<string>(initialDeliveryNote || "");
+  const [title, setTitle] = useState<string>(clientTitle ?? "");
+  const [landmark, setLandmark] = useState<string>(clientLandmark ?? "");
+  const [deliveryNote, setDeliveryNote] = useState<string>(clientDeliveryNote ?? "");
 
   // Location progress state
   const [locationProgress, setLocationProgress] = useState<LocationProgress | null>(null);
@@ -100,7 +155,7 @@ export default function GoogleMapSimple({
   // Hooks
   const { getGoogleMaps } = useGoogleMaps();
   const { getAddressFromCoordinates } = useGeocoding();
-  const { createUserMarker, createSelectedMarker } = useMarkerCreation();
+  const { createSelectedMarker } = useMarkerCreation();
   const { getUserLocation } = useGeolocation();
 
   // Map initialization
@@ -109,32 +164,51 @@ export default function GoogleMapSimple({
       return;
     }
 
-    const google = getGoogleMaps();
-    if (!google?.maps?.Map) {
+    type GoogleLike = {
+      maps?: {
+        Map?: unknown;
+        ControlPosition?: unknown;
+        event?: unknown;
+        Animation?: unknown;
+        SymbolPath?: unknown;
+      }
+    };
+    const google = getGoogleMaps() as GoogleLike;
+    type MapsNamespace = {
+      Map: new (el: HTMLElement, opts: unknown) => unknown;
+      ControlPosition: unknown;
+      event?: { removeListener: (l: unknown) => void };
+      Animation?: unknown;
+      SymbolPath?: unknown;
+    };
+    const maps = (google as { maps?: unknown }).maps as MapsNamespace | undefined;
+    if (!maps?.Map) {
       setError("Google Maps API غير متوفر");
       setIsMapLoading(false);
       return;
     }
 
     try {
-      const map = new google.maps.Map(mapRef.current, {
+      const mapsNs = maps as MapsNamespace;
+      const map = new mapsNs.Map(mapRef.current, {
         center: { lat: 20, lng: 0 },
         zoom: 2,
-        zoomControl: false,
+        zoomControl: true,
         mapTypeControl: true,
         mapTypeControlOptions: {
-          position: google.maps.ControlPosition.TOP_LEFT
+          position: (mapsNs.ControlPosition as unknown)
         },
         streetViewControl: false,
         fullscreenControl: false,
         gestureHandling: 'cooperative'
-      });
+      }) as unknown as GoogleMapsMap;
 
       setMapInstance(map);
       setIsMapLoading(false);
 
-      // Add click listener
-      map.addListener('click', async (event: GoogleMapsMapMouseEvent) => {
+      // Add click listener (cast event locally to our type)
+      map.addListener('click', async (evt: unknown) => {
+        const event = evt as GoogleMapsMapMouseEvent;
         if (!event.latLng) return;
 
         try {
@@ -143,58 +217,23 @@ export default function GoogleMapSimple({
             selectedMarker.setMap(null);
           }
 
-          // Create new marker
-          const marker = new google.maps.Marker({
-            position: event.latLng,
-            map: map,
-            title: `${clientName} - الموقع المحدد`,
-            draggable: true,
-            label: {
-              text: "❤️",
-              color: "hsl(var(--foreground))",
-              fontWeight: "bold",
-              fontSize: "16px"
-            },
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              fillColor: "hsl(var(--destructive))",
-              fillOpacity: 0.3,
-              strokeColor: "hsl(var(--destructive))",
-              strokeWeight: 3,
-              scale: 18
-            },
-            zIndex: 999,
-            animation: google.maps.Animation.DROP
-          });
-
-          // Add pulsing effect
-          setTimeout(() => {
-            marker.setAnimation(google.maps.Animation.BOUNCE);
-            setTimeout(() => marker.setAnimation(null), 2000);
-          }, 500);
-
           const newLocation = {
             lat: event.latLng.lat(),
             lng: event.latLng.lng()
           };
 
           setSelectedLocation(newLocation);
-          setSelectedMarker(marker);
 
-          // Get address and create markers
-          const [address, newUserMarker, newSelectedMarker] = await Promise.all([
+          // Create only ONE selected marker + fetch address
+          const [address, newSelectedMarker] = await Promise.all([
             getAddressFromCoordinates(newLocation.lat, newLocation.lng),
-            createUserMarker(newLocation, map),
             createSelectedMarker(newLocation, map, clientName)
           ]);
 
-          return {
-            location: newLocation,
-            address,
-            userMarker: newUserMarker,
-            selectedMarker: newSelectedMarker
-          };
+          setSelectedMarker(newSelectedMarker);
+          setEditableAddress(address);
 
+          // Listener must return void
         } catch (error) {
           console.error('Error handling map click:', error);
           setError("خطأ في تحديد الموقع");
@@ -206,7 +245,7 @@ export default function GoogleMapSimple({
       setError("خطأ في تحميل الخريطة");
       setIsMapLoading(false);
     }
-  }, [getGoogleMaps, clientName, selectedMarker, getAddressFromCoordinates]);
+  }, [getGoogleMaps, clientName, selectedMarker, getAddressFromCoordinates, createSelectedMarker]);
 
   // Load Google Maps API
   const loadGoogleMapsAPI = useCallback(() => {
@@ -214,7 +253,7 @@ export default function GoogleMapSimple({
       return;
     }
 
-    const google = getGoogleMaps();
+    const google = getGoogleMaps() as { maps?: { Map?: unknown } } | null;
     if (google?.maps?.Map) {
       initializeMap();
       return;
@@ -223,8 +262,8 @@ export default function GoogleMapSimple({
     // Check if script is already loading
     if (document.querySelector('script[src*="maps.googleapis.com"]')) {
       const checkInterval = setInterval(() => {
-        const google = getGoogleMaps();
-        if (google?.maps?.Map) {
+        const loaded = getGoogleMaps() as { maps?: { Map?: unknown } } | null;
+        if (loaded?.maps?.Map) {
           clearInterval(checkInterval);
           initializeMap();
         }
@@ -234,8 +273,8 @@ export default function GoogleMapSimple({
       return;
     }
 
-    const apiKey = googleMapsApiKey || process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
-    if (!apiKey) {
+    const resolvedApiKey = apiKey ?? process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
+    if (!resolvedApiKey) {
       setError("مفتاح Google Maps مفقود");
       setIsMapLoading(false);
       return;
@@ -250,7 +289,7 @@ export default function GoogleMapSimple({
 
     // Create and load script
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=geometry`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${resolvedApiKey}&callback=initMap&libraries=geometry`;
     script.async = true;
     script.defer = true;
 
@@ -260,7 +299,7 @@ export default function GoogleMapSimple({
     };
 
     document.head.appendChild(script);
-  }, [initializeMap, getGoogleMaps, googleMapsApiKey]);
+  }, [initializeMap, getGoogleMaps, apiKey]);
 
   // Map ref callback
   const mapRefCallback = useCallback((node: HTMLDivElement | null) => {
@@ -280,17 +319,19 @@ export default function GoogleMapSimple({
       // Clean up markers
       [userMarker, selectedMarker].forEach(marker => {
         if (marker) {
-          const dragStartListener = marker.get('dragStartListener');
-          const dragEndListener = marker.get('dragEndListener');
+          const dragStartListener = marker.get('dragStartListener') as unknown;
+          const dragEndListener = marker.get('dragEndListener') as unknown;
 
           if (dragStartListener) {
-            const google = getGoogleMaps();
+            type GoogleLike = { maps?: { event?: { removeListener: (l: unknown) => void } } };
+            const google = getGoogleMaps() as GoogleLike;
             if (google?.maps?.event) {
               google.maps.event.removeListener(dragStartListener);
             }
           }
           if (dragEndListener) {
-            const google = getGoogleMaps();
+            type GoogleLike = { maps?: { event?: { removeListener: (l: unknown) => void } } };
+            const google = getGoogleMaps() as GoogleLike;
             if (google?.maps?.event) {
               google.maps.event.removeListener(dragEndListener);
             }
@@ -309,20 +350,11 @@ export default function GoogleMapSimple({
 
   // Initialize user location when map is ready
   useEffect(() => {
-    if (initialLatitude && initialLongitude && mapInstance && !selectedLocation) {
-      const lat = parseFloat(initialLatitude);
-      const lng = parseFloat(initialLongitude);
-      if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
-        setSelectedLocation({ lat, lng });
-        mapInstance.setCenter({ lat, lng });
-        mapInstance.setZoom(15);
+    if (mapInstance && !userLocation) {
+      if (clientLocation) {
+        // If a default location is provided, set it optimistically
+        setSelectedLocation(clientLocation);
       }
-    }
-  }, [initialLatitude, initialLongitude, mapInstance, selectedLocation]);
-
-  // Initialize user location when map is ready
-  useEffect(() => {
-    if (mapInstance && !userLocation && !disableAutoLocation) {
       // Start location progress
       setLocationProgress({
         accuracy: 0,
@@ -342,10 +374,8 @@ export default function GoogleMapSimple({
       }).then((result) => {
         if (result) {
           setUserLocation(result.location);
-          setUserAddress(result.address);
           setUserMarker(result.userMarker);
           setSelectedLocation(result.location);
-          setSelectedAddress(result.address);
           setEditableAddress(result.address);
           setSelectedMarker(result.selectedMarker);
 
@@ -366,22 +396,7 @@ export default function GoogleMapSimple({
         setError("فشل في تحديد الموقع");
       });
     }
-  }, [mapInstance, userLocation, getUserLocation, clientName, disableAutoLocation]);
-
-  // Notify parent when location-related fields change
-  useEffect(() => {
-    if (!onLocationChange) return;
-    const lat = selectedLocation?.lat?.toString() || '';
-    const lng = selectedLocation?.lng?.toString() || '';
-    const addr = editableAddress || '';
-    onLocationChange({
-      latitude: lat,
-      longitude: lng,
-      address: addr,
-      landmark,
-      deliveryNote
-    });
-  }, [onLocationChange, selectedLocation, editableAddress, landmark, deliveryNote]);
+  }, [mapInstance, userLocation, getUserLocation, clientName, clientLocation]);
 
   // Recenter to user location with enhanced accuracy
   const recenterToUserLocation = useCallback(async () => {
@@ -410,7 +425,6 @@ export default function GoogleMapSimple({
       if (result) {
         // Update user location
         setUserLocation(result.location);
-        setUserAddress(result.address);
         setUserMarker(result.userMarker);
 
         // Update selected location
@@ -419,7 +433,6 @@ export default function GoogleMapSimple({
         }
 
         setSelectedLocation(result.location);
-        setSelectedAddress(result.address);
         setEditableAddress(result.address);
         setSelectedMarker(result.selectedMarker);
 
@@ -447,17 +460,17 @@ export default function GoogleMapSimple({
 
     const locationData: LocationData = {
       coordinates: selectedLocation,
+      title,
       address: editableAddress,
       landmark: landmark,
       deliveryNote: deliveryNote
     };
+
+    console.log('Saving location:', locationData);
     if (onSave) {
       onSave(locationData);
-      return;
     }
-    // Default noop behavior remains minimal to avoid side effects
-    console.log('Saving location (default handler):', locationData);
-  }, [selectedLocation, editableAddress, landmark, deliveryNote, onSave]);
+  }, [selectedLocation, title, editableAddress, landmark, deliveryNote, onSave]);
 
   // Handle form clear
   const handleClearFields = useCallback(() => {
@@ -477,31 +490,32 @@ export default function GoogleMapSimple({
   }
 
   return (
-    <Card className={`${className} arabic-text`}>
-      {/* Main Content */}
+    <Card className={`${className}`}>
+      {/* Main Content - Row on Desktop, Column on Mobile */}
       <div className="flex flex-col lg:flex-row gap-6 p-6">
         {/* Map Section */}
         <div className="w-full lg:w-1/2 relative">
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-3">
+            <span className="text-sm">💡</span>
+            <span>انقر على الخريطة لتحديد موقعك • املأ البيانات لتسريع التوصيل</span>
+            <span className="text-sm">💡</span>
+          </div>
           <div
             ref={mapRefCallback}
             className="w-full h-[400px] lg:h-[500px] rounded-xl border border-border shadow-lg bg-muted/30"
             style={{ minHeight: '400px' }}
           />
 
+          {/* Custom Map Type Control */}
+          <MapTypeControl mapInstance={mapInstance} />
+
           {/* Map Overlay Loader */}
           <MapOverlayLoader progress={locationProgress} />
-
           {isMapLoading && <MapLoadingSkeleton />}
         </div>
 
         {/* Location Information Panel */}
         <div className="w-full lg:w-1/2">
-          {/* Map Hint */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-            <span className="text-sm">💡</span>
-            <span>انقر على الخريطة لتحديد موقع التوصيل بدقة، أو اسحب العلامة الحمراء لتغيير الموقع • ملء البيانات الصحيحة يساعد في تسريع عملية التوصيل</span>
-          </div>
-
           {isMapLoading ? (
             <LocationCardSkeleton />
           ) : (
@@ -510,6 +524,8 @@ export default function GoogleMapSimple({
                 <LocationCard
                   userLocation={userLocation}
                   selectedLocation={selectedLocation}
+                  title={title}
+                  setTitle={setTitle}
                   editableAddress={editableAddress}
                   setEditableAddress={setEditableAddress}
                   landmark={landmark}

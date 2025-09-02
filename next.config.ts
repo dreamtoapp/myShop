@@ -61,6 +61,19 @@ const nextConfig: NextConfig = {
           },
         },
       };
+
+      // Remove console.log statements in production builds
+      config.optimization.minimizer = config.optimization.minimizer || [];
+      config.optimization.minimizer.push(
+        new (require('terser-webpack-plugin'))({
+          terserOptions: {
+            compress: {
+              drop_console: true, // Remove console.log statements
+              drop_debugger: true, // Remove debugger statements
+            },
+          },
+        })
+      );
     }
     return config;
   },

@@ -1,13 +1,14 @@
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
 import Link from '@/components/link';
 import { Icon } from '@/components/icons/Icon';
+import AddressMapController from './AddressMapController';
 
 interface AddressHeaderProps {
-  onAddAddress: () => void;
+  googleMapsApiKey: string;
+  onAddressSaved?: () => void; // Callback to refresh addresses
 }
 
-export default function AddressHeader({ onAddAddress }: AddressHeaderProps) {
+export default function AddressHeader({ googleMapsApiKey, onAddressSaved }: AddressHeaderProps) {
   return (
     <div className="flex items-center justify-between">
       <div>
@@ -19,15 +20,18 @@ export default function AddressHeader({ onAddAddress }: AddressHeaderProps) {
           <Icon name='ShoppingBag' className="h-4 w-4 ml-2" />
           تسوق الان
         </Link>
-        <Button onClick={onAddAddress} className="btn-add">
+        {/* <Button onClick={onAddAddress} className="btn-add">
           <Plus className="h-4 w-4 ml-2" />
           إضافة عنوان
-        </Button>
+        </Button> */}
 
-        <Button onClick={onAddAddress} className="bg-destructive">
-          <Plus className="h-4 w-4 ml-2" />
-          إضافة عنوان
-        </Button>
+
+        <div className="flex justify-end">
+          <AddressMapController
+            googleMapsApiKey={googleMapsApiKey}
+            onAddressSaved={onAddressSaved}
+          />
+        </div>
       </div>
     </div>
   );

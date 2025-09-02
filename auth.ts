@@ -15,16 +15,17 @@ async function getNextAuthConfig() {
     const company = await db.company.findFirst({ select: { authCallbackUrl: true } });
     if (company?.authCallbackUrl) {
       callbackUrl = company.authCallbackUrl;
-      console.log('✅ Using auth callback URL from database:', callbackUrl);
-      // Set as environment variable for NextAuth to use
-      process.env.NEXTAUTH_URL = callbackUrl;
+      if (callbackUrl && callbackUrl.trim() !== '') {
+        // console.log('✅ Using auth callback URL from database:', callbackUrl);
+        process.env.NEXTAUTH_URL = callbackUrl;
+      }
     } else {
-      console.log('⚠️ No auth callback URL in database, using fallback:', callbackUrl);
+      // console.log('⚠️ No auth callback URL in database, using fallback:', callbackUrl);
       process.env.NEXTAUTH_URL = callbackUrl;
     }
   } catch (error) {
-    console.error('❌ Failed to read auth callback URL from DB:', error);
-    console.log('⚠️ Using fallback auth callback URL:', callbackUrl);
+    // console.error('❌ Failed to read auth callback URL from DB:', error);
+    // console.log('⚠️ Using fallback auth callback URL:', callbackUrl);
     process.env.NEXTAUTH_URL = callbackUrl;
   }
 

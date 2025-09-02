@@ -33,6 +33,7 @@ export default async function AppleIcon() {
               padding: '20px',
             }}
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={logoUrl}
               alt="Company Logo"

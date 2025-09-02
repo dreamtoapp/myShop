@@ -79,3 +79,5 @@ export const LocationCardSkeleton = () => (
     </div>
   </div>
 );
+
+
