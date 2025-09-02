@@ -15,7 +15,7 @@ async function AddressesPage() {
     const company = await fetchCompany();
     const googleMapsApiKey = company?.googleMapsApiKey || '';
 
-    return <AddressManagement userId={user.id} />;
+    return <AddressManagement userId={user.id} googleMapsApiKey={googleMapsApiKey} />;
 }
 
 export default AddressesPage; 

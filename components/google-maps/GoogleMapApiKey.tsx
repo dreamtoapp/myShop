@@ -60,7 +60,16 @@ const MapOverlayLoader = ({ progress }: { progress: LocationProgress | null }) =
 
 export default function GoogleMapSimple({
   className = "w-full h-96",
-  clientName = "DreamToApp"
+  clientName = "DreamToApp",
+  googleMapsApiKey,
+  initialLatitude,
+  initialLongitude,
+  initialAddress,
+  initialLandmark,
+  initialDeliveryNote,
+  onLocationChange,
+  onSave,
+  disableAutoLocation,
 }: GoogleMapProps) {
   // Refs
   const mapRef = useRef<HTMLDivElement>(null);
@@ -77,13 +86,13 @@ export default function GoogleMapSimple({
   const [selectedMarker, setSelectedMarker] = useState<GoogleMapsMarker | null>(null);
 
   // Address states
-  const [userAddress, setUserAddress] = useState<string | null>(null);
-  const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
-  const [editableAddress, setEditableAddress] = useState<string>("");
+  const [userAddress, setUserAddress] = useState<string | null>(initialAddress || null);
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(initialAddress || null);
+  const [editableAddress, setEditableAddress] = useState<string>(initialAddress || "");
 
   // Form states
-  const [landmark, setLandmark] = useState<string>("");
-  const [deliveryNote, setDeliveryNote] = useState<string>("");
+  const [landmark, setLandmark] = useState<string>(initialLandmark || "");
+  const [deliveryNote, setDeliveryNote] = useState<string>(initialDeliveryNote || "");
 
   // Location progress state
   const [locationProgress, setLocationProgress] = useState<LocationProgress | null>(null);
@@ -225,7 +234,7 @@ export default function GoogleMapSimple({
       return;
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
+    const apiKey = googleMapsApiKey || process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
     if (!apiKey) {
       setError("مفتاح Google Maps مفقود");
       setIsMapLoading(false);
@@ -251,7 +260,7 @@ export default function GoogleMapSimple({
     };
 
     document.head.appendChild(script);
-  }, [initializeMap, getGoogleMaps]);
+  }, [initializeMap, getGoogleMaps, googleMapsApiKey]);
 
   // Map ref callback
   const mapRefCallback = useCallback((node: HTMLDivElement | null) => {
@@ -300,7 +309,20 @@ export default function GoogleMapSimple({
 
   // Initialize user location when map is ready
   useEffect(() => {
-    if (mapInstance && !userLocation) {
+    if (initialLatitude && initialLongitude && mapInstance && !selectedLocation) {
+      const lat = parseFloat(initialLatitude);
+      const lng = parseFloat(initialLongitude);
+      if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+        setSelectedLocation({ lat, lng });
+        mapInstance.setCenter({ lat, lng });
+        mapInstance.setZoom(15);
+      }
+    }
+  }, [initialLatitude, initialLongitude, mapInstance, selectedLocation]);
+
+  // Initialize user location when map is ready
+  useEffect(() => {
+    if (mapInstance && !userLocation && !disableAutoLocation) {
       // Start location progress
       setLocationProgress({
         accuracy: 0,
@@ -344,7 +366,22 @@ export default function GoogleMapSimple({
         setError("فشل في تحديد الموقع");
       });
     }
-  }, [mapInstance, userLocation, getUserLocation, clientName]);
+  }, [mapInstance, userLocation, getUserLocation, clientName, disableAutoLocation]);
+
+  // Notify parent when location-related fields change
+  useEffect(() => {
+    if (!onLocationChange) return;
+    const lat = selectedLocation?.lat?.toString() || '';
+    const lng = selectedLocation?.lng?.toString() || '';
+    const addr = editableAddress || '';
+    onLocationChange({
+      latitude: lat,
+      longitude: lng,
+      address: addr,
+      landmark,
+      deliveryNote
+    });
+  }, [onLocationChange, selectedLocation, editableAddress, landmark, deliveryNote]);
 
   // Recenter to user location with enhanced accuracy
   const recenterToUserLocation = useCallback(async () => {
@@ -414,10 +451,13 @@ export default function GoogleMapSimple({
       landmark: landmark,
       deliveryNote: deliveryNote
     };
-
-    console.log('Saving location:', locationData);
-    alert('تم حفظ الموقع بنجاح!');
-  }, [selectedLocation, editableAddress, landmark, deliveryNote]);
+    if (onSave) {
+      onSave(locationData);
+      return;
+    }
+    // Default noop behavior remains minimal to avoid side effects
+    console.log('Saving location (default handler):', locationData);
+  }, [selectedLocation, editableAddress, landmark, deliveryNote, onSave]);
 
   // Handle form clear
   const handleClearFields = useCallback(() => {

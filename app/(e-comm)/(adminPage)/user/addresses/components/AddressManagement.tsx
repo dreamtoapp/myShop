@@ -16,9 +16,10 @@ import { useAddressState, SUCCESS_MESSAGES, ERROR_MESSAGES } from '../helpers';
 
 interface AddressManagementProps {
     userId: string;
+    googleMapsApiKey: string;
 }
 
-export default function AddressManagement({ userId }: AddressManagementProps) {
+export default function AddressManagement({ userId, googleMapsApiKey }: AddressManagementProps) {
     const searchParams = useSearchParams();
     const router = useRouter();
     const {
@@ -168,6 +169,8 @@ export default function AddressManagement({ userId }: AddressManagementProps) {
 
     return (
         <div className="space-y-6">
+
+
             <AddressHeader onAddAddress={handleAddAddress} />
 
             {addresses.length === 0 ? (

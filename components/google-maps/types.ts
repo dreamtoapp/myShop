@@ -61,6 +61,26 @@ export interface GeolocationResult {
 export interface GoogleMapProps {
   className?: string;
   clientName?: string;
+  // Optional Google Maps API key passed from parent; falls back to env when absent
+  googleMapsApiKey?: string;
+  // Optional controlled initial values
+  initialLatitude?: string;
+  initialLongitude?: string;
+  initialAddress?: string;
+  initialLandmark?: string;
+  initialDeliveryNote?: string;
+  // Notify parent whenever any of the values change inside the map component
+  onLocationChange?: (data: {
+    latitude: string;
+    longitude: string;
+    address: string;
+    landmark: string;
+    deliveryNote: string;
+  }) => void;
+  // Optional external save handler invoked when user presses Save
+  onSave?: (data: LocationData) => void;
+  // If true, skip auto geolocation detection
+  disableAutoLocation?: boolean;
 }
 
 export interface AutoLocationRowProps {
