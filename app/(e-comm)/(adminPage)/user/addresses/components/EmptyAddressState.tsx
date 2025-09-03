@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Truck, Clock, Shield, Plus } from 'lucide-react';
 
@@ -7,7 +7,7 @@ interface EmptyAddressStateProps {
   onAddAddress: () => void;
 }
 
-export default function EmptyAddressState({ onAddAddress }: EmptyAddressStateProps) {
+export default function EmptyAddressState({ onAddAddress: _onAddAddress }: EmptyAddressStateProps) {
   return (
     <Card className="text-center py-12 border-2 border-dashed border-muted-foreground/20 hover:border-primary/30 transition-colors duration-300">
       <CardContent className="space-y-6">
@@ -49,16 +49,16 @@ export default function EmptyAddressState({ onAddAddress }: EmptyAddressStatePro
         </div>
 
         {/* Enhanced CTA Button */}
-        <div className="pt-4">
-          <Button
-            onClick={onAddAddress}
+        {/* <div className="pt-4">
+          <Button 
+            onClick={onAddAddress} 
             className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 px-8 py-3 rounded-lg font-medium text-base"
             size="lg"
           >
             <Plus className="h-5 w-5" />
             إضافة عنوان جديد
           </Button>
-        </div>
+        </div> */}
 
         {/* Additional Info */}
         <div className="pt-4">
