@@ -25,6 +25,7 @@ interface FooterProps {
   productCount?: number | string;
   clientCount?: number | string;
   userId?: string;
+  workingHours?: string;
 }
 
 // Company Information Component with enhanced mobile layout
@@ -32,12 +33,14 @@ function CompanyInfo({
   aboutus,
   companyName,
   productCount,
-  clientCount
+  clientCount,
+  workingHours
 }: {
   aboutus?: string;
   companyName?: string;
   productCount?: number | string;
   clientCount?: number | string;
+  workingHours?: string;
 }) {
   return (
     <div className="space-y-4 md:space-y-6">
@@ -94,8 +97,8 @@ function CompanyInfo({
           <div className="text-xs text-muted-foreground">عميل راضي</div>
         </div>
         <div className="text-center">
-          <div className="text-xl md:text-2xl font-bold text-foreground tabular-nums">24/7</div>
-          <div className="text-xs text-muted-foreground">دعم فني</div>
+          <div className="text-xl md:text-2xl font-bold text-foreground tabular-nums">{workingHours ?? '24/7'}</div>
+          <div className="text-xs text-muted-foreground">مواعيد التوصيل</div>
         </div>
       </div>
     </div>
@@ -301,7 +304,8 @@ const Footer = async ({
   companyName,
   productCount,
   clientCount,
-  userId
+  userId,
+  workingHours
 }: FooterProps) => {
   const compliance = await db.company.findFirst({ select: { taxNumber: true, commercialRegistrationNumber: true, saudiBusinessId: true } });
   return (
@@ -328,6 +332,7 @@ const Footer = async ({
               companyName={companyName}
               productCount={productCount}
               clientCount={clientCount}
+              workingHours={workingHours}
             />
           </div>
 

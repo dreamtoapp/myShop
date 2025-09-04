@@ -11,13 +11,39 @@ export async function saveCompany(rawData: unknown) {
   console.log('🔄 Saving company data:', rawData);
 
   try {
-    // ✅ 1. Validate input using Zod
-    const formData = CompanySchema.parse(rawData);
+    // ✅ 1. Sanitize: convert empty strings to undefined; lightly coerce numeric strings
+    const sanitize = (data: any) => {
+      if (data == null || typeof data !== 'object') return data;
+      const clone: any = Array.isArray(data) ? [] : {};
+      for (const [key, value] of Object.entries<any>(data)) {
+        if (value === null) {
+          clone[key] = undefined;
+        } else if (typeof value === 'string') {
+          const v = value.trim();
+          if (v === '') {
+            clone[key] = undefined;
+          } else if (['shippingFee', 'minShipping', 'taxPercentage'].includes(key)) {
+            const num = Number(v);
+            clone[key] = Number.isFinite(num) ? num : undefined;
+          } else {
+            clone[key] = v;
+          }
+        } else {
+          clone[key] = value;
+        }
+      }
+      return clone;
+    };
 
-    // ❌ Remove `id` from the object passed to Prisma
+    const sanitized = sanitize(rawData);
+
+    // ✅ 2. Validate input using Zod
+    const formData = CompanySchema.parse(sanitized);
+
+    // ❌ 3. Remove `id` from the object passed to Prisma
     const { id, ...dataWithoutId } = formData;
 
-    // 🔍 2. Find existing company (singleton)
+    // 🔍 4. Find existing company (singleton)
     const existingCompany = await db.company.findFirst();
 
     let company;

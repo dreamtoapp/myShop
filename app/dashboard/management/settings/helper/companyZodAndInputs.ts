@@ -11,10 +11,10 @@ import { z } from 'zod';
 // ✅ Zod Schema
 export const CompanySchema = z.object({
   id: z.string().trim().nonempty('الاسم الكامل مطلوب').optional(),
-  fullName: z.string().trim().nonempty('الاسم الكامل مطلوب').optional(),
-  email: z.string().trim().email('صيغة البريد الإلكتروني غير صحيحة').optional(),
-  phoneNumber: z.string().trim().nonempty('رقم الهاتف مطلوب').optional(),
-  whatsappNumber: z.string().trim().nonempty('رقم الواتساب مطلوب').optional(),
+  fullName: z.string().trim().optional().or(z.literal('')),
+  email: z.string().trim().email('صيغة البريد الإلكتروني غير صحيحة').optional().or(z.literal('')),
+  phoneNumber: z.string().trim().optional().or(z.literal('')),
+  whatsappNumber: z.string().trim().optional().or(z.literal('')),
   logo: z.string().url('رابط الشعار غير صالح').optional().or(z.literal('')),
   profilePicture: z.string().url('رابط الصورة غير صالح').optional().or(z.literal('')),
   bio: z.string().trim().optional().or(z.literal('')),
@@ -27,7 +27,7 @@ export const CompanySchema = z.object({
   facebook: z.string().url('رابط فيسبوك غير صالح').optional().or(z.literal('')),
   snapchat: z.string().url('رابط سناب شات غير صالح').optional().or(z.literal('')),
   website: z.string().url('رابط الموقع غير صالح').optional().or(z.literal('')),
-  address: z.string().trim().nonempty('العنوان مطلوب').optional(),
+  address: z.string().trim().optional().or(z.literal('')),
   latitude: z.string().regex(
     /^-?([0-8]?[0-9](\.\d+)?|90(\.0+)?)$/,
     'خط العرض غير صالح'

@@ -57,6 +57,7 @@ export default async function EcommerceLayout({ children }: { children: React.Re
           productCount={productCount}
           clientCount={clientCount}
           userId={userSummary?.id}
+          workingHours={typedCompanyData?.workingHours}
         />
       </div>
     );
