@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { navigationItems, type NavigationItem } from '../helpers/navigationMenu';
-import { ScrollArea } from '@/components/ui/scroll-area';
+// removed shadcn ScrollArea
 
 type NavigationChild = NonNullable<NavigationItem['children']>[0];
 
@@ -100,7 +100,7 @@ export default function NavigationMenu({ pendingOrdersCount: _pendingOrdersCount
                                 className="w-56 bg-background border shadow-lg p-0"
                                 sideOffset={8}
                             >
-                                <ScrollArea className="max-h-[400px] h-auto">
+                                <div className="max-h-[400px] h-auto overflow-y-auto">
                                     <div className="py-1">
                                         {item.children?.map((child: NavigationChild, index) => {
                                             const isChildActive = bestMatch && bestMatch.item === item && bestMatch.child === child;
@@ -178,7 +178,7 @@ export default function NavigationMenu({ pendingOrdersCount: _pendingOrdersCount
                                             );
                                         })}
                                     </div>
-                                </ScrollArea>
+                                </div>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     );
