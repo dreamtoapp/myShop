@@ -85,20 +85,20 @@ function CompanyInfo({
       {/* Stats - Enhanced mobile grid */}
       <div className="grid grid-cols-3 gap-3 md:gap-4 pt-4 border-t border-border">
         <div className="text-center">
-          <div className="text-xl md:text-2xl font-bold text-foreground tabular-nums">
+          <div className="text-sm  font-bold text-foreground tabular-nums">
             {productCount ?? '...'}
           </div>
           <div className="text-xs text-muted-foreground">منتج</div>
         </div>
         <div className="text-center">
-          <div className="text-xl md:text-2xl font-bold text-feature-users tabular-nums">
+          <div className="text-sm  font-bold text-feature-users tabular-nums">
             {clientCount ?? '...'}
           </div>
           <div className="text-xs text-muted-foreground">عميل راضي</div>
         </div>
         <div className="text-center">
-          <div className="text-xl md:text-2xl font-bold text-foreground tabular-nums">{workingHours ?? '24/7'}</div>
-          <div className="text-xs text-muted-foreground">مواعيد التوصيل</div>
+          <div className="text-sm  font-bold text-foreground tabular-nums">{workingHours ?? '24/7'}</div>
+          <div className="text-xs text-muted-foreground">م.التوصيل</div>
         </div>
       </div>
     </div>
