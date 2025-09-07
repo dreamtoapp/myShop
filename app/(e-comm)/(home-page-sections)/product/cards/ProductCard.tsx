@@ -68,6 +68,15 @@ const ProductCard = memo(({
         }
     }, [product, index]);
 
+    // Mouse/touch navigation on media area
+    const handleMediaClick = useCallback((e: React.MouseEvent) => {
+        const target = e.target as HTMLElement | null;
+        // Ignore clicks originating from buttons/links inside media (e.g., Quick View)
+        if (target && (target.closest('button') || target.closest('a'))) return;
+        trackProductView();
+        router.push(`/product/${product.slug}`);
+    }, [router, product.slug, trackProductView]);
+
     // Keyboard navigation handler
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -106,7 +115,7 @@ const ProductCard = memo(({
                 onKeyDown={handleKeyDown}
             >
                 {/* Media Section - 60% height (400x400) - CLIENT REQUIREMENT + INDUSTRY STANDARD */}
-                <div className="relative w-full aspect-square">
+                <div className="relative w-full aspect-square" onClick={handleMediaClick}>
                     <ProductCardMedia
                         product={product}
                         inCart={currentCartState}
