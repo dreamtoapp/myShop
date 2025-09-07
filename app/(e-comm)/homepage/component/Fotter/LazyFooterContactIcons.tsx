@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from '@/components/link';
 import CustomSvgIcon from './CustomSvgIcon';
+import { convertToInternationalFormat } from '@/lib/whatsapp/whatsapp';
 
 interface LazyFooterContactIconsProps {
     email?: string;
@@ -104,7 +105,7 @@ export default function LazyFooterContactIcons({
                         <CustomSvgIcon name="whatsapp" className="h-4 w-4 text-white" />
                     </div>
                     <a
-                        href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('مرحباً! كيف يمكنني مساعدتك؟')}`}
+                        href={`https://wa.me/${convertToInternationalFormat(whatsappNumber).replace('+', '')}?text=${encodeURIComponent('مرحباً! كيف يمكنني مساعدتك؟')}`}
                         className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
                         aria-label="تواصل معنا عبر واتساب"
                         target="_blank"

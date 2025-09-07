@@ -1,5 +1,6 @@
 "use client"
 import { Button, ButtonProps } from '../../../../../components/ui/button';
+import { convertToInternationalFormat } from '@/lib/whatsapp/whatsapp';
 import * as React from 'react';
 import CustomSvgIcon from '../Fotter/CustomSvgIcon';
 
@@ -11,7 +12,8 @@ interface WhatsappMetaButtonProps extends Omit<ButtonProps, 'onClick'> {
 const WhatsappMetaButton: React.FC<WhatsappMetaButtonProps> = ({ phone = '', defaultMessage = '' }) => {
     // Compose WhatsApp URL
     const handleClick = () => {
-        const base = phone ? `https://wa.me/${phone}` : 'https://wa.me/';
+        const normalized = phone ? convertToInternationalFormat(phone).replace('+', '') : '';
+        const base = normalized ? `https://wa.me/${normalized}` : 'https://wa.me/';
         const url = `${base}?text=${encodeURIComponent(defaultMessage)}`;
         window.open(url, '_blank');
     };

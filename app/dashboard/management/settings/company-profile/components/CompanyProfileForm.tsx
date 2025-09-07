@@ -168,6 +168,7 @@ export default function CompanyProfileForm({ company }: CompanyProfileFormProps)
                             className="text-right"
                             dir="rtl"
                         />
+                        <p className="text-xs text-muted-foreground">اكتب الرقم بصيغة دولية: +9665XXXXXXXX (يُقبل 05XXXXXXXX أيضًا)</p>
                         {errors.whatsappNumber && (
                             <div className="flex items-center gap-2 text-xs text-destructive">
                                 <AlertCircle className="w-3 h-3" />
