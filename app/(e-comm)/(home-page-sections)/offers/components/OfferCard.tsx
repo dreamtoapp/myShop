@@ -23,7 +23,8 @@ export default function OfferCard({ offer, isFeatured = false }: OfferCardProps)
         group overflow-hidden transition-all duration-300 hover:shadow-lg
         ${isFeatured ? 'col-span-full md:col-span-2' : ''}
       `}>
-        <div className="relative aspect-video overflow-hidden">
+        <div className="relative aspect-square overflow-hidden">
+
           <Image
             src={imageUrl}
             alt={offer.name}

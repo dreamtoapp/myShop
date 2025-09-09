@@ -1,10 +1,9 @@
 import React from 'react';
-import { Package, Percent, Eye, EyeOff, Edit3 } from 'lucide-react';
+import { Package, Percent, Eye, EyeOff, Edit3, Calendar, BarChart3 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import Link from '@/components/link';
 import AddImage from '@/components/AddImage';
 
@@ -19,20 +18,20 @@ interface OfferCardProps {
 const OfferStatusBadge = ({ offer }: { offer: Offer }) => (
     <Badge
         variant={offer.isActive ? 'default' : 'secondary'}
-        className={`absolute left-3 top-3 w-fit shadow-lg backdrop-blur-sm ${offer.isActive
-            ? 'bg-feature-commerce/90 text-white border-feature-commerce/70'
-            : 'bg-muted/90 text-muted-foreground border-muted-foreground/30'
+        className={`absolute left-3 top-3 ${offer.isActive
+            ? 'bg-emerald-500 text-white'
+            : 'bg-muted text-muted-foreground'
             }`}
     >
         {offer.isActive ? (
-            <div className="flex items-center gap-2 px-1 py-0.5">
-                <Eye size={14} />
-                <span className="font-medium">نشط</span>
+            <div className="flex items-center gap-1">
+                <Eye size={12} />
+                <span className="text-xs font-medium">نشط</span>
             </div>
         ) : (
-            <div className="flex items-center gap-2 px-1 py-0.5">
-                <EyeOff size={14} />
-                <span className="font-medium">غير نشط</span>
+            <div className="flex items-center gap-1">
+                <EyeOff size={12} />
+                <span className="text-xs font-medium">غير نشط</span>
             </div>
         )}
     </Badge>
@@ -42,24 +41,24 @@ const DiscountBadge = ({ offer }: { offer: Offer }) => {
     if (!offer.hasDiscount || !offer.discountPercentage) return null;
 
     return (
-        <Badge className="absolute right-3 bottom-3 bg-feature-commerce/90 text-white shadow-lg border-feature-commerce/70 backdrop-blur-sm hover:bg-feature-commerce transition-colors">
-            <div className="flex items-center gap-2 px-1 py-0.5">
-                <Percent size={14} />
-                <span className="font-semibold">{offer.discountPercentage}% خصم</span>
+        <Badge className="absolute right-3 bottom-3 bg-primary text-primary-foreground">
+            <div className="flex items-center gap-1">
+                <Percent size={12} />
+                <span className="text-xs font-semibold">{offer.discountPercentage}%</span>
             </div>
         </Badge>
     );
 };
 
 const OfferBanner = ({ offer }: { offer: Offer }) => (
-    <div className="relative h-48 w-full overflow-hidden rounded-xl border border-feature-commerce/30 shadow-lg">
+    <div className="relative aspect-square w-full overflow-hidden rounded-lg border">
         <AddImage
             url={offer.bannerImage || undefined}
             recordId={offer.id}
             table="offer"
             tableField="bannerImage"
             autoUpload={true}
-            className="w-full h-full"
+            className="w-full h-full object-contain bg-white"
             alt={`صورة بانر العرض - ${offer.name}`}
         />
         <OfferStatusBadge offer={offer} />
@@ -68,103 +67,93 @@ const OfferBanner = ({ offer }: { offer: Offer }) => (
 );
 
 const OfferInfo = ({ offer }: { offer: Offer }) => (
-    <div className="space-y-4">
-        <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-                {offer.header && (
-                    <h3 className="font-bold text-lg text-feature-commerce mb-1 line-clamp-1 leading-tight">{offer.header}</h3>
-                )}
-                {offer.subheader && (
-                    <div className="text-sm text-feature-commerce/80 mb-1 line-clamp-1 leading-tight">{offer.subheader}</div>
-                )}
-                <h3 className="font-bold text-xl text-foreground mb-2 line-clamp-2 leading-tight">{offer.name}</h3>
-                {offer.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                        {offer.description}
-                    </p>
-                )}
+    <div className="space-y-3">
+        {/* Title and Description */}
+        <div>
+            <h3 className="font-semibold text-lg text-foreground mb-1 line-clamp-1">{offer.name}</h3>
+            {offer.description && (
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                    {offer.description}
+                </p>
+            )}
+        </div>
+
+        {/* Business Metrics */}
+        <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                <Package size={14} className="text-primary" />
+                <div className="text-sm">
+                    <div className="font-semibold text-foreground">{offer._count?.productAssignments || 0}</div>
+                    <div className="text-xs text-muted-foreground">منتج</div>
+                </div>
             </div>
-            <div className="flex items-center gap-1 text-sm text-feature-products bg-feature-products-soft px-3 py-2 rounded-lg border border-feature-products/20 shadow-sm">
-                <Package size={16} />
-                <span className="font-semibold">{offer._count?.productAssignments || 0}</span>
-                <span className="font-medium">منتج</span>
+
+            <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                <BarChart3 size={14} className="text-primary" />
+                <div className="text-sm">
+                    <div className="font-semibold text-foreground">{offer.displayOrder}</div>
+                    <div className="text-xs text-muted-foreground">الترتيب</div>
+                </div>
             </div>
         </div>
 
-        <div className="flex items-center gap-3 text-sm flex-wrap">
-            <div className="flex items-center gap-2 text-feature-settings bg-feature-settings-soft px-3 py-2 rounded-lg border border-feature-settings/20">
-                <span className="font-medium">الترتيب:</span>
-                <span className="font-semibold">{offer.displayOrder}</span>
+        {/* Discount Info */}
+        {offer.hasDiscount && offer.discountPercentage && (
+            <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                <Percent size={14} className="text-primary" />
+                <span className="text-sm font-medium text-foreground">خصم {offer.discountPercentage}%</span>
             </div>
-            {offer.hasDiscount && (
-                <div className="flex items-center gap-2 text-feature-commerce bg-feature-commerce-soft px-3 py-2 rounded-lg border border-feature-commerce/20 shadow-sm">
-                    <Percent size={14} />
-                    <span className="font-semibold">خصم {offer.discountPercentage}%</span>
-                </div>
-            )}
-        </div>
+        )}
     </div>
 );
 
 const ActionButtons = ({ offer }: { offer: Offer }) => (
-    <div className="flex items-center gap-3">
-        {/* View/Manage Products */}
+    <div className="flex items-center gap-2">
+        {/* Primary Action - Manage Products */}
         <Link
             href={`/dashboard/management-offer/manage/${offer.id}`}
             className="flex-1"
         >
-            <Button variant="outline" size="default" className="btn-view-outline w-full hover:bg-feature-products-soft hover:border-feature-products transition-colors">
-                <Package size={16} />
+            <Button variant="default" size="sm" className="w-full">
+                <Package size={14} />
                 إدارة المنتجات
             </Button>
         </Link>
 
-        {/* Edit */}
+        {/* Secondary Actions */}
         <Link href={`/dashboard/management-offer/edit/${offer.id}`}>
-            <Button variant="outline" size="default" className="btn-edit hover:shadow-md transition-all px-4">
-                <Edit3 size={16} />
-                تعديل
+            <Button variant="outline" size="sm">
+                <Edit3 size={14} />
             </Button>
         </Link>
 
-        {/* Toggle Status */}
         <ToggleOfferStatus offer={offer} />
-
-        {/* Delete */}
         <DeleteOfferAlert offerId={offer.id} />
     </div>
 );
 
 const OfferCard: React.FC<OfferCardProps> = ({ offer }) => {
     return (
-        <Card className={`
-      group flex h-full flex-col overflow-hidden 
-      transition-all duration-300 hover:shadow-xl card-hover-effect card-border-glow
-      ${offer.isActive
-                ? 'border-l-4 border-l-feature-commerce bg-card'
-                : 'border-l-4 border-l-muted opacity-75 bg-card'
-            }
-    `}>
-            <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                    <Package className={`h-5 w-5 icon-enhanced ${offer.isActive ? 'text-feature-commerce' : 'text-muted-foreground'}`} />
-                    <span className={`font-bold ${offer.isActive ? 'text-feature-commerce' : 'text-muted-foreground'}`}>
-                        مجموعة منتجات
-                    </span>
-                </CardTitle>
+        <Card className={`flex h-full flex-row flex-wrap overflow-hidden w-full max-w-sm mx-auto ${offer.isActive
+            ? 'border-l-4 border-l-emerald-500'
+            : 'border-l-4 border-l-muted opacity-75'
+            }`}>
+            <CardHeader className="pb-2 w-full">
+                <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-base text-foreground line-clamp-1">{offer.name}</h3>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Calendar size={12} />
+                        <span>{new Date(offer.createdAt).toLocaleDateString('ar-SA')}</span>
+                    </div>
+                </div>
             </CardHeader>
 
-            <CardContent className="flex-1 p-4">
-                {/* Enhanced Layout: Banner takes full width, info below */}
-                <div className="space-y-6">
-                    <OfferBanner offer={offer} />
-                    <OfferInfo offer={offer} />
-                </div>
+            <CardContent className="flex-1 p-4 space-y-4 w-full">
+                <OfferBanner offer={offer} />
+                <OfferInfo offer={offer} />
             </CardContent>
 
-            <Separator className="bg-border" />
-
-            <CardFooter className="bg-muted/30 p-4">
+            <CardFooter className="p-4 pt-0 w-full">
                 <ActionButtons offer={offer} />
             </CardFooter>
         </Card>

@@ -24,3 +24,4 @@ const WhatsAppIcon: React.FC<WhatsAppIconProps> = ({
 };
 
 export default WhatsAppIcon;
+

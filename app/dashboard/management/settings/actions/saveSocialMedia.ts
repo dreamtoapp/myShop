@@ -50,3 +50,4 @@ export async function saveSocialMedia(data: SocialMediaData) {
     return { ok: false as const, message: 'DATABASE_ERROR' };
   }
 }
+

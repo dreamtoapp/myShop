@@ -22,3 +22,4 @@ const TikTokIcon = ({ size = 20, className, ...props }: TikTokIconProps) => (
 );
 
 export default TikTokIcon;
+

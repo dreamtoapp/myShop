@@ -22,3 +22,4 @@ const LinkedInIcon = ({ size = 20, className, ...props }: LinkedInIconProps) => 
 );
 
 export default LinkedInIcon;
+

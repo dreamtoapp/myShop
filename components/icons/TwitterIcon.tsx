@@ -22,3 +22,4 @@ const TwitterIcon = ({ size = 20, className, ...props }: TwitterIconProps) => (
 );
 
 export default TwitterIcon;
+

@@ -22,3 +22,4 @@ const FacebookIcon = ({ size = 20, className, ...props }: FacebookIconProps) => 
 );
 
 export default FacebookIcon;
+
