@@ -8,6 +8,8 @@ export const companyInfo = async () => {
   return await cacheData(
     async () => {
       const company = await db.company.findFirst();
+
+
       return company;
     },
     ['companyInfo'],

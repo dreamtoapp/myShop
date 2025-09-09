@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Icon } from '@/components/icons/Icon';
 import SettingsLayout from '../components/SettingsLayout';
+import { getSocialMedia } from '../actions/getSocialMedia';
+import { saveSocialMedia } from '../actions/saveSocialMedia';
 
 interface SocialMediaLinks {
     facebook?: string | null;
@@ -24,21 +26,20 @@ export default function SocialMediaPage() {
     const [editValue, setEditValue] = useState('');
 
     useEffect(() => {
-        // Fetch social media data
+        // Fetch social media data from database
         const fetchSocialData = async () => {
             try {
-                // TODO: Replace with actual API call
-                const mockData: SocialMediaLinks = {
-                    facebook: 'https://facebook.com/company',
-                    instagram: 'https://instagram.com/company',
-                    twitter: 'https://twitter.com/company',
-                    linkedin: 'https://linkedin.com/company/company',
-                    tiktok: 'https://tiktok.com/@company',
-                    snapchat: 'https://snapchat.com/add/company'
-                };
-                setSocialData(mockData);
+                const result = await getSocialMedia();
+
+                if (result.ok) {
+                    setSocialData(result.data);
+                } else {
+                    console.error('Failed to fetch social media data:', result.message);
+                    toast.error('فشل في تحميل بيانات وسائل التواصل الاجتماعي');
+                }
             } catch (error) {
                 console.error('Error fetching social media data:', error);
+                toast.error('حدث خطأ أثناء تحميل البيانات');
             } finally {
                 setIsLoading(false);
             }
@@ -54,15 +55,20 @@ export default function SocialMediaPage() {
 
     const handleSave = async (field: string) => {
         try {
-            // TODO: Replace with actual API call
-            await new Promise(resolve => setTimeout(resolve, 500));
+            const result = await saveSocialMedia({ [field]: editValue });
 
-            setSocialData(prev => ({ ...prev, [field]: editValue }));
-            setEditingField(null);
-            setEditValue('');
-            toast.success('تم حفظ الرابط بنجاح');
+            if (result.ok) {
+                setSocialData(prev => ({ ...prev, [field]: editValue }));
+                setEditingField(null);
+                setEditValue('');
+                toast.success('تم حفظ الرابط بنجاح');
+            } else {
+                console.error('Failed to save social media data:', result.message);
+                toast.error('فشل في حفظ الرابط');
+            }
         } catch (error) {
-            toast.error('فشل في حفظ الرابط');
+            console.error('Error saving social media data:', error);
+            toast.error('حدث خطأ أثناء حفظ الرابط');
         }
     };
 

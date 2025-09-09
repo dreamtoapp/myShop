@@ -38,6 +38,7 @@ export default function BadgeDialog({
   valueLabel,
 }: BadgeDialogProps) {
   const [qrSvg, setQrSvg] = useState<string | null>(null);
+
   useEffect(() => {
     let canceled = false;
     (async () => {
@@ -71,6 +72,7 @@ export default function BadgeDialog({
     a.remove();
     URL.revokeObjectURL(url);
   };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -122,5 +124,3 @@ export default function BadgeDialog({
     </Dialog>
   );
 }
-
-

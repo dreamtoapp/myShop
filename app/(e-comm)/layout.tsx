@@ -21,6 +21,7 @@ export default async function EcommerceLayout({ children }: { children: React.Re
     } = await fetchEcommLayoutData();
     const typedCompanyData = companyData as any;
 
+
     return (
       <div className="flex flex-col min-h-screen">
         <HeaderUnified
@@ -33,7 +34,7 @@ export default async function EcommerceLayout({ children }: { children: React.Re
           whatsappNumber={typedCompanyData?.whatsappNumber}
         />
         <FilterAlert />
-        <CustomMobileBottomNav />
+        <CustomMobileBottomNav whatsappNumber={typedCompanyData?.whatsappNumber} />
         {/* Real-time notification listener - only for logged-in users */}
         {session && <RealtimeNotificationListener />}
         {/* Test component for notifications - DEVELOPMENT ONLY */}
@@ -54,6 +55,8 @@ export default async function EcommerceLayout({ children }: { children: React.Re
           instagram={typedCompanyData?.instagram}
           twitter={typedCompanyData?.twitter}
           linkedin={typedCompanyData?.linkedin}
+          tiktok={typedCompanyData?.tiktok}
+          snapchat={typedCompanyData?.snapchat}
           productCount={productCount}
           clientCount={clientCount}
           userId={userSummary?.id}

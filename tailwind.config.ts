@@ -153,5 +153,5 @@ export default {
       },
     },
   },
-  plugins: [typography], // Removed require('@tailwindcss/line-clamp')
+  plugins: [typography, require('@tailwindcss/line-clamp')],
 } satisfies Config;

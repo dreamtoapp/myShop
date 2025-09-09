@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import WhatsappIcon from '@/app/(e-comm)/homepage/component/Fotter/WhatsappIcon';
+import WhatsAppIcon from '@/components/icons/WhatsAppIcon';
 import React from 'react';
 
 interface WhatsappShareButtonProps {
@@ -22,7 +22,7 @@ const WhatsappShareButton: React.FC<WhatsappShareButtonProps> = ({ message, labe
             className='flex items-center justify-center'
             onClick={handleClick}
         >
-            <WhatsappIcon width={size === 'icon' ? 20 : 24} height={size === 'icon' ? 20 : 24} />
+            <WhatsAppIcon size={size === 'icon' ? 20 : 24} />
             {label && <span className='ml-2'>{label}</span>}
         </Button>
     );

@@ -4,7 +4,11 @@ import CartDrawer from '../../../(cart-flow)/cart/cart-controller/CartDrawer';
 import WhatsappMetaButton from './WhatsappMetaButton';
 import { Icon } from '@/components/icons/Icon';
 
-export default function CustomMobileBottomNav() {
+interface CustomMobileBottomNavProps {
+    whatsappNumber?: string;
+}
+
+export default function CustomMobileBottomNav({ whatsappNumber }: CustomMobileBottomNavProps) {
     return (
         <nav
             className="fixed bottom-3 left-1/2 z-50 flex h-16 w-[95vw] max-w-md -translate-x-1/2 items-center justify-around border bg-background/80 backdrop-blur-md px-2 shadow-xl rounded-2xl md:hidden"
@@ -29,7 +33,7 @@ export default function CustomMobileBottomNav() {
             </Link>
             <CartDrawer />
             <WishlistIconServer />
-            <WhatsappMetaButton />
+            <WhatsappMetaButton phone={whatsappNumber} />
         </nav>
     );
 } 
