@@ -55,8 +55,8 @@ const ProductCardActions = React.memo(function ProductCardActions({
                         disabled={isOutOfStock}
                         aria-label={`أضف ${product.name} إلى السلة`}
                     >
-                        <Icon name="FaCartPlus" size="sm" />
-                        <span className="font-semibold text-lg">{isOutOfStock ? 'نفد المخزون' : 'أضف إلى السلة'}</span>
+                        <Icon name="ShoppingCart" size="md" />
+                        <span className="hidden sm:inline font-semibold text-lg">{isOutOfStock ? 'نفد المخزون' : 'أضف إلى السلة'}</span>
                     </Button>
                     {/* Modal for add to cart confirmation */}
                     <AddToCartModal

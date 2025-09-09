@@ -66,7 +66,7 @@ export default function AddToCart({
         }
     };
 
-    const btnSize = size === "sm" ? "xs" : size === "lg" ? "md" : "sm";
+    const btnSize = size === "sm" ? "sm" : size === "lg" ? "lg" : "md";
     return (
         <Button
             variant={variant}
@@ -88,7 +88,7 @@ export default function AddToCart({
                 <>
                     <Icon name="ShoppingCart" size={btnSize} />
                     {size !== "icon" && (
-                        <span className="mr-2">{!inStock ? "غير متوفر" : "إضافة إلى السلة"}</span>
+                        <span className="mr-2 hidden sm:inline">{!inStock ? "غير متوفر" : "إضافة إلى السلة"}</span>
                     )}
                 </>
             )}
