@@ -10,12 +10,12 @@ interface AddressHeaderProps {
 
 export default function AddressHeader({ googleMapsApiKey, onAddressSaved }: AddressHeaderProps) {
   return (
-    <div className="flex items-center justify-between">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">إدارة العناوين</h1>
-        <p className="text-muted-foreground">أضف أو عدّل عناوين التوصيل الخاصة بك</p>
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="text-center sm:text-right">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">إدارة العناوين</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">أضف أو عدّل عناوين التوصيل الخاصة بك</p>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 justify-center sm:justify-end">
         <Link href="/" className={buttonVariants({ variant: "default" })}>
           <Icon name='ShoppingBag' className="h-4 w-4 ml-2" />
           تسوق الان
@@ -26,7 +26,7 @@ export default function AddressHeader({ googleMapsApiKey, onAddressSaved }: Addr
         </Button> */}
 
 
-        <div className="flex justify-end">
+        <div className="flex justify-center sm:justify-end">
           <AddressMapController
             googleMapsApiKey={googleMapsApiKey}
             onAddressSaved={onAddressSaved}

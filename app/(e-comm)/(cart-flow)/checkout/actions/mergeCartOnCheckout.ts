@@ -2,6 +2,7 @@
 import db from '@/lib/prisma';
 import { checkIsLogin } from '@/lib/check-is-login';
 import { cookies } from 'next/headers';
+import { unstable_noStore as noStore } from 'next/cache';
 
 async function getCartIdFromCookie(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -9,6 +10,7 @@ async function getCartIdFromCookie(): Promise<string | null> {
 }
 
 export async function mergeCartOnCheckout() {
+  noStore();
   const user = await checkIsLogin();
   const localCartId = await getCartIdFromCookie();
 

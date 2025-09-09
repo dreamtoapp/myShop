@@ -23,9 +23,8 @@ const checkoutSchema = z.object({
   paymentMethod: z.enum(["CASH", "CARD", "WALLET"], {
     errorMap: () => ({ message: "يرجى اختيار طريقة الدفع" })
   }),
-  termsAccepted: z.boolean().refine(val => val === true, {
-    message: "يجب الموافقة على الشروط والأحكام"
-  })
+  // Terms acceptance is no longer required; keep field optional for backward compatibility
+  termsAccepted: z.boolean().optional()
 });
 
 // Types
@@ -42,23 +41,19 @@ interface OrderCalculation {
   total: number;
 }
 
-// Single Responsibility: Get platform settings
+// Single Responsibility: Get platform settings (direct DB read; no API hop)
 async function getPlatformSettings(): Promise<PlatformSettings> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/platform-settings`, {
-      cache: 'no-store',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (response.ok) {
-      return await response.json();
-    }
+    const company = await db.company.findFirst();
+    return {
+      taxPercentage: company?.taxPercentage ?? 15,
+      shippingFee: company?.shippingFee ?? 25,
+      minShipping: company?.minShipping ?? 200,
+    };
   } catch (error) {
-    console.error('Error fetching platform settings:', error);
+    console.error('Error reading platform settings from DB:', error);
+    return { taxPercentage: 15, shippingFee: 25, minShipping: 200 };
   }
-
-  return { taxPercentage: 15, shippingFee: 25, minShipping: 200 };
 }
 
 // Single Responsibility: Calculate order totals
@@ -261,10 +256,11 @@ export async function createDraftOrder(formData: FormData) {
     // Create order
     const order = await createOrderInDatabase(orderData);
 
-    // Send notifications
-    await notifyAdmins(order, validatedData.fullName, total);
+    // Send notifications (non-blocking)
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    notifyAdmins(order, validatedData.fullName, total);
 
-    // Revalidate cache
+    // Revalidate cache (fast; keep synchronous)
     revalidateCache(user.id);
 
     return order.orderNumber;

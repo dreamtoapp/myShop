@@ -375,6 +375,8 @@ model Company {
   authCallbackUrl String @default("")
   // Auth behavior toggles
   requireWhatsappOtp Boolean @default(false)
+  // Location behavior toggles
+  requireLocation   Boolean @default(true)
 }
 
 model NewLetter {

@@ -5,32 +5,30 @@ import { getUser } from "./actions/getUser";
 import { mergeCartOnCheckout } from "./actions/mergeCartOnCheckout";
 import { getAddresses } from "./actions/getAddresses";
 import { debug, error } from '@/utils/logger';
+import { getCompanyOtpRequirement } from '@/helpers/featureFlags';
+import { fetchCompany } from '@/app/dashboard/management/settings/actions/fetchCompany';
 
-async function getPlatformSettings() {
+type PlatformSettingsPage = {
+  taxPercentage: number;
+  shippingFee: number;
+  minShipping: number;
+  requireLocation: boolean;
+};
+
+// Read platform settings directly from DB (no API hop)
+async function getPlatformSettingsDirect(): Promise<PlatformSettingsPage> {
   try {
-    // Use absolute URL for server-side fetch
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/platform-settings`, {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
+    const company = await fetchCompany();
+    return {
+      taxPercentage: company?.taxPercentage ?? 15,
+      shippingFee: company?.shippingFee ?? 25,
+      minShipping: company?.minShipping ?? 200,
+      // Fallback to true if the new field is not yet in the typed Company
+      requireLocation: (company as any)?.requireLocation ?? true,
+    };
   } catch (err) {
     error('Error fetching platform settings:', err instanceof Error ? err.message : String(err));
-    // Return default values if API fails
-    return {
-      taxPercentage: 15,
-      shippingFee: 25,
-      minShipping: 200
-    };
+    return { taxPercentage: 15, shippingFee: 25, minShipping: 200, requireLocation: true };
   }
 }
 
@@ -40,13 +38,21 @@ export default async function CheckoutPage() {
     redirect("/auth/login?redirect=/checkout");
   }
 
-  const [user, cart, addresses, platformSettings] = await Promise.all([
+  const [user, cart, addresses, platformSettings, requireOtp] = await Promise.all([
     getUser(session.user.id),
     mergeCartOnCheckout(),
     getAddresses(session.user.id),
-    getPlatformSettings()
+    getPlatformSettingsDirect(),
+    getCompanyOtpRequirement()
   ]);
-  debug('Platform settings and cart:', { platformSettings, cart });
+  // One concise server-side log for global checkout settings
+  debug('Checkout settings', {
+    requireOtp,
+    requireLocation: platformSettings.requireLocation,
+    taxPercentage: platformSettings.taxPercentage,
+    shippingFee: platformSettings.shippingFee,
+    minShipping: platformSettings.minShipping,
+  });
 
   // Check if database cart is empty, but don't redirect immediately
   // The CheckoutClient will handle Zustand cart as fallback
@@ -61,5 +67,5 @@ export default async function CheckoutPage() {
       id: item.id,
       product: item.product ? { id: item.product.id, name: item.product.name, price: item.product.price } : null
     }))
-  }} addresses={addresses} platformSettings={platformSettings} />;
+  }} addresses={addresses} platformSettings={platformSettings} requireOtp={requireOtp} requireLocation={platformSettings.requireLocation} />;
 }

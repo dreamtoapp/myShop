@@ -1,4 +1,5 @@
 import db from '@/lib/prisma';
+import { unstable_noStore as noStore } from 'next/cache';
 
 /**
  * Checks if WhatsApp OTP should be required based on company settings and environment variables
@@ -6,6 +7,7 @@ import db from '@/lib/prisma';
  */
 export async function shouldRequireWhatsappOtp(): Promise<boolean> {
   try {
+    noStore();
     const company = await db.company.findFirst();
     const companyRequiresOtp = company?.requireWhatsappOtp ?? false;
     const envRequiresOtp = process.env.USE_DB_WHATSAPP_OTP !== 'false';
@@ -24,6 +26,7 @@ export async function shouldRequireWhatsappOtp(): Promise<boolean> {
  */
 export async function getCompanyOtpRequirement(): Promise<boolean> {
   try {
+    noStore();
     const company = await db.company.findFirst();
     return company?.requireWhatsappOtp ?? false;
   } catch (error) {

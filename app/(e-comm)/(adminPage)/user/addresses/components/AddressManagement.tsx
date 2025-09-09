@@ -168,19 +168,23 @@ export default function AddressManagement({ userId, googleMapsApiKey }: AddressM
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-3xl mx-auto px-3 sm:px-4">
             {/* Quick add via Google Maps (opens dialog) */}
 
 
-            <AddressHeader
-                googleMapsApiKey={googleMapsApiKey}
-                onAddressSaved={loadAddresses}
-            />
+            <div className="w-full">
+                <AddressHeader
+                    googleMapsApiKey={googleMapsApiKey}
+                    onAddressSaved={loadAddresses}
+                />
+            </div>
 
 
 
             {addresses.length === 0 ? (
-                <EmptyAddressState onAddAddress={handleAddAddress} />
+                <div className="w-full">
+                    <EmptyAddressState onAddAddress={handleAddAddress} />
+                </div>
             ) : (
                 <AddressList
                     addresses={addresses}

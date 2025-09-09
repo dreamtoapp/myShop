@@ -7,17 +7,15 @@ import MiniCartSummary from "./MiniCartSummary";
 import ShiftSelectorWrapper from "./ShiftSelectorWrapper";
 import PaymentMethodSelector from "./PaymentMethodSelector";
 import PlaceOrderButton from "./PlaceOrderButton";
-import CheckoutProgressBar from "./CheckoutProgressBar";
-import CheckoutValidation from "./CheckoutValidation";
+// import CheckoutValidation from "./CheckoutValidation";
 import { AddressWithDefault } from "./AddressBook";
 import { UserProfile } from "./UserInfoCard";
 import { CartData } from "./PlaceOrderButton";
 import { TermsDialogContent } from "./TermsDialog";
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle, AlertCircle, FileText, User, MapPin, CreditCard, Receipt } from 'lucide-react';
+import { CheckCircle, AlertCircle, FileText } from 'lucide-react';
 import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
-import { Badge } from '@/components/ui/badge';
 import type { Policy } from "./TermsDialog";
 
 interface PlatformSettings {
@@ -31,15 +29,90 @@ interface CheckoutClientProps {
     cart: CartData;
     addresses: AddressWithDefault[];
     platformSettings: PlatformSettings;
+    requireOtp?: boolean;
+    requireLocation?: boolean;
 }
 
-export default function CheckoutClient({ user, cart, addresses, platformSettings }: CheckoutClientProps) {
+interface TermsAcceptanceCardProps {
+    termsDialogOpen: boolean;
+    setTermsDialogOpen: (v: boolean) => void;
+    policies: Policy[];
+    loadingPolicies: boolean;
+    policiesError: string;
+    activeTab: string;
+    setActiveTab: (v: string) => void;
+    fetchPolicies: () => Promise<void>;
+}
+
+function TermsAcceptanceCard({
+    termsDialogOpen,
+    setTermsDialogOpen,
+    policies,
+    loadingPolicies,
+    policiesError,
+    activeTab,
+    setActiveTab,
+    fetchPolicies
+}: TermsAcceptanceCardProps) {
+    return (
+        <Card className={`border rounded-xl bg-muted`} dir="rtl">
+            <CardContent className="p-4">
+                <div className="flex items-center">
+                    <Dialog open={termsDialogOpen} onOpenChange={(open) => { setTermsDialogOpen(open); if (open) fetchPolicies(); }}>
+                        <DialogTrigger asChild>
+                            <button className="group inline-flex items-center gap-1 underline text-sm font-medium text-foreground hover:text-foreground/80">
+                                <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground transition-colors group-hover:text-foreground" />
+                                الشروط والأحكام
+                            </button>
+                        </DialogTrigger>
+                        <DialogContent className="max-h-[90vh] max-w-4xl" dir="rtl">
+                            <TermsDialogContent
+                                policies={policies}
+                                loading={loadingPolicies}
+                                error={policiesError}
+                                activeTab={activeTab}
+                                setActiveTab={setActiveTab}
+                                getPolicyIcon={(title: string) => {
+                                    switch (title) {
+                                        case 'سياسة الموقع': return <FileText className="h-4 w-4" />;
+                                        case 'سياسة الخصوصية': return <AlertCircle className="h-4 w-4" />;
+                                        case 'سياسة الإرجاع': return <CheckCircle className="h-4 w-4" />;
+                                        case 'سياسة الشحن': return <AlertCircle className="h-4 w-4" />;
+                                        default: return <FileText className="h-4 w-4" />;
+                                    }
+                                }}
+                                getPolicySummary={(title: string) => {
+                                    switch (title) {
+                                        case 'سياسة الموقع': return 'شروط استخدام الموقع وحقوق الملكية الفكرية';
+                                        case 'سياسة الخصوصية': return 'كيفية جمع وحماية بياناتك الشخصية';
+                                        case 'سياسة الإرجاع': return 'شروط إرجاع المنتجات واسترداد المبالغ';
+                                        case 'سياسة الشحن': return 'خدمات التوصيل والرسوم والأوقات';
+                                        default: return 'سياسة عامة';
+                                    }
+                                }}
+                                extractKeyPoints={(content: string) => {
+                                    const lines = content.split('\n');
+                                    return lines
+                                        .filter(line => line.trim().startsWith('•') || line.trim().startsWith('-'))
+                                        .slice(0, 5)
+                                        .map(point => point.replace(/^[•\-]\s*/, '').trim());
+                                }}
+                            />
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+export default function CheckoutClient({ user, cart, addresses, platformSettings, requireOtp, requireLocation }: CheckoutClientProps) {
     const router = useRouter();
     const { cart: zustandCart } = useCartStore();
     const [selectedAddress, setSelectedAddress] = useState<AddressWithDefault | null>(addresses.find(addr => addr.isDefault) || addresses[0] || null);
     const [selectedShiftId, setSelectedShiftId] = useState("");
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("CASH");
-    const [termsAccepted, setTermsAccepted] = useState(false);
+    const [termsAccepted] = useState(false);
     const [termsDialogOpen, setTermsDialogOpen] = useState(false);
     const [policies, setPolicies] = useState<Policy[]>([]);
     const [loadingPolicies, setLoadingPolicies] = useState(false);
@@ -57,62 +130,7 @@ export default function CheckoutClient({ user, cart, addresses, platformSettings
         }
     }, [cart, zustandCart, router]);
 
-    // Progress tracking logic
-    const getCurrentStep = (): string => {
-        // Check user info completion
-        const userInfoComplete = user?.name && user?.phone && user?.isOtp === true;
-
-        // Check address selection
-        const addressComplete = selectedAddress && selectedAddress.latitude && selectedAddress.longitude;
-
-        // Check shift selection
-        const shiftComplete = selectedShiftId !== "";
-
-        // Check payment method selection
-
-
-        // Check terms acceptance
-        const termsComplete = termsAccepted;
-
-        if (!userInfoComplete) return "user-info";
-        if (!addressComplete) return "address";
-        if (!shiftComplete) return "payment";
-        if (!termsComplete) return "payment";
-        return "review";
-    };
-
-    const currentStep = getCurrentStep();
-
-    // Define checkout steps
-    const checkoutSteps = [
-        {
-            id: "user-info",
-            label: "بيانات العميل",
-            icon: <User className="h-4 w-4" />,
-            status: (currentStep === "user-info" ? "current" :
-                ["address", "payment", "review"].includes(currentStep) ? "completed" : "pending") as "completed" | "current" | "pending"
-        },
-        {
-            id: "address",
-            label: "عنوان التوصيل",
-            icon: <MapPin className="h-4 w-4" />,
-            status: (currentStep === "address" ? "current" :
-                ["payment", "review"].includes(currentStep) ? "completed" : "pending") as "completed" | "current" | "pending"
-        },
-        {
-            id: "payment",
-            label: "طريقة الدفع",
-            icon: <CreditCard className="h-4 w-4" />,
-            status: (currentStep === "payment" ? "current" :
-                currentStep === "review" ? "completed" : "pending") as "completed" | "current" | "pending"
-        },
-        {
-            id: "review",
-            label: "مراجعة الطلب",
-            icon: <Receipt className="h-4 w-4" />,
-            status: (currentStep === "review" ? "current" : "pending") as "completed" | "current" | "pending"
-        }
-    ];
+    // Checkout progress UI removed as requested
 
     const fetchPolicies = async () => {
         setLoadingPolicies(true);
@@ -140,15 +158,11 @@ export default function CheckoutClient({ user, cart, addresses, platformSettings
     return (
         <div className="min-h-screen bg-background">
             <div className="max-w-7xl mx-auto px-4 py-6">
-                {/* Checkout Progress Bar */}
-                <CheckoutProgressBar
-                    currentStep={currentStep}
-                    steps={checkoutSteps}
-                />
+                {/* Progress bar removed */}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 space-y-6">
-                        {user && <UserInfoCard user={user} />}
+                        {user && <UserInfoCard user={user} requireOtp={requireOtp} />}
                         <AddressBook
                             addresses={addresses}
                             onSelectAddress={id => setSelectedAddress(addresses.find(a => a.id === id) || null)}
@@ -158,100 +172,28 @@ export default function CheckoutClient({ user, cart, addresses, platformSettings
                         <PaymentMethodSelector selectedPaymentMethod={selectedPaymentMethod} onSelectPayment={setSelectedPaymentMethod} />
 
                         {/* Enhanced Terms Acceptance Section */}
-                        <Card className={`border-2 transition-all duration-200 ${termsAccepted ? 'border-green-300 bg-green-50' : 'border-orange-300 bg-orange-50'}`} dir="rtl">
-                            <CardContent className="p-4">
-                                <div className="flex items-start gap-3">
-                                    <div className={`p-2 rounded-full flex-shrink-0 ${termsAccepted ? 'bg-green-200' : 'bg-orange-200'}`}>
-                                        {termsAccepted ? (
-                                            <CheckCircle className="h-5 w-5 text-green-700" />
-                                        ) : (
-                                            <AlertCircle className="h-5 w-5 text-orange-700" />
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                            <label
-                                                htmlFor="terms"
-                                                className="cursor-pointer font-medium text-base flex items-center gap-2 text-gray-900 flex-wrap"
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    id="terms"
-                                                    checked={termsAccepted}
-                                                    onChange={e => setTermsAccepted(e.target.checked)}
-                                                    className="accent-feature-commerce h-5 w-5 flex-shrink-0"
-                                                />
-                                                <span className="break-words">الموافقة على الشروط والأحكام</span>
-                                            </label>
-                                            <Badge variant={termsAccepted ? "default" : "destructive"} className="text-xs font-medium flex-shrink-0">
-                                                {termsAccepted ? 'تمت الموافقة' : 'مطلوب'}
-                                            </Badge>
-                                        </div>
-
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <Dialog open={termsDialogOpen} onOpenChange={(open) => { setTermsDialogOpen(open); if (open) fetchPolicies(); }}>
-                                                <DialogTrigger asChild>
-                                                    <button className="inline-flex items-center gap-1 text-blue-700 hover:text-blue-800 underline text-sm transition-colors font-medium break-words">
-                                                        <FileText className="h-3 w-3 flex-shrink-0" />
-                                                        قراءة الشروط والأحكام
-                                                    </button>
-                                                </DialogTrigger>
-                                                <DialogContent className="max-h-[90vh] max-w-4xl" dir="rtl">
-                                                    <TermsDialogContent
-                                                        policies={policies}
-                                                        loading={loadingPolicies}
-                                                        error={policiesError}
-                                                        activeTab={activeTab}
-                                                        setActiveTab={setActiveTab}
-                                                        getPolicyIcon={(title: string) => {
-                                                            switch (title) {
-                                                                case 'سياسة الموقع': return <FileText className="h-4 w-4" />;
-                                                                case 'سياسة الخصوصية': return <AlertCircle className="h-4 w-4" />;
-                                                                case 'سياسة الإرجاع': return <CheckCircle className="h-4 w-4" />;
-                                                                case 'سياسة الشحن': return <AlertCircle className="h-4 w-4" />;
-                                                                default: return <FileText className="h-4 w-4" />;
-                                                            }
-                                                        }}
-                                                        getPolicySummary={(title: string) => {
-                                                            switch (title) {
-                                                                case 'سياسة الموقع': return 'شروط استخدام الموقع وحقوق الملكية الفكرية';
-                                                                case 'سياسة الخصوصية': return 'كيفية جمع وحماية بياناتك الشخصية';
-                                                                case 'سياسة الإرجاع': return 'شروط إرجاع المنتجات واسترداد المبالغ';
-                                                                case 'سياسة الشحن': return 'خدمات التوصيل والرسوم والأوقات';
-                                                                default: return 'سياسة عامة';
-                                                            }
-                                                        }}
-                                                        extractKeyPoints={(content: string) => {
-                                                            const lines = content.split('\n');
-                                                            return lines
-                                                                .filter(line => line.trim().startsWith('•') || line.trim().startsWith('-'))
-                                                                .slice(0, 5)
-                                                                .map(point => point.replace(/^[•\-]\s*/, '').trim());
-                                                        }}
-                                                    />
-                                                </DialogContent>
-                                            </Dialog>
-                                        </div>
-
-                                        {!termsAccepted && (
-                                            <p className="text-sm text-red-700 mt-2 font-medium break-words">
-                                                يجب الموافقة على الشروط والأحكام للمتابعة
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Checkout Validation */}
-                        <CheckoutValidation
-                            user={user}
-                            selectedAddress={selectedAddress}
-                            selectedShiftId={selectedShiftId}
-                            selectedPaymentMethod={selectedPaymentMethod}
-                            termsAccepted={termsAccepted}
-                            cart={cart}
+                        <TermsAcceptanceCard
+                            termsDialogOpen={termsDialogOpen}
+                            setTermsDialogOpen={setTermsDialogOpen}
+                            policies={policies}
+                            loadingPolicies={loadingPolicies}
+                            policiesError={policiesError}
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                            fetchPolicies={fetchPolicies}
                         />
+
+                        {/* Checkout Validation (temporarily disabled; handled at CTA) */}
+                        {/**
+                         * <CheckoutValidation
+                         *   user={user}
+                         *   selectedAddress={selectedAddress}
+                         *   selectedShiftId={selectedShiftId}
+                         *   selectedPaymentMethod={selectedPaymentMethod}
+                         *   termsAccepted={termsAccepted}
+                         *   cart={cart}
+                         * />
+                         */}
 
                         <PlaceOrderButton
                             user={user}
@@ -259,6 +201,8 @@ export default function CheckoutClient({ user, cart, addresses, platformSettings
                             shiftId={selectedShiftId}
                             paymentMethod={selectedPaymentMethod}
                             termsAccepted={termsAccepted}
+                            requireOtp={requireOtp}
+                            requireLocation={requireLocation}
                         />
                     </div>
                     <div className="space-y-6">

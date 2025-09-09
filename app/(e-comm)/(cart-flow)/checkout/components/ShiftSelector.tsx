@@ -5,14 +5,7 @@ import {
   useState,
 } from 'react';
 import { Clock, CheckCircle } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -56,11 +49,13 @@ export const ShiftSelector = ({ selectedShiftId, onShiftSelect }: ShiftSelectorP
     };
 
     fetchShifts();
-  }, [onShiftSelect, selectedShiftId]);
+    // We only need to load shifts once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="shadow-lg border-0 bg-white">
         <CardContent className="p-4">
           <div className="space-y-3">
             <Skeleton className="h-4 w-32" />
@@ -80,54 +75,45 @@ export const ShiftSelector = ({ selectedShiftId, onShiftSelect }: ShiftSelectorP
   }
 
   return (
-    <div className="space-y-4">
-      <Select value={selectedShiftId} onValueChange={onShiftSelect}>
-        <SelectTrigger className="h-12 bg-background">
-          <SelectValue placeholder="اختر وقت التوصيل المناسب" />
-        </SelectTrigger>
-        <SelectContent>
-          {shifts.filter(shift => shift.id).map((shift) => (
-            <SelectItem
-              key={shift.id}
-              value={shift.id!}
-              className="py-3"
-            >
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">
-                  {shift.startTime} - {shift.endTime}
+    <Card className="shadow-lg border-0 bg-white">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-3 text-xl font-bold text-slate-800">
+          <Clock className="h-6 w-6 text-blue-600" />
+          وقت التوصيل
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-4 sm:p-5 space-y-3">
+        <div role="radiogroup" className="flex flex-wrap gap-2 ">
+          {shifts.filter(shift => shift.id).map((shift) => {
+            const isSelected = selectedShiftId === shift.id;
+            const buttonClasses = isSelected
+              ? 'border-primary ring-2 ring-primary/20 bg-primary/10 text-foreground'
+              : 'border-slate-200 hover:bg-slate-50 text-foreground';
+            const iconClasses = isSelected ? 'text-primary' : 'text-muted-foreground';
+            return (
+              <button
+                key={shift.id}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                onClick={() => onShiftSelect(shift.id!)}
+                className={`h-12 w-full sm:w-auto rounded-xl border px-3 sm:px-4 text-right flex items-center justify-between transition-colors flex-shrink-0 ${buttonClasses}`}
+              >
+                <span className="flex items-center gap-2">
+                  <Clock className={`h-4 w-4 ${iconClasses}`} />
+                  <span
+                    className={`font-medium ${isSelected ? "text-primary" : "text-primary/70"
+                      }`}
+                  >
+                    {shift.startTime} - {shift.endTime}
+                  </span>
                 </span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Selected Shift Info */}
-      {selectedShiftId && (
-        <Card className="bg-feature-commerce-soft/20 border-feature-commerce/20">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-feature-commerce">
-              <CheckCircle className="h-4 w-4" />
-              <span className="font-medium">وقت التوصيل المحدد</span>
-            </div>
-            <div className="mt-2 text-sm text-muted-foreground">
-              {(() => {
-                const selectedShift = shifts.find(s => s.id === selectedShiftId);
-                if (!selectedShift) return '';
-                return `سيتم توصيل طلبك بين ${selectedShift.startTime} و ${selectedShift.endTime}`;
-              })()}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Delivery Info */}
-      <div className="text-xs text-muted-foreground space-y-1">
-        <p>• يتم التوصيل خلال الوقت المحدد</p>
-        <p>• سيتم التواصل معك قبل الوصول</p>
-        <p>• يمكن تغيير وقت التوصيل حتى ساعتين قبل الموعد</p>
-      </div>
-    </div>
+                {isSelected && <CheckCircle className="h-4 w-4 text-primary" />}
+              </button>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
