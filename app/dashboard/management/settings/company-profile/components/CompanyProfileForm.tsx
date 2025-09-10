@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,9 +27,10 @@ type CompanyProfileFormData = z.infer<typeof CompanyProfileSchema>;
 
 interface CompanyProfileFormProps {
     company?: any;
+    onProgressChange?: (current: number, total: number, isComplete: boolean) => void;
 }
 
-export default function CompanyProfileForm({ company }: CompanyProfileFormProps) {
+export default function CompanyProfileForm({ company, onProgressChange }: CompanyProfileFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isComplete, setIsComplete] = useState(
         !!(company?.fullName && company?.email && company?.phoneNumber)
@@ -53,8 +54,16 @@ export default function CompanyProfileForm({ company }: CompanyProfileFormProps)
         },
     });
 
-    const watchedValues = watch();
-    const isFormComplete = !!(watchedValues.fullName && watchedValues.email && watchedValues.phoneNumber);
+
+    // Report progress to parent (top progress bar)
+    useEffect(() => {
+        const subscription = watch((vals) => {
+            const total = 3;
+            const current = [vals.fullName, vals.email, vals.phoneNumber].filter(Boolean).length;
+            onProgressChange?.(current, total, current === total);
+        });
+        return () => subscription.unsubscribe();
+    }, [watch, onProgressChange]);
 
     const onSubmit = async (data: CompanyProfileFormData) => {
         setIsSubmitting(true);
@@ -217,24 +226,7 @@ export default function CompanyProfileForm({ company }: CompanyProfileFormProps)
                 </div>
             </form>
 
-            {/* Progress Indicator */}
-            <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">الحقول المطلوبة</span>
-                    <span className="text-sm text-muted-foreground">
-                        {isFormComplete ? 'مكتمل' : 'غير مكتمل'}
-                    </span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                    <div
-                        className={`h-2 rounded-full transition-all duration-300 ${isFormComplete ? 'bg-green-500' : 'bg-muted-foreground'}`}
-                        style={{ width: `${isFormComplete ? 100 : 0}%` }}
-                    />
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                    الحقول المطلوبة: اسم المتجر، البريد الإلكتروني، رقم الهاتف
-                </p>
-            </div>
+
         </div>
     );
 }

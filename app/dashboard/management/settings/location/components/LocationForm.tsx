@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle2, Loader2, MapPin } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import GoogleMapsLink from "@/components/GoogleMapsLink";
 import { saveCompany } from "../../actions/saveCompnay";
 import { z } from "zod";
 
@@ -30,9 +32,10 @@ type LocationFormData = z.infer<typeof LocationSchema>;
 
 interface LocationFormProps {
     company?: any;
+    onProgressChange?: (current: number, total: number, isComplete: boolean) => void;
 }
 
-export default function LocationForm({ company }: LocationFormProps) {
+export default function LocationForm({ company, onProgressChange }: LocationFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isComplete, setIsComplete] = useState(
         !!(company?.address && company?.latitude && company?.longitude)
@@ -54,8 +57,15 @@ export default function LocationForm({ company }: LocationFormProps) {
         },
     });
 
-    const watchedValues = watch();
-    const isFormComplete = !!(watchedValues.address && watchedValues.latitude && watchedValues.longitude);
+    // Dynamically report progress to parent (top progress bar)
+    useEffect(() => {
+        const subscription = watch((values) => {
+            const total = 3;
+            const current = [values.address, values.latitude, values.longitude].filter(Boolean).length;
+            onProgressChange?.(current, total, current === total);
+        });
+        return () => subscription.unsubscribe();
+    }, [watch, onProgressChange]);
 
     const onSubmit = async (data: LocationFormData) => {
         setIsSubmitting(true);
@@ -156,21 +166,7 @@ export default function LocationForm({ company }: LocationFormProps) {
                     </div>
                 </div>
 
-                {/* Help Text */}
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="flex items-start gap-2">
-                        <MapPin className="w-4 h-4 text-blue-600 mt-0.5" />
-                        <div className="text-sm text-blue-800">
-                            <p className="font-medium mb-1">كيفية الحصول على الإحداثيات:</p>
-                            <ul className="list-disc list-inside space-y-1 text-xs">
-                                <li>افتح Google Maps</li>
-                                <li>ابحث عن موقعك</li>
-                                <li>انقر بزر الماوس الأيمن على الموقع</li>
-                                <li>انسخ الإحداثيات التي تظهر</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+
 
                 {/* Form Actions */}
                 <div className="flex gap-4 pt-6 border-t justify-end">
@@ -191,25 +187,18 @@ export default function LocationForm({ company }: LocationFormProps) {
                 </div>
             </form>
 
-            {/* Progress Indicator */}
-            <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">الحقول المطلوبة</span>
-                    <span className="text-sm text-muted-foreground">
-                        {isFormComplete ? 'مكتمل' : 'غير مكتمل'}
-                    </span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                    <div
-                        className={`h-2 rounded-full transition-all duration-300 ${isFormComplete ? 'bg-green-500' : 'bg-muted-foreground'
-                            }`}
-                        style={{ width: `${isFormComplete ? 100 : 0}%` }}
-                    />
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                    الحقول المطلوبة: العنوان، خط العرض، خط الطول
-                </p>
-            </div>
+            {/* Show map link if coordinates are valid */}
+            {(() => {
+                const lat = parseFloat((watch('latitude') ?? '').toString());
+                const lng = parseFloat((watch('longitude') ?? '').toString());
+                const valid = Number.isFinite(lat) && Number.isFinite(lng);
+                return valid ? (
+                    <div className="flex justify-end mt-4">
+                        <GoogleMapsLink latitude={lat} longitude={lng} label="عرض الموقع على الخريطة" showIcon showExternalIcon />
+                    </div>
+                ) : null;
+            })()}
+
         </div>
     );
 } 

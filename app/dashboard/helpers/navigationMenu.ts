@@ -70,7 +70,7 @@ export const navigationItems = [
 
       { label: 'الروابط الاجتماعية', href: '/dashboard/management/settings/social-media', icon: 'Share2' },
       { label: 'الشعار والهوية', href: '/dashboard/management/settings/branding', icon: 'Palette' },
-      { label: 'الامتثال (VAT/CR/رقم التعريف)', href: '/dashboard/management/settings/compliance', icon: 'ShieldCheck' },
+      { label: 'المستندات الحكومية', href: '/dashboard/management/settings/compliance', icon: 'FileText' },
       // السياسات ضمن معلومات المتجر
       { label: 'سياسة الموقع', href: '/dashboard/management/policies/website', icon: 'Globe' },
       { label: 'سياسة الإرجاع', href: '/dashboard/management/policies/return', icon: 'Undo' },
