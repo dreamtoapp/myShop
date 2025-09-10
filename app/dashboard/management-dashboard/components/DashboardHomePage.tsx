@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/icons/Icon';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import CompanyDataAlert from '@/components/CompanyDataAlert';
+import { CompanyDataStatus } from '@/helpers/companyDataValidator';
 
 interface DashboardHomePageProps {
   summary: {
@@ -20,6 +22,7 @@ interface DashboardHomePageProps {
     orderStatus: { name: string; value: number }[];
     recentOrders: { id: string; orderNumber: string; customer: string; amount: number; status: string; date: string }[];
   };
+  companyDataStatus?: CompanyDataStatus;
 }
 
 const statusLabels: Record<string, string> = {
@@ -58,7 +61,7 @@ function getStatusHint(status: string): string {
   return statusHints[status] || 'حالة غير معروفة';
 }
 
-export default function DashboardHomePage({ summary: initialSummary }: DashboardHomePageProps) {
+export default function DashboardHomePage({ summary: initialSummary, companyDataStatus }: DashboardHomePageProps) {
   const [summary, setSummary] = useState(initialSummary);
 
   const fetchSummary = async () => {
@@ -93,6 +96,11 @@ export default function DashboardHomePage({ summary: initialSummary }: Dashboard
           {/* Dashboard actions can go here */}
         </div>
       </div>
+
+      {/* Company Data Alert */}
+      {companyDataStatus && (
+        <CompanyDataAlert status={companyDataStatus} />
+      )}
 
       {/* Key Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 xl:gap-5">

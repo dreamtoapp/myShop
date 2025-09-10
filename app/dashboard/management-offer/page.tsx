@@ -65,7 +65,7 @@ function ActiveOffersSection({ offers }: { offers: Offer[] }) {
     return (
         <section className="mb-6">
             <h2 className="text-lg font-medium mb-3 text-foreground">العروض النشطة</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="flex flex-wrap gap-4 justify-center">
                 {offers.map((offer) => (
                     <OfferCard key={offer.id} offer={offer} />
                 ))}
@@ -81,7 +81,7 @@ function InactiveOffersSection({ offers }: { offers: Offer[] }) {
     return (
         <section className="mb-6">
             <h2 className="text-lg font-medium mb-3 text-muted-foreground">العروض غير النشطة</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="flex flex-wrap gap-4 justify-center">
                 {offers.map((offer) => (
                     <OfferCard key={offer.id} offer={offer} />
                 ))}

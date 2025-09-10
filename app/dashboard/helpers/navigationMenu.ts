@@ -140,6 +140,7 @@ export const navigationItems = [
       { label: 'إعدادات متقدمة', href: '/dashboard/management/settings/advanced', icon: 'Wrench' },
 
       { label: 'System Log', href: '/dashboard/management/settings/errors', icon: 'Bug' },
+      { label: 'حالة التطبيق', href: '/dashboard/health-status', icon: 'Activity' },
       { label: 'تحسين المحركات', href: '/dashboard/management-seo', icon: 'Search' },
       { label: 'الصيانة', href: '/dashboard/management-maintinance', icon: 'Wrench' },
     ]
