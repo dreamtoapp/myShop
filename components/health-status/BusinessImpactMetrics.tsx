@@ -15,7 +15,7 @@ export default function BusinessImpactMetrics({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <Card className="border-red-500 bg-red-100 dark:bg-red-900 dark:border-red-600">
+      <Card className="border-red-600 bg-red-50 dark:bg-red-900 dark:border-red-600">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -30,7 +30,7 @@ export default function BusinessImpactMetrics({
         </CardContent>
       </Card>
 
-      <Card className="border-orange-500 bg-orange-100 dark:bg-orange-900 dark:border-orange-600">
+      <Card className="border-orange-600 bg-orange-50 dark:bg-orange-900 dark:border-orange-600">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -45,7 +45,7 @@ export default function BusinessImpactMetrics({
         </CardContent>
       </Card>
 
-      <Card className="border-green-500 bg-green-100 dark:bg-green-900 dark:border-green-600">
+      <Card className="border-green-600 bg-green-50 dark:bg-green-900 dark:border-green-600">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -60,7 +60,7 @@ export default function BusinessImpactMetrics({
         </CardContent>
       </Card>
 
-      <Card className="border-blue-500 bg-blue-100 dark:bg-blue-900 dark:border-blue-600">
+      <Card className="border-blue-600 bg-blue-50 dark:bg-blue-900 dark:border-blue-600">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>

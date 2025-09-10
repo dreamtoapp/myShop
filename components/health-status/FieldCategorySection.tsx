@@ -89,8 +89,40 @@ function humanizeFieldName(field: string): string {
     whatsappPhoneNumberId: 'معرّف رقم واتساب (نظام)',
     whatsappApiVersion: 'إصدار واجهة واتساب (نظام)',
     whatsappBusinessAccountId: 'معرّف حساب واتساب التجاري (نظام)',
+    whatsappWebhookVerifyToken: 'توكن التحقق من واتساب (نظام)',
+    whatsappAppSecret: 'سر تطبيق واتساب (نظام)',
+    whatsappEnvironment: 'بيئة واتساب (نظام)',
     createdAt: 'تاريخ الإنشاء',
     updatedAt: 'تاريخ آخر تحديث',
+
+    // Email/SMTP Configuration
+    emailUser: 'مستخدم البريد الإلكتروني (نظام)',
+    emailPass: 'كلمة مرور البريد الإلكتروني (نظام)',
+    smtpHost: 'خادم SMTP (نظام)',
+    smtpPort: 'منفذ SMTP (نظام)',
+    smtpUser: 'مستخدم SMTP (نظام)',
+    smtpPass: 'كلمة مرور SMTP (نظام)',
+    smtpFrom: 'عنوان المرسل (نظام)',
+
+    // Cloudinary Integration
+    cloudinaryCloudName: 'اسم سحابة Cloudinary (نظام)',
+    cloudinaryApiKey: 'مفتاح API لـ Cloudinary (نظام)',
+    cloudinaryApiSecret: 'سر API لـ Cloudinary (نظام)',
+    cloudinaryUploadPreset: 'إعداد رفع Cloudinary (نظام)',
+    cloudinaryClientFolder: 'مجلد Cloudinary (نظام)',
+
+    // Pusher Real-time
+    pusherAppId: 'معرف تطبيق Pusher (نظام)',
+    pusherKey: 'مفتاح Pusher (نظام)',
+    pusherSecret: 'سر Pusher (نظام)',
+    pusherCluster: 'عنقود Pusher (نظام)',
+
+    // Analytics and Other Integrations
+    gtmContainerId: 'معرف حاوية GTM (نظام)',
+    googleMapsApiKey: 'مفتاح Google Maps (نظام)',
+    authCallbackUrl: 'رابط استدعاء المصادقة (نظام)',
+    requireWhatsappOtp: 'تفعيل OTP واتساب (نظام)',
+    requireLocation: 'تفعيل الموقع (نظام)',
   };
   return map[field] || field;
 }

@@ -37,12 +37,6 @@ export const DEFAULT_COMPANY_SETTINGS = {
   pusherSecret: 'ea7e9b152b16c6d28afd',
   pusherCluster: 'us2',
 
-  // Web Push (VAPID)
-  vapidPublicKey: 'BItqQ5e0yq2bjIquXBHMVy-_4I3bTPqAKqdCJdG_BQCjYPUSs_zmC-Yw13OmUBwWR4TL9sWrfgn535pfOQ1YDj4',
-  vapidPrivateKey: 'Hm6gy3OnZ8AUZfDZwVZ8FHD1y3KfgUvXNchuQmEPbjA',
-  vapidSubject: 'mailto:admin@dreamtoapp.com',
-  vapidEmail: 'admin@dreamtoapp.com',
-
   // Auth
   authCallbackUrl: 'http://localhost:3000',
   // Auth behavior toggles

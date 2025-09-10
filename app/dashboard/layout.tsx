@@ -7,6 +7,7 @@ import AdminNotificationWrapper from '@/app/components/AdminNotificationWrapper'
 import DashboardNav from './components/DashboardNav';
 import DashboardFooter from './components/DashboardFooter';
 import { getPendingOrdersCount } from './helpers/navigationMenu';
+import { getCompanyHealthStatus } from '@/actions/getCompanyHealthStatus';
 
 export default async function LayoutNew({ children }: { children: React.ReactNode }) {
     // This layout is used for the dashboard pages
@@ -17,14 +18,17 @@ export default async function LayoutNew({ children }: { children: React.ReactNod
         return redirect('/auth/login');
     }
 
-    // Fetch pending orders count for navigation badge
-    const pendingOrdersCount = await getPendingOrdersCount();
+    // Fetch pending orders count and company health status for navigation
+    const [pendingOrdersCount, companyStatus] = await Promise.all([
+        getPendingOrdersCount(),
+        getCompanyHealthStatus()
+    ]);
 
     // Hardcode RTL for now; in the future, detect from language/i18n
     return (
         <div className='flex min-h-screen w-full bg-background flex-col' dir='rtl'>
             {/* Top Navigation Bar */}
-            <DashboardNav pendingOrdersCount={pendingOrdersCount} />
+            <DashboardNav pendingOrdersCount={pendingOrdersCount} companyStatus={companyStatus} />
 
             {/* Main Content Area */}
             <div className='flex flex-1 flex-col pt-16'>

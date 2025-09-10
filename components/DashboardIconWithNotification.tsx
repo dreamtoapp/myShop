@@ -1,11 +1,14 @@
-'use client';
-
 import Link from 'next/link';
 import { Icon } from '@/components/icons/Icon';
-import { useCompanyDataStatus } from '@/helpers/useCompanyDataStatus';
+import { CompanyDataStatus } from '@/helpers/companyDataValidator';
 
-export default function DashboardIconWithNotification() {
-  const { hasMissingData, hasCriticalMissing, loading, status } = useCompanyDataStatus();
+interface DashboardIconWithNotificationProps {
+  companyStatus: CompanyDataStatus;
+}
+
+export default function DashboardIconWithNotification({ companyStatus }: DashboardIconWithNotificationProps) {
+  const hasMissingData = !companyStatus.isComplete;
+  const hasCriticalMissing = companyStatus.criticalMissing.length > 0;
 
   return (
     <Link href="/dashboard" className="flex items-center relative group">
@@ -18,7 +21,7 @@ export default function DashboardIconWithNotification() {
       />
 
       {/* Red pulsing notification dot */}
-      {!loading && hasMissingData && (
+      {hasMissingData && (
         <div className="absolute -top-1 -right-1">
           <div className={`h-3 w-3 rounded-full ${hasCriticalMissing ? 'bg-red-500' : 'bg-orange-500'
             } animate-pulse`} />
@@ -35,11 +38,9 @@ export default function DashboardIconWithNotification() {
             : 'لوحة التحكم'
           }
         </div>
-        {status && (
-          <div className="text-xs mt-1 text-gray-300">
-            اكتمال البيانات: {status.completionPercentage}%
-          </div>
-        )}
+        <div className="text-xs mt-1 text-gray-300">
+          اكتمال البيانات: {companyStatus.completionPercentage}%
+        </div>
         <div className="text-xs mt-1 text-gray-400">
           انقر للانتقال للوحة التحكم
         </div>

@@ -39,6 +39,48 @@ export interface CompanyData {
   facebook?: string;
   snapchat?: string;
   website?: string;
+  online?: boolean;
+  taxPercentage?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+
+  // WhatsApp Integration
+  whatsappPermanentToken?: string;
+  whatsappPhoneNumberId?: string;
+  whatsappApiVersion?: string;
+  whatsappBusinessAccountId?: string;
+  whatsappWebhookVerifyToken?: string;
+  whatsappAppSecret?: string;
+  whatsappEnvironment?: string;
+
+  // Email/SMTP Configuration
+  emailUser?: string;
+  emailPass?: string;
+  smtpHost?: string;
+  smtpPort?: string;
+  smtpUser?: string;
+  smtpPass?: string;
+  smtpFrom?: string;
+
+  // Cloudinary Integration
+  cloudinaryCloudName?: string;
+  cloudinaryApiKey?: string;
+  cloudinaryApiSecret?: string;
+  cloudinaryUploadPreset?: string;
+  cloudinaryClientFolder?: string;
+
+  // Pusher Real-time
+  pusherAppId?: string;
+  pusherKey?: string;
+  pusherSecret?: string;
+  pusherCluster?: string;
+
+  // Analytics and Other Integrations
+  gtmContainerId?: string;
+  googleMapsApiKey?: string;
+  authCallbackUrl?: string;
+  requireWhatsappOtp?: boolean;
+  requireLocation?: boolean;
 }
 
 // Critical fields that are absolutely required for business operations
@@ -89,7 +131,49 @@ const FIELD_LABELS: Record<string, string> = {
   tiktok: 'تيك توك',
   facebook: 'فيسبوك',
   snapchat: 'سناب شات',
-  website: 'الموقع الإلكتروني'
+  website: 'الموقع الإلكتروني',
+  online: 'حالة المتجر',
+  taxPercentage: 'نسبة الضريبة',
+  createdAt: 'تاريخ الإنشاء',
+  updatedAt: 'تاريخ آخر تحديث',
+
+  // WhatsApp Integration
+  whatsappPermanentToken: 'توكن واتساب الدائم',
+  whatsappPhoneNumberId: 'معرّف رقم واتساب',
+  whatsappApiVersion: 'إصدار واجهة واتساب',
+  whatsappBusinessAccountId: 'معرّف حساب واتساب التجاري',
+  whatsappWebhookVerifyToken: 'توكن التحقق من واتساب',
+  whatsappAppSecret: 'سر تطبيق واتساب',
+  whatsappEnvironment: 'بيئة واتساب',
+
+  // Email/SMTP Configuration
+  emailUser: 'مستخدم البريد الإلكتروني',
+  emailPass: 'كلمة مرور البريد الإلكتروني',
+  smtpHost: 'خادم SMTP',
+  smtpPort: 'منفذ SMTP',
+  smtpUser: 'مستخدم SMTP',
+  smtpPass: 'كلمة مرور SMTP',
+  smtpFrom: 'عنوان المرسل',
+
+  // Cloudinary Integration
+  cloudinaryCloudName: 'اسم سحابة Cloudinary',
+  cloudinaryApiKey: 'مفتاح API لـ Cloudinary',
+  cloudinaryApiSecret: 'سر API لـ Cloudinary',
+  cloudinaryUploadPreset: 'إعداد رفع Cloudinary',
+  cloudinaryClientFolder: 'مجلد Cloudinary',
+
+  // Pusher Real-time
+  pusherAppId: 'معرف تطبيق Pusher',
+  pusherKey: 'مفتاح Pusher',
+  pusherSecret: 'سر Pusher',
+  pusherCluster: 'عنقود Pusher',
+
+  // Analytics and Other Integrations
+  gtmContainerId: 'معرف حاوية GTM',
+  googleMapsApiKey: 'مفتاح Google Maps',
+  authCallbackUrl: 'رابط استدعاء المصادقة',
+  requireWhatsappOtp: 'تفعيل OTP واتساب',
+  requireLocation: 'تفعيل الموقع'
 };
 
 /**

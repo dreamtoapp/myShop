@@ -10,11 +10,11 @@ export default function HealthStatusHeader({ overallHealth }: HealthStatusHeader
   const getHealthIcon = () => {
     switch (overallHealth) {
       case 'critical':
-        return <AlertTriangle className="h-8 w-8 text-red-500" />;
+        return <AlertTriangle className="h-8 w-8 text-red-700" />;
       case 'warning':
-        return <AlertCircle className="h-8 w-8 text-orange-500" />;
+        return <AlertCircle className="h-8 w-8 text-orange-700" />;
       default:
-        return <CheckCircle className="h-8 w-8 text-green-500" />;
+        return <CheckCircle className="h-8 w-8 text-green-700" />;
     }
   };
 
@@ -25,7 +25,7 @@ export default function HealthStatusHeader({ overallHealth }: HealthStatusHeader
       case 'warning':
         return <Badge variant="secondary" className="text-sm px-3 py-1">يحتاج تحسين</Badge>;
       default:
-        return <Badge variant="default" className="bg-green-500 text-sm px-3 py-1">ممتاز</Badge>;
+        return <Badge variant="default" className="bg-green-600 text-white text-sm px-3 py-1">ممتاز</Badge>;
     }
   };
 

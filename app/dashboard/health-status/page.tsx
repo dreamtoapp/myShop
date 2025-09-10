@@ -256,6 +256,30 @@ const FIELD_BUSINESS_IMPACT = {
     icon: Globe,
     color: 'blue'
   },
+  whatsappWebhookVerifyToken: {
+    category: 'إعدادات النظام',
+    priority: 'optional',
+    businessImpact: 'توكن التحقق من واتساب ضروري لاستقبال الرسائل',
+    userImpact: 'لا تأثير مباشر، إعداد تشغيلي',
+    icon: Globe,
+    color: 'blue'
+  },
+  whatsappAppSecret: {
+    category: 'إعدادات النظام',
+    priority: 'optional',
+    businessImpact: 'سر تطبيق واتساب مطلوب للمصادقة الآمنة',
+    userImpact: 'لا تأثير مباشر، إعداد تشغيلي',
+    icon: Globe,
+    color: 'blue'
+  },
+  whatsappEnvironment: {
+    category: 'إعدادات النظام',
+    priority: 'optional',
+    businessImpact: 'بيئة واتساب تحدد الخادم المستخدم (تطوير/إنتاج)',
+    userImpact: 'لا تأثير مباشر، إعداد تشغيلي',
+    icon: Globe,
+    color: 'blue'
+  },
   createdAt: {
     category: 'البيانات التعريفية',
     priority: 'optional',
@@ -270,6 +294,182 @@ const FIELD_BUSINESS_IMPACT = {
     businessImpact: 'تاريخ آخر تحديث يساعد على تتبع الصيانة والجودة',
     userImpact: 'لا تأثير مباشر',
     icon: FileText,
+    color: 'blue'
+  },
+
+  // Email/SMTP Configuration - CRITICAL for email functionality
+  emailUser: {
+    category: 'إعدادات البريد الإلكتروني',
+    priority: 'important',
+    businessImpact: 'اسم مستخدم البريد الإلكتروني مطلوب لإرسال الرسائل',
+    userImpact: 'العملاء يحتاجون استقبال إشعارات البريد الإلكتروني',
+    icon: Mail,
+    color: 'orange'
+  },
+  emailPass: {
+    category: 'إعدادات البريد الإلكتروني',
+    priority: 'important',
+    businessImpact: 'كلمة مرور البريد الإلكتروني مطلوبة للمصادقة',
+    userImpact: 'العملاء يحتاجون استقبال إشعارات البريد الإلكتروني',
+    icon: Mail,
+    color: 'orange'
+  },
+  smtpHost: {
+    category: 'إعدادات البريد الإلكتروني',
+    priority: 'important',
+    businessImpact: 'خادم SMTP مطلوب لإرسال الرسائل الإلكترونية',
+    userImpact: 'العملاء يحتاجون استقبال إشعارات البريد الإلكتروني',
+    icon: Mail,
+    color: 'orange'
+  },
+  smtpPort: {
+    category: 'إعدادات البريد الإلكتروني',
+    priority: 'important',
+    businessImpact: 'منفذ SMTP مطلوب للاتصال بخادم البريد',
+    userImpact: 'العملاء يحتاجون استقبال إشعارات البريد الإلكتروني',
+    icon: Mail,
+    color: 'orange'
+  },
+  smtpUser: {
+    category: 'إعدادات البريد الإلكتروني',
+    priority: 'important',
+    businessImpact: 'مستخدم SMTP مطلوب للمصادقة مع الخادم',
+    userImpact: 'العملاء يحتاجون استقبال إشعارات البريد الإلكتروني',
+    icon: Mail,
+    color: 'orange'
+  },
+  smtpPass: {
+    category: 'إعدادات البريد الإلكتروني',
+    priority: 'important',
+    businessImpact: 'كلمة مرور SMTP مطلوبة للمصادقة مع الخادم',
+    userImpact: 'العملاء يحتاجون استقبال إشعارات البريد الإلكتروني',
+    icon: Mail,
+    color: 'orange'
+  },
+  smtpFrom: {
+    category: 'إعدادات البريد الإلكتروني',
+    priority: 'important',
+    businessImpact: 'عنوان المرسل مطلوب لإرسال الرسائل الإلكترونية',
+    userImpact: 'العملاء يحتاجون معرفة مصدر الرسائل الإلكترونية',
+    icon: Mail,
+    color: 'orange'
+  },
+
+  // Cloudinary Integration - CRITICAL for image uploads
+  cloudinaryCloudName: {
+    category: 'إعدادات رفع الصور',
+    priority: 'important',
+    businessImpact: 'اسم سحابة Cloudinary مطلوب لرفع وتخزين الصور',
+    userImpact: 'العملاء يحتاجون رؤية صور المنتجات والشركة',
+    icon: Image,
+    color: 'orange'
+  },
+  cloudinaryApiKey: {
+    category: 'إعدادات رفع الصور',
+    priority: 'important',
+    businessImpact: 'مفتاح API لـ Cloudinary مطلوب للمصادقة',
+    userImpact: 'العملاء يحتاجون رؤية صور المنتجات والشركة',
+    icon: Image,
+    color: 'orange'
+  },
+  cloudinaryApiSecret: {
+    category: 'إعدادات رفع الصور',
+    priority: 'important',
+    businessImpact: 'سر API لـ Cloudinary مطلوب للمصادقة الآمنة',
+    userImpact: 'العملاء يحتاجون رؤية صور المنتجات والشركة',
+    icon: Image,
+    color: 'orange'
+  },
+  cloudinaryUploadPreset: {
+    category: 'إعدادات رفع الصور',
+    priority: 'important',
+    businessImpact: 'إعداد رفع Cloudinary مطلوب لتحسين الصور',
+    userImpact: 'العملاء يحتاجون رؤية صور عالية الجودة',
+    icon: Image,
+    color: 'orange'
+  },
+  cloudinaryClientFolder: {
+    category: 'إعدادات رفع الصور',
+    priority: 'optional',
+    businessImpact: 'مجلد Cloudinary يساعد في تنظيم الصور',
+    userImpact: 'لا تأثير مباشر على تجربة العميل',
+    icon: Image,
+    color: 'blue'
+  },
+
+  // Pusher Real-time - CRITICAL for notifications
+  pusherAppId: {
+    category: 'إعدادات الإشعارات المباشرة',
+    priority: 'important',
+    businessImpact: 'معرف تطبيق Pusher مطلوب للإشعارات المباشرة',
+    userImpact: 'العملاء يحتاجون إشعارات فورية عن الطلبات',
+    icon: Globe,
+    color: 'orange'
+  },
+  pusherKey: {
+    category: 'إعدادات الإشعارات المباشرة',
+    priority: 'important',
+    businessImpact: 'مفتاح Pusher مطلوب للاتصال بخدمة الإشعارات',
+    userImpact: 'العملاء يحتاجون إشعارات فورية عن الطلبات',
+    icon: Globe,
+    color: 'orange'
+  },
+  pusherSecret: {
+    category: 'إعدادات الإشعارات المباشرة',
+    priority: 'important',
+    businessImpact: 'سر Pusher مطلوب للمصادقة الآمنة',
+    userImpact: 'العملاء يحتاجون إشعارات فورية عن الطلبات',
+    icon: Globe,
+    color: 'orange'
+  },
+  pusherCluster: {
+    category: 'إعدادات الإشعارات المباشرة',
+    priority: 'important',
+    businessImpact: 'عنقود Pusher يحدد الخادم المستخدم للإشعارات',
+    userImpact: 'العملاء يحتاجون إشعارات فورية عن الطلبات',
+    icon: Globe,
+    color: 'orange'
+  },
+
+  // Analytics and Other Integrations
+  gtmContainerId: {
+    category: 'إعدادات التحليلات',
+    priority: 'optional',
+    businessImpact: 'معرف حاوية GTM مطلوب لتتبع سلوك المستخدمين',
+    userImpact: 'لا تأثير مباشر، يساعد في تحسين الخدمة',
+    icon: Globe,
+    color: 'blue'
+  },
+  googleMapsApiKey: {
+    category: 'إعدادات الخرائط',
+    priority: 'optional',
+    businessImpact: 'مفتاح Google Maps مطلوب لعرض الخرائط والمواقع',
+    userImpact: 'العملاء يمكنهم رؤية موقع المتجر على الخرائط',
+    icon: MapPin,
+    color: 'blue'
+  },
+  authCallbackUrl: {
+    category: 'إعدادات المصادقة',
+    priority: 'optional',
+    businessImpact: 'رابط استدعاء المصادقة مطلوب لتسجيل الدخول',
+    userImpact: 'العملاء يمكنهم تسجيل الدخول بأمان',
+    icon: Globe,
+    color: 'blue'
+  },
+  requireWhatsappOtp: {
+    category: 'إعدادات السلوك',
+    priority: 'optional',
+    businessImpact: 'تفعيل OTP واتساب يحدد طريقة التحقق من الهوية',
+    userImpact: 'العملاء يحتاجون التحقق عبر واتساب',
+    icon: Globe,
+    color: 'blue'
+  },
+  requireLocation: {
+    category: 'إعدادات السلوك',
+    priority: 'optional',
+    businessImpact: 'تفعيل الموقع يحدد ما إذا كان مطلوباً من العملاء',
+    userImpact: 'العملاء قد يحتاجون مشاركة موقعهم',
+    icon: MapPin,
     color: 'blue'
   }
 };

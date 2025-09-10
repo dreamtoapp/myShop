@@ -17,7 +17,7 @@ export default function BusinessRecommendations({
   const importantMissing = missingFields.filter(field => !criticalMissing.includes(field));
 
   return (
-    <Card className="border-blue-500 bg-blue-100 dark:bg-blue-900 dark:border-blue-600">
+    <Card className="border-blue-600 bg-blue-50 dark:bg-blue-900 dark:border-blue-600">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-blue-900 dark:text-blue-100">
           <Zap className="h-6 w-6" />
@@ -26,7 +26,7 @@ export default function BusinessRecommendations({
       </CardHeader>
       <CardContent className="space-y-4">
         {criticalMissing.length > 0 && (
-          <div className="p-4 bg-red-200 dark:bg-red-800 border border-red-500 dark:border-red-600 rounded-lg">
+          <div className="p-4 bg-red-100 dark:bg-red-800 border border-red-600 dark:border-red-600 rounded-lg">
             <h4 className="font-semibold text-red-900 dark:text-red-100 mb-2">🚨 أولوية عالية - بيانات حرجة</h4>
             <p className="text-sm text-red-900 dark:text-red-100 mb-2">
               هذه البيانات مطلوبة لبدء العمليات التجارية بشكل قانوني وفعال:
@@ -40,7 +40,7 @@ export default function BusinessRecommendations({
         )}
 
         {importantMissing.length > 0 && (
-          <div className="p-4 bg-orange-200 dark:bg-orange-800 border border-orange-500 dark:border-orange-600 rounded-lg">
+          <div className="p-4 bg-orange-100 dark:bg-orange-800 border border-orange-600 dark:border-orange-600 rounded-lg">
             <h4 className="font-semibold text-orange-900 dark:text-orange-100 mb-2">⚠️ أولوية متوسطة - بيانات مهمة</h4>
             <p className="text-sm text-orange-900 dark:text-orange-100 mb-2">
               هذه البيانات ستحسن من تجربة العملاء وكفاءة العمليات:
@@ -54,7 +54,7 @@ export default function BusinessRecommendations({
         )}
 
         {isComplete && (
-          <div className="p-4 bg-green-200 dark:bg-green-800 border border-green-500 dark:border-green-600 rounded-lg">
+          <div className="p-4 bg-green-100 dark:bg-green-800 border border-green-600 dark:border-green-600 rounded-lg">
             <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">✅ ممتاز - جميع البيانات مكتملة</h4>
             <p className="text-sm text-green-900 dark:text-green-100">
               متجرك جاهز للعمل بكفاءة عالية! جميع البيانات الأساسية والمهمة مكتملة.
