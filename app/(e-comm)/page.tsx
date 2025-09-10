@@ -41,11 +41,12 @@ export default async function HomePage(props: { searchParams: Promise<{ slug?: s
       <div className='container mx-auto flex flex-col gap-8 bg-background text-foreground px-4 sm:px-6 lg:px-8'>
         {/* <PreloadScript /> */}
         {/* <HomepageHeroSection /> */}
-        <section className="space-y-6" aria-label="Product categories">
-          <CategoryList />
-        </section>
+
         <section className="space-y-6" aria-label="Featured promotions">
           <FeaturedPromotions />
+        </section>
+        <section className="space-y-6" aria-label="Product categories">
+          <CategoryList />
         </section>
         <section className="space-y-6" aria-label="Featured products">
           <SWRConfig value={{ fallback: { [firstPageKey]: { products } } }}>

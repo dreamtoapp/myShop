@@ -40,13 +40,13 @@ export default async function FeaturedPromotions() {
                             className="block min-w-[320px] max-w-xs overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary"
                         >
                             {/* Offer Image */}
-                            <div className="relative aspect-video overflow-hidden">
+                            <div className="relative aspect-square overflow-hidden">
                                 {offer.imageUrl ? (
                                     <Image
                                         src={offer.imageUrl}
                                         alt={offer.name}
                                         fill
-                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                        className="object-contain"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                         priority={idx < 8}
                                     />
