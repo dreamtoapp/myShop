@@ -34,13 +34,6 @@ export function getCustomerFields(
           error: errors.name?.message,
         },
         {
-          name: 'email',
-          type: 'email',
-          placeholder: 'البريد الإلكتروني',
-          register: register('email'),
-          error: errors.email?.message,
-        },
-        {
           name: 'phone',
           type: 'tel',
           placeholder: 'رقم الهاتف',

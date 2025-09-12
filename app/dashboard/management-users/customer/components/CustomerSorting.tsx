@@ -4,47 +4,16 @@ import { useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Icon } from '@/components/icons/Icon';
+import { useRouter, useSearchParams } from 'next/navigation';
+import type { Customer } from '../helpers/types';
 
-type Customer = {
-    id: string;
-    name: string;
-    email: string | null;
-    phone: string | null;
-    role: any;
-    addresses?: Array<{
-        id: string;
-        label: string;
-        district: string;
-        street: string;
-        buildingNumber: string;
-        floor?: string | null;
-        apartmentNumber?: string | null;
-        landmark?: string | null;
-        deliveryInstructions?: string | null;
-        latitude?: string | null;
-        longitude?: string | null;
-        isDefault: boolean;
-    }> | null;
-    password?: string | null;
-    sharedLocationLink?: string | null;
-    image?: string | null;
-    latitude?: string | null;
-    longitude?: string | null;
-    preferredPaymentMethod?: string | null;
-    deliveryPreferences?: string | null;
-    orderCount: number;
-    vipLevel?: number | null;
-    createdAt: Date;
-    updatedAt: Date;
-};
 
-type CustomerSortingProps = {
-    customers: Customer[];
-    onSortChange: (value: string) => void;
-    currentSort: string;
-};
 
-export default function CustomerSorting({ customers, onSortChange, currentSort }: CustomerSortingProps) {
+type CustomerSortingProps = { customers: Customer[]; currentSort: string };
+
+export default function CustomerSorting({ customers, currentSort }: CustomerSortingProps) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     // Calculate status counts
     const statusCounts = useMemo(() => {
@@ -61,11 +30,9 @@ export default function CustomerSorting({ customers, onSortChange, currentSort }
 
     // Update the URL to reflect the current sort
     const handleSortChange = (value: string) => {
-        onSortChange(value);
-        // Update URL without page reload
-        const url = new URL(window.location.href);
-        url.searchParams.set('sort', value);
-        window.history.pushState({}, '', url.toString());
+        const params = new URLSearchParams(searchParams?.toString());
+        params.set('sort', value);
+        router.replace(`?${params.toString()}`, { scroll: false });
     };
 
     return (
@@ -75,9 +42,6 @@ export default function CustomerSorting({ customers, onSortChange, currentSort }
                 <span className='text-sm font-medium text-muted-foreground'>الحالة:</span>
                 <Badge variant="outline" className="border-primary/20 text-primary">
                     الكل: {statusCounts.all}
-                </Badge>
-                <Badge variant="outline" className="border-special-fg text-special-fg">
-                    VIP: {statusCounts.vip}
                 </Badge>
                 <Badge variant="outline" className="border-success-fg text-success-fg">
                     نشط: {statusCounts.active}
@@ -96,7 +60,6 @@ export default function CustomerSorting({ customers, onSortChange, currentSort }
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">جميع العملاء</SelectItem>
-                        <SelectItem value="vip">VIP فقط</SelectItem>
                         <SelectItem value="active">نشط فقط</SelectItem>
                         <SelectItem value="inactive">غير نشط فقط</SelectItem>
                         <SelectItem value="most-orders">الأكثر طلباً</SelectItem>

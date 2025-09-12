@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Customer-specific validation schema
 export const CustomerSchema = z.object({
   name: z.string().trim().nonempty('الاسم مطلوب'),
-  email: z.string().trim().email('صيغة البريد الإلكتروني غير صحيحة'),
+  email: z.string().trim().email('صيغة البريد الإلكتروني غير صحيحة').optional().or(z.literal('')),
   phone: z
     .string()
     .trim()

@@ -1,6 +1,7 @@
 'use client';
 
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 import AddImage from '@/components/AddImage';
 import {
@@ -17,6 +18,92 @@ import { UserRole } from '@prisma/client';
 import DeleteCustomerAlert from './DeleteCustomerAlert';
 import CustomerUpsert from './CustomerUpsert';
 import AddressBook from './AddressBook';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import AppDialog from '@/components/app-dialog';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+// Optimized status badge with business logic
+function StatusBadge({ orderCount }: { orderCount: number }) {
+    const isActive = orderCount > 0;
+    return (
+        <Badge
+            variant={isActive ? "default" : "secondary"}
+            className={`text-xs px-2 py-1 ${isActive ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+        >
+            {isActive ? 'نشط' : 'غير نشط'}
+        </Badge>
+    );
+}
+
+// Compact info display for business-critical data
+function BusinessInfo({ icon, label, value, isClickable = false }: {
+    icon: string;
+    label: string;
+    value: string;
+    isClickable?: boolean;
+}) {
+    const content = (
+        <div className='flex items-center gap-2 py-1'>
+            <Icon name={icon} size="xs" className="text-muted-foreground w-3 h-3 flex-shrink-0" />
+            <span className='text-xs text-muted-foreground'>{label}:</span>
+            <span className='text-sm font-medium text-foreground truncate'>{value}</span>
+        </div>
+    );
+
+    return isClickable ? (
+        <a href={`tel:${value}`} className="hover:text-primary transition-colors">
+            {content}
+        </a>
+    ) : content;
+}
+
+type ImageDialogTriggerProps = {
+    name: string;
+    imageUrl?: string | null;
+    recordId: string;
+    onUploaded: () => void;
+};
+
+// Optimized image dialog with business focus
+function ImageDialogTrigger({ name, imageUrl, recordId, onUploaded }: ImageDialogTriggerProps) {
+    return (
+        <AppDialog
+            trigger={
+                <div className='w-10 h-10 cursor-pointer hover:scale-105 transition-transform duration-200 border-2 border-transparent hover:border-primary/20 rounded-full'>
+                    <Avatar className="w-full h-full rounded-full overflow-hidden">
+                        {imageUrl ? (
+                            <AvatarImage className="w-full h-full object-cover" src={imageUrl} alt={name} />
+                        ) : null}
+                        <AvatarFallback className="text-sm font-semibold bg-primary/10 text-primary">
+                            {name?.trim()?.charAt(0)?.toUpperCase() || '?'}
+                        </AvatarFallback>
+                    </Avatar>
+                </div>
+            }
+            title="تحديث صورة العميل"
+            description={name}
+            mode="update"
+            size="sm"
+            footer={null}
+        >
+            <div className="p-4">
+                <div className="w-[280px] h-[280px] aspect-square overflow-hidden mx-auto border border-border rounded-lg">
+                    <AddImage
+                        className="relative w-full h-full"
+                        url={imageUrl || undefined}
+                        alt={`${name}'s profile`}
+                        recordId={recordId}
+                        table="user"
+                        tableField='image'
+                        onUploadComplete={onUploaded}
+                    />
+                </div>
+            </div>
+        </AppDialog>
+    );
+}
 
 type CustomerCardProps = {
     customer: {
@@ -25,6 +112,7 @@ type CustomerCardProps = {
         email: string | null;
         phone: string | null;
         role: UserRole;
+        createdAt: Date | string;
         addresses?: Array<{
             id: string;
             label: string;
@@ -53,181 +141,187 @@ type CustomerCardProps = {
 };
 
 export default function CustomerCard({ customer }: CustomerCardProps) {
+    const router = useRouter();
+    const [imageVersion, setImageVersion] = useState(0);
+
+    // Business logic optimization
     const safeCustomer = {
         ...customer,
-        name: customer.name || 'No Name',
+        name: customer.name || 'غير محدد',
         email: customer.email || '',
-        password: undefined,
         imageUrl: customer.image || undefined,
     };
 
-    const getStatusBadge = (orderCount: number) => {
-        if (orderCount === 0) {
-            return <Badge variant="secondary" className="bg-neutral-soft-bg text-neutral-fg hover:bg-neutral-soft-bg/90">غير نشط</Badge>;
-        } else if (orderCount >= 6) {
-            return <Badge variant="default" className="bg-special-soft-bg text-special-fg hover:bg-special-soft-bg/90">VIP</Badge>;
+    const getPaymentMethodLabel = (method: string | null) => {
+        const methods = {
+            'CASH': 'نقداً',
+            'CARD': 'بطاقة ائتمان',
+            'WALLET': 'محفظة إلكترونية'
+        };
+        return methods[method as keyof typeof methods] || 'غير محدد';
+    };
+
+    const formatCreatedAt = (date: Date | string) => {
+        const createdDate = new Date(date);
+        const now = new Date();
+        const diffInDays = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        if (diffInDays === 0) {
+            return 'اليوم';
+        } else if (diffInDays === 1) {
+            return 'أمس';
+        } else if (diffInDays < 7) {
+            return `منذ ${diffInDays} أيام`;
+        } else if (diffInDays < 30) {
+            const weeks = Math.floor(diffInDays / 7);
+            return `منذ ${weeks} ${weeks === 1 ? 'أسبوع' : 'أسابيع'}`;
         } else {
-            return <Badge variant="default" className="bg-success-soft-bg text-success-fg hover:bg-success-soft-bg/90">نشط</Badge>;
+            return createdDate.toLocaleDateString('ar-SA');
         }
     };
 
-    const getPaymentMethodLabel = (method: string | null) => {
-        switch (method) {
-            case 'CASH':
-                return 'نقداً';
-            case 'CARD':
-                return 'بطاقة ائتمان';
-            case 'WALLET':
-                return 'محفظة إلكترونية';
-            default:
-                return 'غير محدد';
-        }
-    };
+    const isActiveCustomer = customer.orderCount > 0;
+    const hasAddresses = customer.addresses && customer.addresses.length > 0;
 
     return (
-        <Card className='overflow-hidden rounded-lg border border-primary/20 bg-background text-foreground shadow-md transition-all duration-200 hover:shadow-lg hover:scale-[1.02] h-[600px] flex flex-col'>
-            {/* ===== CARD HEADER ===== */}
-            <CardHeader className='border-b border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5 p-4 flex-shrink-0'>
+        <Card className='overflow-hidden rounded-xl border border-border/50 bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-200 min-h-[280px] max-h-[400px] flex flex-col'>
+            {/* ===== ROW LAYOUT HEADER ===== */}
+            <CardHeader className='border-b border-border/30 p-3 flex-shrink-0'>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-3'>
-                        <div className='w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center'>
-                            <Icon name="User" size="xs" className="text-primary" />
-                        </div>
-                        <div>
-                            <CardTitle className='line-clamp-1 text-lg font-semibold text-primary'>
-                                {safeCustomer.name}
-                            </CardTitle>
-                            <div className='text-xs text-muted-foreground flex items-center gap-1'>
-                                <Icon name="Phone" size="xs" className="text-primary w-3 h-3" />
-                                {customer.phone ? (
-                                    <a
-                                        href={`tel:${customer.phone}`}
-                                        className="hover:text-primary hover:underline transition-colors cursor-pointer"
-                                        title="Click to call"
-                                    >
-                                        {customer.phone}
-                                    </a>
-                                ) : (
-                                    'No Phone'
-                                )}
-                            </div>
-                        </div>
+                        <ImageDialogTrigger
+                            name={safeCustomer.name}
+                            imageUrl={safeCustomer.imageUrl ? `${safeCustomer.imageUrl}?v=${imageVersion}` : null}
+                            recordId={safeCustomer.id}
+                            onUploaded={() => {
+                                toast.success('تم رفع الصورة بنجاح');
+                                setImageVersion(v => v + 1);
+                                router.refresh();
+                            }}
+                        />
+                        <CardTitle className='line-clamp-1 text-lg font-semibold text-foreground'>
+                            {safeCustomer.name}
+                        </CardTitle>
                     </div>
                     <div className='flex items-center gap-2'>
-                        {getStatusBadge(customer.orderCount)}
-                        <Badge variant="outline" className="border-primary/20 text-primary text-xs">
-                            {customer.orderCount} طلب
-                        </Badge>
+                        <Icon name="Phone" size="xs" className="text-muted-foreground w-3 h-3" />
+                        {customer.phone ? (
+                            <a
+                                href={`tel:${customer.phone}`}
+                                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                            >
+                                {customer.phone}
+                            </a>
+                        ) : (
+                            <span className='text-sm text-muted-foreground'>غير محدد</span>
+                        )}
                     </div>
                 </div>
             </CardHeader>
 
-            {/* ===== CARD BODY ===== */}
-            <CardContent className='p-0 flex-1 overflow-hidden flex flex-col'>
-                {/* Profile Image Section */}
-                <div className="relative h-32 w-full overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10 flex-shrink-0">
-                    <AddImage
-                        url={safeCustomer.imageUrl}
-                        alt={`${safeCustomer.name}'s profile`}
-                        recordId={safeCustomer.id}
-                        table="user"
-                        tableField='image'
-                        onUploadComplete={() => toast.success("تم رفع الصورة بنجاح")}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                </div>
+            {/* ===== COMPACT BUSINESS BODY ===== */}
+            <CardContent className='p-0 flex-1 overflow-hidden'>
+                <div className='p-3 space-y-2'>
+                    {/* Essential Business Info */}
+                    <div className='space-y-1'>
+                        <BusinessInfo icon="Mail" label="البريد" value={safeCustomer.email || 'غير محدد'} />
 
-                {/* Scrollable Content Section */}
-                <div className='flex-1 overflow-y-auto p-4 space-y-3'>
-                    <div className='grid grid-cols-1 gap-3'>
-                        {/* Email */}
-                        <div className='flex items-center gap-3 p-2 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors'>
-                            <div className='w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center'>
-                                <Icon name="Mail" size="xs" className="text-primary w-3 h-3" />
-                            </div>
-                            <div className='flex-1 min-w-0'>
-                                <p className='text-sm font-medium text-foreground truncate'>
-                                    {safeCustomer.email || 'No Email'}
-                                </p>
-                            </div>
-                        </div>
+                        <BusinessInfo
+                            icon="Calendar"
+                            label="تاريخ الإنشاء"
+                            value={formatCreatedAt(customer.createdAt)}
+                        />
 
-
-
-                        {/* Payment Method */}
                         {customer.preferredPaymentMethod && (
-                            <div className='flex items-center gap-3 p-2 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors'>
-                                <div className='w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center'>
-                                    <Icon name="CreditCard" size="xs" className="text-primary w-3 h-3" />
-                                </div>
-                                <div className='flex-1 min-w-0'>
-                                    <p className='text-xs text-muted-foreground'>Payment Method</p>
-                                    <p className='text-sm font-medium text-foreground truncate'>
-                                        {getPaymentMethodLabel(customer.preferredPaymentMethod)}
-                                    </p>
-                                </div>
-                            </div>
+                            <BusinessInfo
+                                icon="CreditCard"
+                                label="طريقة الدفع"
+                                value={getPaymentMethodLabel(customer.preferredPaymentMethod)}
+                            />
                         )}
 
-                        {/* Order Count */}
-                        <div className='flex items-center gap-3 p-2 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors'>
-                            <div className='w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center'>
-                                <Icon name="ShoppingCart" size="xs" className="text-primary w-3 h-3" />
-                            </div>
-                            <div className='flex-1 min-w-0'>
-                                <p className='text-xs text-muted-foreground'>Total Orders</p>
-                                <p className='text-sm font-medium text-foreground'>
-                                    {customer.orderCount} طلب
-                                </p>
+                        {/* Business Metrics */}
+                        <div className='pt-2'>
+                            <div className='bg-muted/30 rounded-lg p-2 text-center'>
+                                <div className='text-lg font-bold text-primary'>{customer.orderCount}</div>
+                                <div className='text-xs text-muted-foreground'>إجمالي الطلبات</div>
                             </div>
                         </div>
 
-                        {/* Delivery Preferences */}
-                        {customer.deliveryPreferences && (
-                            <div className='flex items-center gap-3 p-2 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors'>
-                                <div className='w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center'>
-                                    <Icon name="Truck" size="xs" className="text-primary w-3 h-3" />
+                        {/* Customer Status Summary */}
+                        <div className='bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg p-2 mt-2'>
+                            <div className='flex items-center justify-between'>
+                                <div className='flex items-center gap-2'>
+                                    <Icon name="User" size="xs" className="text-primary w-3 h-3" />
+                                    <span className='text-xs text-muted-foreground'>حالة العميل:</span>
                                 </div>
-                                <div className='flex-1 min-w-0'>
-                                    <p className='text-xs text-muted-foreground'>Delivery Preferences</p>
-                                    <p className='text-sm font-medium text-foreground line-clamp-2'>
-                                        {customer.deliveryPreferences}
-                                    </p>
+                                <StatusBadge orderCount={customer.orderCount} />
+                            </div>
+                            <div className='text-xs text-muted-foreground mt-1'>
+                                {isActiveCustomer ? 'عميل نشط - يطلب بانتظام' : 'عميل غير نشط - لم يطلب بعد'}
+                            </div>
+                        </div>
+
+                        {customer.deliveryPreferences && (
+                            <div className='py-1'>
+                                <div className='flex items-start gap-2'>
+                                    <Icon name="Truck" size="xs" className="text-muted-foreground w-3 h-3 flex-shrink-0 mt-0.5" />
+                                    <div className='min-w-0'>
+                                        <span className='text-xs text-muted-foreground'>تفضيلات التوصيل:</span>
+                                        <p className='text-sm font-medium text-foreground line-clamp-1 mt-0.5'>
+                                            {customer.deliveryPreferences}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* Address Section */}
-                    <AddressBook
-                        addresses={customer.addresses || []}
-                        onAddressUpdate={() => window.location.reload()}
-                    />
+
+                    {/* Address Section - Only show if addresses exist */}
+                    {hasAddresses && (
+                        <div className='pt-2 border-t border-border/20'>
+                            <AddressBook
+                                addresses={customer.addresses || []}
+                                onAddressUpdate={() => router.refresh()}
+                            />
+                        </div>
+                    )}
                 </div>
             </CardContent>
 
-            {/* ===== CARD FOOTER ===== */}
-            <CardFooter className='flex justify-between border-t border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 p-4 flex-shrink-0'>
-                <CustomerUpsert
-                    mode='update'
-                    title="تعديل بيانات العميل"
-                    description="يرجى إدخال بيانات العميل المحدثة"
-                    defaultValues={{
-                        name: customer.name,
-                        email: customer.email || '',
-                        phone: customer.phone || '',
-                        password: customer.password || '',
-                    }}
-                    userId={customer.id}
-                />
+            {/* ===== OPTIMIZED FOOTER ===== */}
+            <CardFooter className='flex justify-between items-center border-t border-border/30 bg-muted/30 p-3 flex-shrink-0'>
+                {/* More Details - Left Side */}
+                <Link
+                    href={`/dashboard/management-users/customer/${customer.id}`}
+                    className='flex items-center gap-1.5 px-3 py-1.5 rounded-md text-primary hover:bg-primary/10 transition-colors text-sm font-medium'
+                >
+                    <Icon name="Eye" size="xs" className="w-3 h-3" />
+                    <span>تفاصيل أكثر</span>
+                </Link>
 
-                {/* Delete Customer Alert */}
-                <DeleteCustomerAlert customerId={safeCustomer.id}>
-                    <button className='flex items-center gap-2 px-3 py-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors'>
-                        <Icon name="Trash2" size="xs" className="w-3 h-3" />
-                        <span className='text-sm'>Delete</span>
-                    </button>
-                </DeleteCustomerAlert>
+                {/* Edit and Delete - Right Side */}
+                <div className='flex items-center gap-2'>
+                    <CustomerUpsert
+                        mode='update'
+                        title="تعديل بيانات العميل"
+                        description="يرجى إدخال البيانات المحدثة"
+                        defaultValues={{
+                            name: customer.name || '',
+                            phone: customer.phone || '',
+                            password: customer.password || '',
+                        }}
+                        userId={customer.id}
+                    />
+
+                    <DeleteCustomerAlert customerId={safeCustomer.id}>
+                        <button className='flex items-center gap-1.5 px-3 py-1.5 rounded-md text-destructive hover:bg-destructive/10 transition-colors text-sm font-medium'>
+                            <Icon name="Trash2" size="xs" className="w-3 h-3" />
+                            <span>حذف</span>
+                        </button>
+                    </DeleteCustomerAlert>
+                </div>
             </CardFooter>
         </Card>
     );
