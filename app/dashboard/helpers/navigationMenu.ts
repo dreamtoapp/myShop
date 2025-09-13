@@ -35,7 +35,14 @@ export const navigationItems = [
     children: [
       { label: 'المنتجات', href: '/dashboard/management-products', icon: 'Package' },
       { label: 'التصنيفات', href: '/dashboard/management-categories', icon: 'Tags' },
-      { label: 'الموردين', href: '/dashboard/management-suppliers', icon: 'Warehouse' },
+      { label: 'الموردين', href: '/dashboard/management-suppliers', icon: 'Warehouse' }
+    ]
+  },
+  {
+    label: 'العروض',
+    href: '/dashboard/management-offer',
+    icon: 'Megaphone',
+    children: [
       { label: 'العروض', href: '/dashboard/management-offer', icon: 'Megaphone' }
     ]
   },

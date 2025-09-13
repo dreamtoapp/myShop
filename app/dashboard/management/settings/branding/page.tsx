@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Palette } from 'lucide-react';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import SettingsLayout from '../components/SettingsLayout';
@@ -168,7 +169,13 @@ export default function BrandingPage() {
                                     {/* Page header with logo */}
                                     <div className="h-12 bg-muted/50 flex items-center px-4">
                                         {logoUrl ? (
-                                            <img src={logoUrl} alt="Logo" className="h-7 w-auto" />
+                                            <Image
+                                                src={logoUrl}
+                                                alt="Logo"
+                                                width={28}
+                                                height={28}
+                                                className="h-7 w-auto"
+                                            />
                                         ) : (
                                             <div className="h-7 w-28 bg-muted rounded" />
                                         )}
@@ -176,7 +183,12 @@ export default function BrandingPage() {
                                     {/* Full desktop hero (16:9, rounded) */}
                                     <div className="relative w-full overflow-hidden rounded-xl shadow-sm" style={{ paddingTop: '56.25%' }}>
                                         {heroUrl ? (
-                                            <img src={heroUrl} alt="Hero" className="absolute inset-0 w-full h-full object-cover" />
+                                            <Image
+                                                src={heroUrl}
+                                                alt="Hero"
+                                                fill
+                                                className="object-cover"
+                                            />
                                         ) : (
                                             <div className="absolute inset-0 bg-muted/50" />
                                         )}
@@ -216,7 +228,13 @@ export default function BrandingPage() {
                                         {/* App bar with logo */}
                                         <div className="h-10 bg-muted/60 flex items-center px-3">
                                             {logoUrl ? (
-                                                <img src={logoUrl} alt="Logo" className="h-5 w-auto" />
+                                                <Image
+                                                    src={logoUrl}
+                                                    alt="Logo"
+                                                    width={20}
+                                                    height={20}
+                                                    className="h-5 w-auto"
+                                                />
                                             ) : (
                                                 <div className="h-5 w-20 bg-muted rounded" />
                                             )}
@@ -224,7 +242,12 @@ export default function BrandingPage() {
                                         {/* Full mobile hero area */}
                                         <div className="h-48 relative">
                                             {heroUrl ? (
-                                                <img src={heroUrl} alt="Hero" className="absolute inset-0 w-full h-full object-cover" />
+                                                <Image
+                                                    src={heroUrl}
+                                                    alt="Hero"
+                                                    fill
+                                                    className="object-cover"
+                                                />
                                             ) : (
                                                 <div className="absolute inset-0 bg-muted/50" />
                                             )}

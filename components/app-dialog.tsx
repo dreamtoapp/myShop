@@ -53,18 +53,18 @@ const AppDialog: React.FC<AppDialogProps> = memo(({
     full: 'max-w-[95vw]'
   };
 
-  // Mode-based badge variants
-  const modeBadgeVariants = {
-    new: 'outline',
-    update: 'secondary',
-    delete: 'destructive',
-    view: 'outline',
-    default: 'secondary'
-  } as const;
-
   // Memoize header for performance
-  const header = useMemo(() => (
-    (title || description) && (
+  const header = useMemo(() => {
+    // Mode-based badge variants
+    const modeBadgeVariants = {
+      new: 'outline',
+      update: 'secondary',
+      delete: 'destructive',
+      view: 'outline',
+      default: 'secondary'
+    } as const;
+
+    return (title || description) && (
       <DialogHeader className='space-y-3 pb-4 border-b border-border/50' dir='rtl'>
         <div className='flex items-start justify-between gap-3'>
           <div className='flex-1 min-w-0'>
@@ -92,8 +92,8 @@ const AppDialog: React.FC<AppDialogProps> = memo(({
           )}
         </div>
       </DialogHeader>
-    )
-  ), [title, description, mode]);
+    );
+  }, [title, description, mode]);
 
   // Memoize footer for performance
   const dialogFooter = useMemo(() => (
