@@ -20,7 +20,7 @@ export async function cloudinaryHealthCheck(): Promise<CloudinaryHealth> {
     return { ok: false, configured: false, source: null, missing: [], message: 'UNAUTHORIZED' };
   }
 
-  const useDb = process.env.USE_DB_CLOUDINARY === 'true';
+  const useDb = process.env.USE_DB_CLOUDINARY !== 'false'; // Default to true unless explicitly disabled
 
   let cloudName: string | undefined;
   let apiKey: string | undefined;

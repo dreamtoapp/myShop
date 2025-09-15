@@ -15,7 +15,9 @@ export async function getOfferById(id: string) {
                 name: true,
                 slug: true,
                 price: true,
+                imageUrl: true,
                 images: true,
+                supplierId: true,
                 categoryAssignments: {
                   select: {
                     category: {

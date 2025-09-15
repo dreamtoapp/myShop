@@ -161,7 +161,7 @@ async function notifyAdmins(order: any, customerName: string, total: number) {
   try {
     const { pusherServer } = await import('@/lib/pusherServer');
     const pusherPromises = adminUsers.map(admin =>
-      pusherServer.trigger(`admin-${admin.id}`, 'new-order', {
+      pusherServer?.trigger(`admin-${admin.id}`, 'new-order', {
         orderId: order.orderNumber,
         customer: customerName,
         total,

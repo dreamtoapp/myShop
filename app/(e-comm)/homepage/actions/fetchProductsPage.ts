@@ -23,7 +23,7 @@ export async function fetchProductsPage({
   pageSize = 8,
   slug
 }: FetchProductsParams) {
-  const where: any = { published: true };
+  const where: any = { published: true, type: 'product' };
   if (typeof search === 'string' && search.trim() !== '') {
     where.name = { contains: search.trim(), mode: 'insensitive' };
   }
@@ -89,7 +89,7 @@ export async function fetchProductsPage({
 // Cached version for use in homepage
 export async function getCachedProductsPage(params: FetchProductsParams) {
   const cacheKey = `products-${JSON.stringify(params)}`;
-  
+
   const cachedFetch = unstable_cache(
     () => fetchProductsPage(params),
     [cacheKey],
@@ -98,6 +98,6 @@ export async function getCachedProductsPage(params: FetchProductsParams) {
       revalidate: 3600 // 1 hour
     }
   );
-  
+
   return cachedFetch();
 }

@@ -38,6 +38,12 @@ export default function RealtimeNotificationListener({
                 const { getPusherClient } = await import('@/lib/pusherClient');
                 pusher = await getPusherClient();
 
+                // If Pusher is not configured, skip initialization
+                if (!pusher) {
+                    console.log('Pusher not configured - real-time notifications disabled');
+                    return;
+                }
+
                 // Subscribe to user's private channel
                 const channelName = `user-${session.user.id}`;
                 channel = pusher.subscribe(channelName);

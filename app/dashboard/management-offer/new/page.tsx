@@ -10,7 +10,7 @@ export default function NewOfferPage() {
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                         <Plus className="h-6 w-6 text-feature-commerce" />
-                        <h1 className="text-2xl font-bold text-foreground">إضافة مجموعة جديدة</h1>
+                        <h1 className="text-2xl font-bold text-foreground">إضافة عرض جديد</h1>
                     </div>
                 </div>
             </header>
@@ -22,10 +22,10 @@ export default function NewOfferPage() {
                         <CardHeader className="pb-4">
                             <CardTitle className="flex items-center gap-2 text-xl">
                                 <Package className="h-5 w-5 text-feature-commerce" />
-                                تفاصيل المجموعة الجديدة
+                                تفاصيل العرض الجديد
                             </CardTitle>
                             <p className="text-sm text-muted-foreground">
-                                أضف تفاصيل المجموعة المميزة التي ستظهر للعملاء في الموقع
+                                أضف تفاصيل العرض المميز الذي سيظهر للعملاء في الموقع
                             </p>
                         </CardHeader>
                         <CardContent>

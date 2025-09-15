@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Package, Trash2, Eye, AlertTriangle } from 'lucide-react';
-import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +10,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 import { removeProductFromOffer } from '../actions/manage-products';
 import Link from '@/components/link';
+import AddImage from '@/components/AddImage';
+import { toast } from 'sonner';
 
 // Empty State Component
 function EmptyState() {
@@ -31,29 +32,32 @@ function EmptyState() {
 function ProductImage({
     imageUrl,
     productName,
+    productId,
     hasDiscount,
     discountPercentage
 }: {
     imageUrl?: string;
     productName: string;
+    productId: string;
     hasDiscount: boolean;
     discountPercentage?: number | null;
 }) {
     return (
-        <div className="relative aspect-square w-full mb-3 overflow-hidden rounded-md">
-            {imageUrl ? (
-                <Image
-                    src={imageUrl}
-                    alt={productName}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-            ) : (
-                <div className="flex items-center justify-center w-full h-full bg-muted">
-                    <Package className="h-8 w-8 text-muted-foreground" />
-                </div>
-            )}
+        <div className="relative aspect-square w-full mb-3 overflow-hidden rounded-md bg-gradient-to-br from-muted/50 to-muted">
+            <AddImage
+                url={imageUrl || undefined}
+                alt={`صورة ${productName}`}
+                className="object-cover"
+                recordId={productId}
+                table="product"
+                tableField="imageUrl"
+                onUploadComplete={() => {
+                    toast.success('تم تحديث صورة المنتج بنجاح');
+                    // Refresh the page to show the new image
+                    setTimeout(() => window.location.reload(), 1000);
+                }}
+                autoUpload={true}
+            />
 
             {/* Discount Badge */}
             {hasDiscount && discountPercentage && (
@@ -195,8 +199,9 @@ function ProductCard({
     return (
         <div className="border border-border rounded-lg p-4 w-full max-w-[200px] mx-auto">
             <ProductImage
-                imageUrl={product.images?.[0]}
+                imageUrl={product.imageUrl || product.images?.[0]}
                 productName={product.name}
+                productId={product.id}
                 hasDiscount={hasDiscount}
                 discountPercentage={discountPercentage}
             />
@@ -236,7 +241,9 @@ interface AssignedProduct {
         name: string;
         slug: string;
         price: number;
+        imageUrl?: string | null;
         images: string[];
+        supplierId: string;
         categoryAssignments: Array<{
             category: {
                 name: string;

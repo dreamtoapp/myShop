@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 
 import { auth } from '@/auth';
 import db from '@/lib/prisma';
-import { pusherServer } from '@/lib/pusherServer';
+import { getPusherServer } from '@/lib/pusherServer';
 // import { pusherServer } from '@/lib/pusherSetting';
 import { checkNewsletterExists, addNewsletter } from '@/app/(e-comm)/homepage/actions/newsletterHelpers';
 
@@ -44,11 +44,19 @@ export async function subscribeToNewsletter(formData: FormData) {
         userId: userId, // Associate the notification with the authenticated user
       },
     });
-    // إرسال الإشعار عبر Pusher
-    await pusherServer.trigger('admin', 'new-order', {
-      message: notificationMessage, // Send the message as a string
-      type: puserNotifactionmsg.type, // Include the type explicitly
-    });
+    // إرسال الإشعار عبر Pusher (only if configured)
+    const pusherServer = await getPusherServer();
+    if (pusherServer) {
+      try {
+        await pusherServer.trigger('admin', 'new-order', {
+          message: notificationMessage, // Send the message as a string
+          type: puserNotifactionmsg.type, // Include the type explicitly
+        });
+      } catch (pusherError) {
+        console.warn('Failed to send Pusher notification:', pusherError);
+        // Continue execution - notification failure shouldn't break the flow
+      }
+    }
 
     revalidatePath('/'); // Revalidate the page if needed
     return { message: 'تم التسجيل بنجاح!' };

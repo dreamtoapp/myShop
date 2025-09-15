@@ -1,4 +1,5 @@
 import CartPageView from './components/CartPageView';
+import { getAppConfig } from '@/helpers/appConfig';
 
 // Force dynamic rendering for cart page since it uses cookies/session
 export const dynamic = 'force-dynamic';
@@ -6,8 +7,8 @@ export const dynamic = 'force-dynamic';
 async function getPlatformSettings() {
   try {
     // Use absolute URL for server-side fetch
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/platform-settings`, {
+    const { appUrl } = await getAppConfig();
+    const response = await fetch(`${appUrl}/api/platform-settings`, {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',

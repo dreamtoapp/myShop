@@ -26,6 +26,18 @@ export const menuGroups = [
       { title: 'المنتجات', url: '/dashboard/management-products', icon: 'Package' },
       { title: 'التصنيفات', url: '/dashboard/management-categories', icon: 'Tags' },
       { title: 'الموردين', url: '/dashboard/management-suppliers', icon: 'Warehouse' },
+      // نقل "العروض" إلى مجموعة المنتجات
+      {
+        title: 'العروض',
+        url: '/dashboard/management-offer',
+        icon: 'Tag',
+        // قائمة فرعية أفضل تجربة استخدام
+        children: [
+          { title: 'إنشاء عرض', url: '/dashboard/management-offer/new', icon: 'PlusCircle', key: 'offer-new' },
+          { title: 'عروض المنتجات', url: '/dashboard/management-offer?type=product', icon: 'Tag', key: 'offer-product' },
+          { title: 'جميع العروض', url: '/dashboard/management-offer?type=all', icon: 'Megaphone', key: 'offer-all' },
+        ],
+      },
     ],
   },
   {
@@ -47,7 +59,6 @@ export const menuGroups = [
   {
     label: 'التسويق',
     items: [
-      { title: 'العروض', url: '/dashboard/management-offer', icon: 'Tag' },
       { title: 'البريد الإلكتروني', url: '/dashboard/management/client-news', icon: 'Mailbox' },
     ],
   },

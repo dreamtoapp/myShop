@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = JSON.parse(body);
-    const useDb = process.env.USE_DB_WHATSAPP_WEBHOOK_PROCESSING === 'true';
+    const useDb = true; // WhatsApp webhook processing enabled by default
     info('whatsapp.webhook', { kind: 'request', mode: useDb ? 'db' : 'log-only' });
 
     // Handle incoming messages and status updates
@@ -85,8 +85,8 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // Optional auto-reply
-          if (process.env.AUTO_REPLY_ENABLED === 'true') {
+          // Optional auto-reply - enabled by default
+          if (true) { // AUTO_REPLY_ENABLED hardcoded to true
             try {
               const to = message.from;
               await sendWhatsAppText(to, 'مرحبا! تم استلام رسالتك. سنعاودك قريبًا.');

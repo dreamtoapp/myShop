@@ -10,7 +10,7 @@ function mask(value?: string | null, visible: number = 4): string | null {
 
 export async function GET(_req: NextRequest) {
   try {
-    const useDb = process.env.USE_DB_CLOUDINARY === 'true';
+    const useDb = process.env.USE_DB_CLOUDINARY !== 'false'; // Default to true unless explicitly disabled
 
     let cloudName: string | undefined;
     let apiKey: string | undefined;

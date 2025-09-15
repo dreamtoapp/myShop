@@ -2,25 +2,48 @@
 import { createTransport } from 'nodemailer';
 
 import { generateOTP } from '@/lib/otp-Generator';
+import { getAppConfig } from '@/helpers/appConfig';
 import db from '@/lib/prisma';
 
 // Generate OTP token with expiration (6 digits, 10 minutes)
 
 // Email transporter configuration
-const transporter = createTransport({
-  // host: process.env.EMAIL_HOST,
-  // port: Number(process.env.EMAIL_PORT),
+const createTransporter = async () => {
+  try {
+    const company = await db.company.findFirst({
+      select: {
+        emailUser: true,
+        emailPass: true,
+        smtpHost: true,
+        smtpPort: true,
+      },
+    });
 
-  // secure: true, // true for 465, false for other ports
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+    if (!company || !company.emailUser || !company.emailPass) {
+      console.warn('Email credentials not configured in database');
+      return null;
+    }
+
+    return createTransport({
+      service: 'gmail',
+      host: company.smtpHost || 'smtp.gmail.com',
+      port: parseInt(company.smtpPort) || 587,
+      auth: {
+        user: company.emailUser,
+        pass: company.emailPass,
+      },
+    });
+  } catch (error) {
+    console.error('Error creating email transporter:', error);
+    return null;
+  }
+};
 
 // Email template function
-const createOTPEmailTemplate = (otp: string, recipientName?: string) => `
+const createOTPEmailTemplate = async (otp: string, recipientName?: string) => {
+  const { appName, appUrl } = await getAppConfig();
+
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,7 +76,7 @@ const createOTPEmailTemplate = (otp: string, recipientName?: string) => `
 <body>
     <div class="container">
         <div class="header">
-            <h2>${process.env.APP_NAME || 'Your App Name'}</h2>
+            <h2>${appName}</h2>
         </div>
         
         <div class="content">
@@ -64,19 +87,31 @@ const createOTPEmailTemplate = (otp: string, recipientName?: string) => `
         </div>
 
         <div class="footer">
-            <p>© ${new Date().getFullYear()} ${process.env.APP_NAME || 'Your App Name'}. All rights reserved.</p>
-            <p>Need help? <a href="${process.env.APP_URL}/contact">Contact support</a></p>
+            <p>© ${new Date().getFullYear()} ${appName}. All rights reserved.</p>
+            <p>Need help? <a href="${appUrl}/contact">Contact support</a></p>
         </div>
     </div>
 </body>
 </html>
 `;
+};
 
 // Helper function to send email
 export const sendEmail = async (to: string, subject: string, html: string) => {
   try {
+    const transporter = await createTransporter();
+    if (!transporter) {
+      console.warn('Email service not configured - skipping email delivery');
+      return { success: false };
+    }
+
+    const { appName } = await getAppConfig();
+    const company = await db.company.findFirst({
+      select: { emailUser: true },
+    });
+
     await transporter.sendMail({
-      from: `"${process.env.EMAIL_SENDER_NAME}" <${process.env.EMAIL_USER}>`,
+      from: `"${appName}" <${company?.emailUser}>`,
       to,
       subject,
       html,
@@ -101,8 +136,8 @@ export const otpViaEmail = async (email: string) => {
 
     const emailResult = await sendEmail(
       email,
-      `Your Verification Code - ${process.env.APP_NAME || ''}`,
-      createOTPEmailTemplate(token),
+      `Your Verification Code - ${(await getAppConfig()).appName}`,
+      await createOTPEmailTemplate(token),
     );
 
     if (!emailResult.success) {

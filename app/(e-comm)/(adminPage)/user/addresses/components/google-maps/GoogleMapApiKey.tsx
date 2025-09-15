@@ -248,7 +248,7 @@ export default function GoogleMapSimple({
   }, [getGoogleMaps, clientName, selectedMarker, getAddressFromCoordinates, createSelectedMarker]);
 
   // Load Google Maps API
-  const loadGoogleMapsAPI = useCallback(() => {
+  const loadGoogleMapsAPI = useCallback(async () => {
     if (typeof window === 'undefined') {
       return;
     }
@@ -273,7 +273,27 @@ export default function GoogleMapSimple({
       return;
     }
 
-    const resolvedApiKey = apiKey ?? process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
+    // Try to get API key from props first, then from database, then from env
+    let resolvedApiKey = apiKey;
+
+    if (!resolvedApiKey) {
+      try {
+        // Fetch Google Maps API key from database
+        const response = await fetch('/api/google-maps/config');
+        if (response.ok) {
+          const config = await response.json();
+          resolvedApiKey = config.googleMapsApiKey;
+        }
+      } catch (error) {
+        console.warn('Failed to fetch Google Maps API key from database:', error);
+      }
+    }
+
+    // Fallback to environment variable
+    if (!resolvedApiKey) {
+      resolvedApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_API_KEY;
+    }
+
     if (!resolvedApiKey) {
       setError("مفتاح Google Maps مفقود");
       setIsMapLoading(false);

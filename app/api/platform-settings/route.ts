@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { fetchCompany } from '@/app/dashboard/management/settings/actions/fetchCompany';
+import { getCachedAppConfig } from '@/helpers/cachedAppConfig';
 
 export async function GET() {
   try {
     const companyData = await fetchCompany();
+    const { appName, appUrl } = await getCachedAppConfig();
 
     if (!companyData) {
       return NextResponse.json(
@@ -15,7 +17,9 @@ export async function GET() {
     const platformSettings = {
       taxPercentage: companyData.taxPercentage || 15,
       shippingFee: companyData.shippingFee || 0,
-      minShipping: companyData.minShipping || 0
+      minShipping: companyData.minShipping || 0,
+      appName,        // From database (fullName)
+      appUrl,         // From database (website)
     };
 
     return NextResponse.json(platformSettings);

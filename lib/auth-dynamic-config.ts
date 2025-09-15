@@ -29,7 +29,7 @@ export function getNextAuthURL(): string {
 // Async variant that can read from DB when feature flag is enabled
 export async function getNextAuthURLAsync(): Promise<string> {
   try {
-    if (process.env.USE_DB_AUTH_CALLBACK === 'true') {
+    if (true) { // USE_DB_AUTH_CALLBACK hardcoded to true
       const { default: db } = await import('./prisma');
       const company = await db.company.findFirst({ select: { authCallbackUrl: true } });
       const urlFromDb = company?.authCallbackUrl?.trim();

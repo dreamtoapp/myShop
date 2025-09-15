@@ -23,6 +23,12 @@ export default function AdminNotificationListener({ showToast = true }: AdminNot
                 const { getPusherClient } = await import('@/lib/pusherClient');
                 pusher = await getPusherClient();
 
+                // If Pusher is not configured, skip initialization gracefully
+                if (!pusher) {
+                    console.log('Pusher not configured - Admin notifications disabled');
+                    return;
+                }
+
                 // Subscribe to admin-specific channel for dashboard feedback
                 channel = pusher.subscribe(`admin-${session.user.id}`);
 

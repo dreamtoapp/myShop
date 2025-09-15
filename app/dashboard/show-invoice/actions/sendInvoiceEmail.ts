@@ -3,6 +3,7 @@ import nodemailer from 'nodemailer';
 
 import db from '@/lib/prisma';
 import { Company } from '@/types/databaseTypes';
+import { getAppConfig } from '@/helpers/appConfig';
 
 interface EmailOptions {
   to: string;
@@ -14,25 +15,43 @@ interface EmailOptions {
 // type company = Partial<Company>   // to avoid TypeScript to some of the type only
 
 
-const createTransporter = () => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    throw new Error('Email credentials not configured');
-  }
+const createTransporter = async () => {
+  try {
+    const company = await db.company.findFirst({
+      select: {
+        emailUser: true,
+        emailPass: true,
+        smtpHost: true,
+        smtpPort: true,
+      },
+    });
 
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    logger: true,
-    debug: false,
-  });
+    if (!company || !company.emailUser || !company.emailPass) {
+      console.warn('Email credentials not configured in database');
+      return null;
+    }
+
+    return nodemailer.createTransport({
+      host: company.smtpHost || 'smtp.gmail.com',
+      port: parseInt(company.smtpPort) || 587,
+      secure: false,
+      auth: {
+        user: company.emailUser,
+        pass: company.emailPass,
+      },
+      logger: true,
+      debug: false,
+    });
+  } catch (error) {
+    console.error('Error creating email transporter:', error);
+    return null;
+  }
 };
 
-const generateEmailTemplate = (orderNumber: string, orderLink: string, company: Partial<Company>) => `
+const generateEmailTemplate = async (orderNumber: string, orderLink: string, company: Partial<Company>) => {
+  const { appUrl } = await getAppConfig();
+
+  return `
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -91,7 +110,7 @@ const generateEmailTemplate = (orderNumber: string, orderLink: string, company: 
             <p>مع أطيب التحيات،<br>
             ${company.fullName}<br>
             📞 ${company.phoneNumber}<br>
-            🌐 <a href="${company.website || process.env.BASE_URL || '#'}">${company.website || process.env.BASE_URL || 'لا يوجد موقع إلكتروني'}</a></p>
+            🌐 <a href="${appUrl || '#'}">${appUrl || 'لا يوجد موقع إلكتروني'}</a></p>
             
             <p style="color: #999; font-size: 0.8em;">
                 هذه رسالة تلقائية. يرجى عدم الرد مباشرة على هذا البريد الإلكتروني.
@@ -101,6 +120,7 @@ const generateEmailTemplate = (orderNumber: string, orderLink: string, company: 
 </body>
 </html>
 `;
+};
 
 export const sendInvoiceEmail = async ({ to, orderNumber, cc, orderId }: EmailOptions) => {
   try {
@@ -108,14 +128,19 @@ export const sendInvoiceEmail = async ({ to, orderNumber, cc, orderId }: EmailOp
     const company = await db.company.findFirst();
     if (!company) throw new Error('Company details not found');
 
-    const orderLink = `${process.env.BASE_URL}/client-invoice/${orderId}`;
-    if (!process.env.BASE_URL) throw new Error('Base URL not configured');
+    const { appUrl } = await getAppConfig();
+    const orderLink = `${appUrl}/client-invoice/${orderId}`;
 
-    const transporter = createTransporter();
-    const htmlTemplate = generateEmailTemplate(orderNumber, orderLink, company);
+    const transporter = await createTransporter();
+    if (!transporter) {
+      console.warn('Email service not configured - skipping email delivery');
+      return false; // Return false instead of throwing error
+    }
+
+    const htmlTemplate = await generateEmailTemplate(orderNumber, orderLink, company);
 
     const mailOptions = {
-      from: `"${company.fullName}" <${process.env.EMAIL_USER}>`,
+      from: `"${company.fullName}" <${company.emailUser}>`,
       to,
       cc,
       subject: `فاتورة الطلبية رقم #${orderNumber}`,

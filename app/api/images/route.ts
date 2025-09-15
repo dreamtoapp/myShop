@@ -23,7 +23,7 @@ const SUPPORTED_TABLES = {
 type TableName = keyof typeof SUPPORTED_TABLES;
 
 async function resolveCloudinaryContext(table: TableName | null, overridePreset: string | null, overrideFolder: string | null) {
-  const useDbCloudinary = process.env.USE_DB_CLOUDINARY === 'true';
+  const useDbCloudinary = process.env.USE_DB_CLOUDINARY !== 'false'; // Default to true unless explicitly disabled
   let uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET || 'E-comm';
   let clientFolder = process.env.CLOUDINARY_CLIENT_FOLDER || 'E-comm';
 
@@ -35,7 +35,7 @@ async function resolveCloudinaryContext(table: TableName | null, overridePreset:
       if (dbPreset) uploadPreset = dbPreset;
       if (dbFolder) clientFolder = dbFolder;
       if (!dbPreset || !dbFolder) {
-        console.warn('[cloudinary] Using env fallback for preset/folder; missing DB values while USE_DB_CLOUDINARY=true');
+        console.warn('[cloudinary] Using env fallback for preset/folder; missing DB values while USE_DB_CLOUDINARY is enabled');
       }
     } catch {
       console.warn('[cloudinary] Failed to read preset/folder from DB; using env fallback');

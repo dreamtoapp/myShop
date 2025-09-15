@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache';
 
 import { auth } from '@/auth';
 import db from '@/lib/prisma';
-import { pusherServer } from '@/lib/pusherServer';
+import { getPusherServer } from '@/lib/pusherServer';
 import { prevState } from '@/types/commonType';
 
 // import { pusherServer } from '@/lib/pusherSetting';
@@ -40,16 +40,16 @@ export async function submitContactForm(
       message: `رسالة جديدة  ${subject}`,
       type: 'contact',
     };
-          // Save the notification to the database
-      await db.userNotification.create({
-        data: {
-          title: 'رسالة تواصل جديدة',
-          body: notificationMessage,
-          type: 'INFO',
-          read: false,
-          userId: userId, // Associate the notification with the authenticated user
-        },
-      });
+    // Save the notification to the database
+    await db.userNotification.create({
+      data: {
+        title: 'رسالة تواصل جديدة',
+        body: notificationMessage,
+        type: 'INFO',
+        read: false,
+        userId: userId, // Associate the notification with the authenticated user
+      },
+    });
     // Get admin users
     const adminUsers = await db.user.findMany({
       where: {
@@ -58,18 +58,22 @@ export async function submitContactForm(
       select: { id: true }
     });
 
-    // Send to each admin's specific channel for dashboard feedback
-    try {
-      const pusherPromises = adminUsers.map(admin =>
-        pusherServer.trigger(`admin-${admin.id}`, 'new-order', {
-          message: notificationMessage,
-          type: puserNotifactionmsg.type,
-        })
-      );
-      
-      await Promise.all(pusherPromises);
-    } catch (error) {
-      console.error('Pusher trigger failed:', error);
+    // Send to each admin's specific channel for dashboard feedback (only if Pusher configured)
+    const pusherServer = await getPusherServer();
+    if (pusherServer && adminUsers.length > 0) {
+      try {
+        const pusherPromises = adminUsers.map(admin =>
+          pusherServer.trigger(`admin-${admin.id}`, 'new-order', {
+            message: notificationMessage,
+            type: puserNotifactionmsg.type,
+          })
+        );
+
+        await Promise.all(pusherPromises);
+      } catch (error) {
+        console.warn('Pusher trigger failed:', error);
+        // Continue execution - notification failure shouldn't break the flow
+      }
     }
 
     revalidatePath('/dashboard/contact');

@@ -72,11 +72,11 @@ export function OfferForm({ initialData, mode = 'create' }: OfferFormProps) {
                 </h3>
 
                 <div className="space-y-2">
-                    <Label htmlFor="name" className="text-foreground font-medium">اسم المجموعة *</Label>
+                    <Label htmlFor="name" className="text-foreground font-medium">اسم العرض *</Label>
                     <Input
                         id="name"
                         name="name"
-                        placeholder="أدخل اسم المجموعة"
+                        placeholder="أدخل اسم العرض"
                         required
                         defaultValue={initialData?.name}
                         className="border-feature-commerce/30 focus:border-feature-commerce focus:ring-feature-commerce/20"
@@ -84,11 +84,11 @@ export function OfferForm({ initialData, mode = 'create' }: OfferFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="description" className="text-foreground font-medium">وصف المجموعة</Label>
+                    <Label htmlFor="description" className="text-foreground font-medium">وصف العرض</Label>
                     <Textarea
                         id="description"
                         name="description"
-                        placeholder="أدخل وصف المجموعة"
+                        placeholder="أدخل وصف العرض"
                         defaultValue={initialData?.description || ''}
                         className="border-feature-commerce/30 focus:border-feature-commerce focus:ring-feature-commerce/20 min-h-[100px]"
                     />
@@ -118,11 +118,11 @@ export function OfferForm({ initialData, mode = 'create' }: OfferFormProps) {
 
             <Separator className="bg-feature-commerce/20" />
 
-            {/* Discount Settings */}
+            {/* Offer Settings: discount, order, active toggle */}
             <div className="space-y-4 p-6 bg-feature-commerce-soft rounded-lg border border-feature-commerce/20">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                     <Percent className="h-5 w-5 text-feature-commerce icon-enhanced" />
-                    إعدادات الخصم
+                    إعدادات العرض
                 </h3>
 
                 <div className="space-y-3 p-4 bg-card rounded-md border">
@@ -157,47 +157,8 @@ export function OfferForm({ initialData, mode = 'create' }: OfferFormProps) {
 
                 {/* Hidden input for form submission */}
                 <input type="hidden" name="hasDiscount" value={hasDiscount.toString()} />
-            </div>
 
-            <Separator className="bg-feature-commerce/20" />
-
-            {/* Product Selection */}
-            <div className="space-y-4 p-6 bg-feature-products-soft rounded-lg border border-feature-products/20">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Package className="h-5 w-5 text-feature-products icon-enhanced" />
-                    اختيار المنتجات
-                </h3>
-
-                <div className="p-6 bg-card rounded-lg border">
-                    <div className="text-center space-y-3">
-                        <div className="p-3 bg-feature-products/10 rounded-full w-fit mx-auto">
-                            <Package className="h-8 w-8 text-feature-products" />
-                        </div>
-                        <div>
-                            <h4 className="text-sm font-semibold text-feature-products mb-1">
-                                إدارة المنتجات
-                            </h4>
-                            <p className="text-xs text-muted-foreground leading-relaxed">
-                                بعد إنشاء المجموعة، ستتمكن من إضافة وإدارة المنتجات من خلال صفحة تفاصيل المجموعة
-                            </p>
-                        </div>
-                        <div className="flex items-center justify-center gap-2 text-xs text-feature-products bg-feature-products/5 px-3 py-2 rounded-md border border-feature-products/20">
-                            <div className="w-2 h-2 bg-feature-products rounded-full"></div>
-                            <span>سيتم تفعيل إدارة المنتجات بعد الحفظ</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <Separator className="bg-feature-commerce/20" />
-
-            {/* Display Settings */}
-            <div className="space-y-4 p-6 bg-feature-settings-soft rounded-lg border border-feature-settings/20">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Eye className="h-5 w-5 text-feature-settings icon-enhanced" />
-                    إعدادات العرض
-                </h3>
-
+                {/* Display Order */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2 p-4 bg-card rounded-md border">
                         <Label className="text-feature-settings font-medium">ترتيب العرض</Label>
@@ -214,6 +175,7 @@ export function OfferForm({ initialData, mode = 'create' }: OfferFormProps) {
                         </p>
                     </div>
 
+                    {/* Active toggle */}
                     <div className="space-y-3 p-4 bg-card rounded-md border">
                         <div className="flex items-center gap-3">
                             <Switch
@@ -240,20 +202,19 @@ export function OfferForm({ initialData, mode = 'create' }: OfferFormProps) {
                                 {isActive ? (
                                     <span className="flex items-center gap-2">
                                         <Eye className="h-4 w-4" />
-                                        المجموعة نشطة
+                                        العرض نشط
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-2">
                                         <EyeOff className="h-4 w-4" />
-                                        المجموعة غير نشطة
+                                        العرض غير نشط
                                     </span>
                                 )}
                             </Label>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            المجموعات النشطة فقط تظهر للعملاء
+                            العروض النشطة فقط تظهر للعملاء
                         </p>
-
                         {/* Status indicator */}
                         <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${isActive
                             ? 'bg-feature-commerce/10 text-feature-commerce border border-feature-commerce/20'
@@ -277,6 +238,17 @@ export function OfferForm({ initialData, mode = 'create' }: OfferFormProps) {
                 {/* Hidden input for isActive */}
                 <input type="hidden" name="isActive" value={isActive.toString()} />
             </div>
+
+            <Separator className="bg-feature-commerce/20" />
+
+            {/* Product Selection Hint (Inline) */}
+            <div className="px-1">
+                <div className="text-xs text-muted-foreground flex items-center gap-2">
+                    <Package className="h-4 w-4 text-feature-products" />
+                    <span>بعد إنشاء العرض، ستتمكن من إضافة وإدارة المنتجات من خلال صفحة تفاصيل العرض.</span>
+                </div>
+            </div>
+
 
             {/* Error/Success Message */}
             {state.message && (
@@ -320,7 +292,7 @@ export function OfferForm({ initialData, mode = 'create' }: OfferFormProps) {
                     ) : (
                         <>
                             <Package className="h-5 w-5" />
-                            {mode === 'edit' ? 'تحديث المجموعة' : 'إنشاء المجموعة'}
+                            {mode === 'edit' ? 'تحديث العرض' : 'إنشاء العرض'}
                         </>
                     )}
                 </Button>

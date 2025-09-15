@@ -9,6 +9,15 @@ export default async function ConfigurationOverviewPage() {
   const company = await fetchCompany();
 
   const configurationFields = {
+    company: {
+      title: 'Company Information',
+      fields: [
+        { key: 'fullName', required: true, type: 'string' as const },
+        { key: 'website', required: false, type: 'string' as const },
+        { key: 'email', required: false, type: 'string' as const },
+        { key: 'phoneNumber', required: false, type: 'string' as const }
+      ]
+    },
     media: {
       title: 'Media Services',
       fields: [

@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
 import db from '@/lib/prisma';
+import { getAppConfig } from '@/helpers/appConfig';
 import { Order } from '../[id]/page';
 
 interface EmailOptions {
@@ -19,33 +20,50 @@ interface CompanyData {
   website?: string;
 }
 
-const createTransporter = () => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    throw new Error('Email credentials not configured');
-  }
+const createTransporter = async () => {
+  try {
+    const company = await db.company.findFirst({
+      select: {
+        emailUser: true,
+        emailPass: true,
+        smtpHost: true,
+        smtpPort: true,
+      },
+    });
 
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    logger: true,
-    debug: false,
-  });
+    if (!company || !company.emailUser || !company.emailPass) {
+      console.warn('Email credentials not configured in database');
+      return null;
+    }
+
+    return nodemailer.createTransport({
+      host: company.smtpHost || 'smtp.gmail.com',
+      port: parseInt(company.smtpPort) || 587,
+      secure: false,
+      auth: {
+        user: company.emailUser,
+        pass: company.emailPass,
+      },
+      logger: true,
+      debug: false,
+    });
+  } catch (error) {
+    console.error('Error creating email transporter:', error);
+    return null;
+  }
 };
 
-const generateOrderEmailTemplate = (order: Order, customerName: string, companyData: CompanyData) => {
+const generateOrderEmailTemplate = async (order: Order, customerName: string, companyData: CompanyData) => {
+  const { appName } = await getAppConfig();
+
   const orderItems = order.items.map(item => `
     <tr style="border-bottom: 1px solid #eee;">
       <td style="padding: 12px; text-align: right;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          ${item.product?.imageUrl ? 
-            `<img src="${item.product.imageUrl}" alt="${item.product.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">` : 
-            `<div style="width: 50px; height: 50px; background: #f3f4f6; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6b7280;">صورة</div>`
-          }
+          ${item.product?.imageUrl ?
+      `<img src="${item.product.imageUrl}" alt="${item.product.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">` :
+      `<div style="width: 50px; height: 50px; background: #f3f4f6; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6b7280;">صورة</div>`
+    }
           <div>
             <div style="font-weight: 600; color: #1f2937;">${item.product?.name || 'منتج غير متوفر'}</div>
             <div style="font-size: 12px; color: #6b7280;">كود المنتج: ${item.productId}</div>
@@ -131,10 +149,10 @@ const generateOrderEmailTemplate = (order: Order, customerName: string, companyD
                         <div class="info-label">حالة الطلبية</div>
                         <div class="info-value">
                             <span class="status-badge status-${order.status.toLowerCase()}">
-                                ${order.status === 'DELIVERED' ? 'مسلم' : 
-                                  order.status === 'PENDING' ? 'قيد الانتظار' : 
-                                  order.status === 'IN_TRANSIT' ? 'في الطريق' : 
-                                  order.status === 'CANCELED' ? 'ملغي' : order.status}
+                                ${order.status === 'DELIVERED' ? 'مسلم' :
+      order.status === 'PENDING' ? 'قيد الانتظار' :
+        order.status === 'IN_TRANSIT' ? 'في الطريق' :
+          order.status === 'CANCELED' ? 'ملغي' : order.status}
                             </span>
                         </div>
                     </div>
@@ -183,8 +201,8 @@ const generateOrderEmailTemplate = (order: Order, customerName: string, companyD
         </div>
 
         <div class="footer">
-            <p>شكراً لاختياركم ${companyData.fullName || process.env.APP_NAME || 'متجرنا'}</p>
-            <p>📞 ${companyData.phoneNumber || ''} | 📧 <a href="mailto:${companyData.email || process.env.EMAIL_USER}">${companyData.email || process.env.EMAIL_USER}</a></p>
+            <p>شكراً لاختياركم ${companyData.fullName || appName || 'متجرنا'}</p>
+            <p>📞 ${companyData.phoneNumber || ''} | 📧 <a href="mailto:${companyData.email || ''}">${companyData.email || ''}</a></p>
             <p style="margin-top: 15px; font-size: 12px; color: #9ca3af;">
                 هذه رسالة تلقائية. يرجى عدم الرد مباشرة على هذا البريد الإلكتروني.
             </p>
@@ -205,11 +223,17 @@ export const sendOrderEmail = async ({ to, orderData, customerName }: EmailOptio
       website: company.website,
     } : {};
 
-    const transporter = createTransporter();
-    const htmlTemplate = generateOrderEmailTemplate(orderData, customerName, companyData);
+    const transporter = await createTransporter();
+    if (!transporter) {
+      console.warn('Email service not configured - skipping email delivery');
+      return { success: false, message: 'خدمة البريد الإلكتروني غير مُعدة' };
+    }
+
+    const { appName } = await getAppConfig();
+    const htmlTemplate = await generateOrderEmailTemplate(orderData, customerName, companyData);
 
     const mailOptions = {
-      from: `"${companyData.fullName || process.env.APP_NAME || 'Online Shop'}" <${process.env.EMAIL_USER}>`,
+      from: `"${companyData.fullName || appName || 'Online Shop'}" <${company?.emailUser || 'noreply@example.com'}>`,
       to,
       subject: `تفاصيل الطلبية #${orderData.orderNumber}`,
       text: `تفاصيل الطلبية #${orderData.orderNumber}\n\nالمبلغ الإجمالي: ${orderData.amount.toFixed(2)} ر.س\nحالة الطلبية: ${orderData.status}\n\nشكراً لاختياركم ${companyData.fullName || 'متجرنا'}.`,

@@ -1,7 +1,7 @@
 "use server";
 
 import db from '@/lib/prisma';
-import { pusherServer } from '@/lib/pusherServer';
+import { getPusherServer } from '@/lib/pusherServer';
 
 interface CreateOrderNotificationParams {
   userId: string;
@@ -38,34 +38,42 @@ export async function createOrderNotification({
       }
     });
 
-    // Send real-time notification via Pusher
-    await pusherServer.trigger(
-      `user-${userId}`, // Private channel for this user
-      'new-notification',
-      {
-        id: notification.id,
-        title: notification.title,
-        body: notification.body,
-        type: notification.type,
-        read: notification.read,
-        createdAt: notification.createdAt.toISOString(),
-        actionUrl: notification.actionUrl,
-        metadata: {
-          orderId,
-          orderNumber,
-          driverName
-        }
+    // Send real-time notification via Pusher (only if configured)
+    const pusherServer = await getPusherServer();
+    if (pusherServer) {
+      try {
+        await pusherServer.trigger(
+          `user-${userId}`, // Private channel for this user
+          'new-notification',
+          {
+            id: notification.id,
+            title: notification.title,
+            body: notification.body,
+            type: notification.type,
+            read: notification.read,
+            createdAt: notification.createdAt.toISOString(),
+            actionUrl: notification.actionUrl,
+            metadata: {
+              orderId,
+              orderNumber,
+              driverName
+            }
+          }
+        );
+      } catch (pusherError) {
+        console.warn('Failed to send Pusher notification:', pusherError);
+        // Continue execution - notification failure shouldn't break the flow
       }
-    );
+    }
 
     console.log(`📱 Real-time notification sent to user ${userId}: ${title}`);
 
     return { success: true, notification };
   } catch (error) {
     console.error('Error creating ORDER notification:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to create notification' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to create notification'
     };
   }
 }

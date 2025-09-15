@@ -78,9 +78,16 @@ export const otpViaWhatsApp = async () => {
       }
     });
 
-    // Only return fake OTP if WhatsApp token is completely missing
-    if (!process.env.WHATSAPP_PERMANENT_TOKEN) {
-      console.log('⚠️ WhatsApp token missing, returning fake OTP');
+    // Check if WhatsApp is configured in database
+    const company = await db.company.findFirst({
+      select: {
+        whatsappPermanentToken: true,
+        whatsappPhoneNumberId: true,
+      },
+    });
+
+    if (!company?.whatsappPermanentToken || !company?.whatsappPhoneNumberId) {
+      console.log('⚠️ WhatsApp not configured in database, returning fake OTP');
       return {
         success: true,
         message: 'تم إرسال رمز التحقق (وهمي) - WhatsApp غير مُعد',
@@ -283,12 +290,20 @@ export const resendOTP = async () => {
 // Test function for the Arabic "confirm" template shown in the image
 export const testArabicConfirmTemplate = async (phoneNumber: string) => {
   try {
-    const accessToken = process.env.WHATSAPP_PERMANENT_TOKEN;
-    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-    const apiVersion = process.env.WHATSAPP_API_VERSION || 'v23.0';
+    const company = await db.company.findFirst({
+      select: {
+        whatsappPermanentToken: true,
+        whatsappPhoneNumberId: true,
+        whatsappApiVersion: true,
+      },
+    });
+
+    const accessToken = company?.whatsappPermanentToken;
+    const phoneNumberId = company?.whatsappPhoneNumberId;
+    const apiVersion = company?.whatsappApiVersion || 'v23.0';
 
     if (!accessToken || !phoneNumberId) {
-      return { success: false, error: 'Server configuration error' };
+      return { success: false, error: 'WhatsApp not configured in database' };
     }
 
     // Convert phone number to international format

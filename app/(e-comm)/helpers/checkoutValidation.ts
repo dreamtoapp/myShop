@@ -34,10 +34,10 @@ export function getCheckoutValidation(params: Params) {
   if (requireOtp && user?.isOtp !== true) rules.push({ id: 'user-verification', message: 'يجب تفعيل الحساب قبل المتابعة', severity: 'error' });
 
   // Address selection / completeness
-  if (!selectedAddress) {
-    rules.push({ id: 'address-selection', message: 'يجب اختيار عنوان للتوصيل', severity: 'error' });
-  } else {
-    if (requireLocation) {
+  if (requireLocation) {
+    if (!selectedAddress) {
+      rules.push({ id: 'address-selection', message: 'يجب اختيار عنوان للتوصيل', severity: 'error' });
+    } else {
       const addressIssues: string[] = [];
       const hasValidLocation = !!(selectedAddress.latitude && selectedAddress.longitude);
       if (!hasValidLocation) addressIssues.push('إحداثيات صحيحة');

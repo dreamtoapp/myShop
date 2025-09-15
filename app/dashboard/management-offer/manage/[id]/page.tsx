@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import { Package, Settings } from 'lucide-react';
-import { getOfferById, getAllProducts } from '../../actions';
+import { getOfferById } from '../../actions';
 import { AssignedProducts } from '../../components/AssignedProducts';
-import { ProductSelector } from '../../components/ProductSelector';
 import { OfferBannerUpload } from '../../components/OfferBannerUpload';
+import OfferProductDialog from '../../components/OfferProductDialog';
 
 interface ManageOfferPageProps {
     params: Promise<{
@@ -15,18 +15,13 @@ export default async function ManageOfferPage({ params }: ManageOfferPageProps) 
     // Await the params Promise
     const { id } = await params;
 
-    // Fetch offer and products data in parallel
-    const [offer, allProducts] = await Promise.all([
-        getOfferById(id).catch(() => null),
-        getAllProducts().catch(() => [])
-    ]);
+    // Fetch offer data
+    const offer = await getOfferById(id).catch(() => null);
 
     if (!offer) {
         notFound();
     }
 
-    // Get assigned product IDs for filtering
-    const assignedProductIds = offer.productAssignments?.map(assignment => assignment.product.id) || [];
 
     return (
         <div className="min-h-screen bg-background">
@@ -37,6 +32,15 @@ export default async function ManageOfferPage({ params }: ManageOfferPageProps) 
                     <div>
                         <h1 className="text-lg font-semibold text-foreground">إدارة منتجات العرض</h1>
                         <p className="text-sm text-muted-foreground">{offer.name}</p>
+                    </div>
+                    <div className="ml-auto">
+                        {/* Supplier ID requirement: using offer's first product supplier if exists, else fallback to company default if available. */}
+                        {(() => {
+                            const supplierId = offer.productAssignments?.[0]?.product?.supplierId || '000000000000000000000000';
+                            return (
+                                <OfferProductDialog offerId={offer.id} supplierId={supplierId} />
+                            );
+                        })()}
                     </div>
                 </div>
             </header>
@@ -92,13 +96,6 @@ export default async function ManageOfferPage({ params }: ManageOfferPageProps) 
                     discountPercentage={offer.discountPercentage}
                 />
 
-                {/* Add Products */}
-                <ProductSelector
-                    offerId={offer.id}
-                    offerName={offer.name}
-                    availableProducts={allProducts}
-                    assignedProductIds={assignedProductIds}
-                />
             </main>
         </div>
     );

@@ -2,9 +2,9 @@ import cloudinary from 'cloudinary';
 import db from '@/lib/prisma';
 
 // Feature-flagged initializer that reads credentials from DB (Company) with env fallback
-// Flag: USE_DB_CLOUDINARY === 'true'
+// Default behavior: USE_DB_CLOUDINARY = true (database-first with env fallback)
 export const initCloudinary = async (): Promise<{ error?: string }> => {
-  const useDb = process.env.USE_DB_CLOUDINARY === 'true';
+  const useDb = process.env.USE_DB_CLOUDINARY !== 'false'; // Default to true unless explicitly disabled
 
   let cloudName: string | undefined;
   let apiKey: string | undefined;
@@ -18,7 +18,7 @@ export const initCloudinary = async (): Promise<{ error?: string }> => {
       apiSecret = company?.cloudinaryApiSecret ?? process.env.CLOUDINARY_API_SECRET;
 
       if (!company?.cloudinaryCloudName || !company?.cloudinaryApiKey || !company?.cloudinaryApiSecret) {
-        console.warn('[cloudinary] Using env fallback; missing DB credentials while USE_DB_CLOUDINARY=true');
+        console.warn('[cloudinary] Using env fallback; missing DB credentials while USE_DB_CLOUDINARY is enabled');
       }
     } catch (error) {
       console.warn('[cloudinary] Failed to read DB settings; using env fallback');

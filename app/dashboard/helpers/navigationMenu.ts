@@ -35,15 +35,18 @@ export const navigationItems = [
     children: [
       { label: 'المنتجات', href: '/dashboard/management-products', icon: 'Package' },
       { label: 'التصنيفات', href: '/dashboard/management-categories', icon: 'Tags' },
-      { label: 'الموردين', href: '/dashboard/management-suppliers', icon: 'Warehouse' }
-    ]
-  },
-  {
-    label: 'العروض',
-    href: '/dashboard/management-offer',
-    icon: 'Megaphone',
-    children: [
-      { label: 'العروض', href: '/dashboard/management-offer', icon: 'Megaphone' }
+      { label: 'الموردين', href: '/dashboard/management-suppliers', icon: 'Warehouse' },
+      // نقل "العروض" تحت قسم المنتجات مع قائمة فرعية
+      {
+        label: 'العروض',
+        href: '/dashboard/management-offer',
+        icon: 'Megaphone',
+        children: [
+          { label: 'إنشاء عرض', href: '/dashboard/management-offer/new', icon: 'PlusCircle', key: 'offer-new' },
+          { label: 'عروض المنتجات', href: '/dashboard/management-offer?type=product', icon: 'Tag', key: 'offer-product' },
+          { label: 'جميع العروض', href: '/dashboard/management-offer?type=all', icon: 'Megaphone', key: 'offer-all' }
+        ]
+      }
     ]
   },
   {

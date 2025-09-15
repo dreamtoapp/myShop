@@ -44,9 +44,21 @@ export function formatPhoneForWhatsAppAPI(phoneNumber: string): string {
 
 // Generate WhatsApp URL to prompt user to message business first
 export async function generateWhatsAppGuidanceURL(_phoneNumber: string): Promise<string> {
-  const businessPhone = process.env.WHATSAPP_BUSINESS_PHONE || '+966XXXXXXXXX';
-  const message = encodeURIComponent('Hello, I need to register for OTP verification');
-  return `https://wa.me/${businessPhone.replace('+', '')}?text=${message}`;
+  try {
+    const db = (await import('@/lib/prisma')).default;
+    const company = await db.company.findFirst({
+      select: { whatsappNumber: true },
+    });
+
+    const businessPhone = company?.whatsappNumber || '+966XXXXXXXXX';
+    const message = encodeURIComponent('Hello, I need to register for OTP verification');
+    return `https://wa.me/${businessPhone.replace('+', '')}?text=${message}`;
+  } catch (error) {
+    console.warn('Failed to get WhatsApp business phone from database:', error);
+    const businessPhone = '+966XXXXXXXXX';
+    const message = encodeURIComponent('Hello, I need to register for OTP verification');
+    return `https://wa.me/${businessPhone.replace('+', '')}?text=${message}`;
+  }
 }
 
 
