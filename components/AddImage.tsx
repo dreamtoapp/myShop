@@ -8,6 +8,7 @@ import React, {
 
 import Image from 'next/image';
 import { Icon } from '@/components/icons/Icon';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface AddImageProps {
   url?: string;
@@ -20,6 +21,13 @@ interface AddImageProps {
   onUploadComplete?: (url: string) => void;
   autoUpload?: boolean;
   folder?: string; // Optional folder for Cloudinary - if not provided, uses CLOUDINARY_UPLOAD_PRESET/CLOUDINARY_CLIENT_FOLDER/table
+  // New UX controls
+  showBottomProgress?: boolean; // default: false (overlay only)
+  useShadcnAlert?: boolean; // default: true (use Alert by default)
+  // Client-side validation (safe defaults)
+  acceptMimeTypes?: string[]; // default common images
+  maxFileSizeMB?: number; // default 5MB
+  requiredMinDimensions?: { width: number; height: number }; // default undefined (off)
 }
 
 const AddImage: React.FC<AddImageProps> = ({
@@ -33,12 +41,18 @@ const AddImage: React.FC<AddImageProps> = ({
   tableField = 'image', // Default to 'image' if not provided
   autoUpload = false,
   folder, // Optional - API will auto-generate using env vars if not provided
+  showBottomProgress = false,
+  useShadcnAlert = true,
+  acceptMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
+  maxFileSizeMB = 5,
+  requiredMinDimensions,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | undefined>(url);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errorCode, setErrorCode] = useState<string | undefined>(undefined);
   const [progress, setProgress] = useState(0);
   const xhrRef = useRef<XMLHttpRequest | null>(null);
 
@@ -51,9 +65,60 @@ const AddImage: React.FC<AddImageProps> = ({
     inputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const validateSelectedFile = async (candidate: File): Promise<{ ok: true } | { ok: false; message: string; code?: string }> => {
+    // Size check
+    if (typeof maxFileSizeMB === 'number' && Number.isFinite(maxFileSizeMB)) {
+      const maxBytes = maxFileSizeMB * 1024 * 1024;
+      if (candidate.size > maxBytes) {
+        return { ok: false, message: `حجم الصورة كبير جدًا. الحد الأقصى ${maxFileSizeMB}MB`, code: 'FileTooLarge' };
+      }
+    }
+    // Type check
+    if (Array.isArray(acceptMimeTypes) && acceptMimeTypes.length > 0) {
+      if (!acceptMimeTypes.includes(candidate.type)) {
+        return { ok: false, message: 'صيغة الصورة غير مدعومة. يُسمح بـ JPEG, PNG, WEBP, AVIF', code: 'UnsupportedFormat' };
+      }
+    }
+    // Dimensions check (optional)
+    if (requiredMinDimensions) {
+      const { width: minW, height: minH } = requiredMinDimensions;
+      const objectUrl = URL.createObjectURL(candidate);
+      try {
+        const dims = await new Promise<{ w: number; h: number }>((resolve, reject) => {
+          const img = new window.Image();
+          img.onload = () => resolve({ w: img.width, h: img.height });
+          img.onerror = reject;
+          img.src = objectUrl;
+        });
+        URL.revokeObjectURL(objectUrl);
+        if (dims.w < minW || dims.h < minH) {
+          return { ok: false, message: `أبعاد الصورة صغيرة. الحد الأدنى ${minW}x${minH}px`, code: 'DimensionsTooSmall' };
+        }
+      } catch {
+        URL.revokeObjectURL(objectUrl);
+        // If we can't read dimensions, fail softly (do not block)
+      }
+    }
+    return { ok: true };
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
+
+    // Reset previous errors
+    setError('');
+    setErrorCode(undefined);
+
+    // Client-side validation (enabled by defaults)
+    const validation = await validateSelectedFile(selected);
+    if ('ok' in validation && !validation.ok) {
+      const message = validation.message;
+      // Avoid duplicating same error message repeatedly
+      setError(prev => (prev === message ? prev : message));
+      setErrorCode(validation.code);
+      return;
+    }
 
     setFile(selected);
 
@@ -112,17 +177,39 @@ const AddImage: React.FC<AddImageProps> = ({
           setProgress(100);
           onUploadComplete?.(data.imageUrl);
         } else {
-          throw new Error(data.error || 'Upload failed');
+          // Map backend/Cloudinary errors to human-friendly messages
+          const mapped = (() => {
+            const raw = (data && (data.error?.message || data.error)) || 'Upload failed';
+            const lower = String(raw).toLowerCase();
+            if (lower.includes('file size') || lower.includes('too large') || lower.includes('413')) {
+              return { message: `حجم الصورة كبير جدًا. الحد الأقصى ${maxFileSizeMB}MB`, code: 'FileTooLarge' };
+            }
+            if (lower.includes('unsupported') || lower.includes('format') || lower.includes('extension')) {
+              return { message: 'صيغة الصورة غير مدعومة. يُسمح بـ JPEG, PNG, WEBP, AVIF', code: 'UnsupportedFormat' };
+            }
+            if (lower.includes('signature') || lower.includes('auth')) {
+              return { message: 'حدثت مشكلة في التحقق من الرفع. حاول مجددًا.', code: 'InvalidSignature' };
+            }
+            if (lower.includes('rate') || lower.includes('limit')) {
+              return { message: 'محاولات كثيرة. يرجى المحاولة لاحقًا.', code: 'RateLimited' };
+            }
+            return { message: typeof raw === 'string' ? raw : 'حدث خطأ أثناء الرفع', code: 'UploadFailed' };
+          })();
+          throw Object.assign(new Error(mapped.message), { code: mapped.code });
         }
       } catch (err: any) {
-        setError(err.message || 'Upload error');
+        const msg = err?.message || 'Upload error';
+        setError(prev => (prev === msg ? prev : msg));
+        setErrorCode(err?.code);
       }
     };
 
     xhr.onerror = () => {
       setLoading(false);
       xhrRef.current = null;
-      setError('Upload failed due to a network error.');
+      const msg = 'تعذر الرفع بسبب مشكلة في الاتصال بالشبكة.';
+      setError(prev => (prev === msg ? prev : msg));
+      setErrorCode('NetworkError');
     };
 
     xhr.onabort = () => {
@@ -130,6 +217,7 @@ const AddImage: React.FC<AddImageProps> = ({
       xhrRef.current = null;
       setError('تم إلغاء الرفع');
       setProgress(0);
+      setErrorCode('UploadAborted');
     };
 
     xhr.open('POST', `/api/images`);
@@ -228,8 +316,8 @@ const AddImage: React.FC<AddImageProps> = ({
         </div>
       )}
 
-      {/* Progress bar (existing) */}
-      {loading && (
+      {/* Progress bar (bottom - optional) */}
+      {loading && showBottomProgress && (
         <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-200 rounded overflow-hidden">
           <div
             className="bg-primary h-full transition-all duration-200"
@@ -238,30 +326,62 @@ const AddImage: React.FC<AddImageProps> = ({
         </div>
       )}
 
-      {/* Error message with retry */}
+      {/* Error message with retry (Alert by default, fallback to inline) */}
       {error && (
-        <div className="absolute top-2 left-2 right-2 bg-destructive text-destructive-foreground text-xs p-2 rounded shadow flex items-center justify-between gap-2">
-          <span className="truncate">{error}</span>
-          <div className="flex items-center gap-2">
-            {file && !loading && (
+        useShadcnAlert ? (
+          <div className="absolute top-2 left-2 right-2">
+            <Alert variant="destructive">
+              <AlertTitle>فشل رفع الصورة{errorCode ? ` (${errorCode})` : ''}</AlertTitle>
+              <AlertDescription>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate">{error}</span>
+                  <div className="flex items-center gap-2">
+                    {file && !loading && (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); setErrorCode(undefined); handleUpload(file); }}
+                        className="px-2 py-0.5 rounded bg-background text-foreground border border-border"
+                      >
+                        إعادة المحاولة
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); setErrorCode(undefined); }}
+                      aria-label="إغلاق"
+                      className="px-2 py-0.5 rounded border border-border"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              </AlertDescription>
+            </Alert>
+          </div>
+        ) : (
+          <div role="alert" aria-live="polite" className="absolute top-2 left-2 right-2 bg-destructive text-destructive-foreground text-xs p-2 rounded shadow flex items-center justify-between gap-2">
+            <span className="truncate">{error}</span>
+            <div className="flex items-center gap-2">
+              {file && !loading && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); setErrorCode(undefined); handleUpload(file); }}
+                  className="px-2 py-0.5 rounded bg-background text-foreground border border-border hover:bg-background/80"
+                >
+                  إعادة المحاولة
+                </button>
+              )}
               <button
                 type="button"
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); handleUpload(file); }}
-                className="px-2 py-0.5 rounded bg-background text-foreground border border-border hover:bg-background/80"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); setErrorCode(undefined); }}
+                aria-label="إغلاق"
+                className="px-2 py-0.5 rounded border border-border hover:bg-background/30"
               >
-                إعادة المحاولة
+                ×
               </button>
-            )}
-            <button
-              type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); }}
-              aria-label="إغلاق"
-              className="px-2 py-0.5 rounded border border-border hover:bg-background/30"
-            >
-              ×
-            </button>
+            </div>
           </div>
-        </div>
+        )
       )}
     </div>
   );

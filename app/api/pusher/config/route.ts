@@ -10,32 +10,22 @@ export async function GET(_request: NextRequest) {
       },
     });
 
-    if (!company) {
-      return NextResponse.json(
-        { error: 'No company configuration found' },
-        { status: 404 }
-      );
-    }
-
-    const { pusherKey, pusherCluster } = company;
-
-    // Check if Pusher is configured
-    if (!pusherKey || !pusherCluster) {
-      return NextResponse.json(
-        { error: 'Pusher not configured' },
-        { status: 404 }
-      );
-    }
+    // Provide fallback values if Pusher is not configured
+    const pusherKey = company?.pusherKey || '';
+    const pusherCluster = company?.pusherCluster || 'mt1';
 
     return NextResponse.json({
       pusherKey,
       pusherCluster,
+      isConfigured: !!(company?.pusherKey && company?.pusherCluster),
     });
   } catch (error) {
     console.error('Error fetching Pusher config:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    // Return fallback values even on error
+    return NextResponse.json({
+      pusherKey: '',
+      pusherCluster: 'mt1',
+      isConfigured: false,
+    });
   }
 }

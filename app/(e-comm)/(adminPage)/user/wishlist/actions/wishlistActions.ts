@@ -199,18 +199,31 @@ export async function getUserWishlist() {
  */
 export async function getWishlistByUserId(userId: string) {
   if (!userId) return [];
+
+  // Get wishlist items without supplier relationship to avoid Prisma errors
   const wishlistItems = await db.wishlistItem.findMany({
     where: { userId },
     include: {
-      product: { include: { supplier: true } },
+      product: true, // Get product without supplier to avoid errors
     },
     orderBy: { createdAt: 'desc' },
   });
-  return wishlistItems.map((item) => ({
-    ...item.product,
-    details: item.product.details ?? null,
-    size: item.product.size ?? null,
-    inStock: !item.product.outOfStock,
-    imageUrl: item.product.imageUrl || '/fallback/product-fallback.avif',
-  }));
+
+  // Get all valid suppliers separately
+  const allSuppliers = await db.supplier.findMany({
+    select: { id: true, name: true },
+  });
+  const supplierMap = new Map(allSuppliers.map(s => [s.id, s]));
+
+  return wishlistItems.map((item) => {
+    const supplier = supplierMap.get(item.product.supplierId);
+    return {
+      ...item.product,
+      details: item.product.details ?? null,
+      size: item.product.size ?? null,
+      inStock: !item.product.outOfStock,
+      imageUrl: item.product.imageUrl || '/fallback/product-fallback.avif',
+      supplier: supplier ? { id: supplier.id, name: supplier.name } : null,
+    };
+  });
 } 

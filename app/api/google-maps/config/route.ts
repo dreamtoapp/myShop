@@ -9,31 +9,19 @@ export async function GET(_request: NextRequest) {
       },
     });
 
-    if (!company) {
-      return NextResponse.json(
-        { error: 'No company configuration found' },
-        { status: 404 }
-      );
-    }
-
-    const { googleMapsApiKey } = company;
-
-    // Check if Google Maps is configured
-    if (!googleMapsApiKey) {
-      return NextResponse.json(
-        { error: 'Google Maps not configured' },
-        { status: 404 }
-      );
-    }
+    // Provide fallback values if Google Maps is not configured
+    const googleMapsApiKey = company?.googleMapsApiKey || '';
 
     return NextResponse.json({
       googleMapsApiKey,
+      isConfigured: !!company?.googleMapsApiKey,
     });
   } catch (error) {
     console.error('Error fetching Google Maps config:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    // Return fallback values even on error
+    return NextResponse.json({
+      googleMapsApiKey: '',
+      isConfigured: false,
+    });
   }
 }

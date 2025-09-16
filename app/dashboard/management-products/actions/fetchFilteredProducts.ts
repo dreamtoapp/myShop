@@ -38,16 +38,31 @@ export async function fetchFilteredProducts( // Update return type
   const page = filters.page ?? 1;
   const pageSize = filters.pageSize ?? 10;
 
-  const [products, total] = await Promise.all([ // Use FetchedProduct type
+  const [allProducts, total, allSuppliers] = await Promise.all([
     db.product.findMany({
       where,
-      orderBy: { createdAt: 'desc' }, // Default findMany fetches all scalar fields
-      include: { supplier: true },
+      orderBy: { createdAt: 'desc' },
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
     db.product.count({ where }),
+    db.supplier.findMany({ select: { id: true, name: true } }),
   ]);
+
+  // Create supplier map and filter products with valid suppliers
+  const supplierMap = new Map(allSuppliers.map(s => [s.id, s]));
+  const products = allProducts
+    .filter(product => {
+      const supplier = supplierMap.get(product.supplierId);
+      if (!supplier) {
+        console.warn(`Product ${product.id} (${product.name}) has invalid supplierId: ${product.supplierId}`);
+      }
+      return supplier !== undefined;
+    })
+    .map(product => ({
+      ...product,
+      supplier: supplierMap.get(product.supplierId)!
+    }));
 
   return {
     products: products.map(p => ({ ...p, categorySlug: p.categorySlug ?? null })),

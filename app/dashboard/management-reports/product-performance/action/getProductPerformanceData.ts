@@ -17,10 +17,10 @@ interface ProductPerformanceData {
 export async function getProductPerformanceData({ from, to }: { from?: string; to?: string }) {
   // Note: Date filtering (from/to) is applied *after* fetching, within the map below
 
-  // Get all products
-  const products = await db.product.findMany({
+  // Get all products with their suppliers and order items
+  // First, get all products without the supplier relationship to avoid the Prisma error
+  const allProducts = await db.product.findMany({
     include: {
-      supplier: true,
       orderItems: {
         include: {
           order: true,
@@ -29,8 +29,30 @@ export async function getProductPerformanceData({ from, to }: { from?: string; t
     },
   });
 
+  // Then, get all valid suppliers to check which products have valid supplier relationships
+  const allSuppliers = await db.supplier.findMany({
+    select: { id: true, name: true },
+  });
+  const supplierMap = new Map(allSuppliers.map(s => [s.id, s]));
+
+  // Filter products that have valid suppliers and add supplier data
+  const validProducts = allProducts
+    .filter(product => {
+      const supplier = supplierMap.get(product.supplierId);
+      if (!supplier) {
+        console.warn(`Product ${product.id} (${product.name}) has invalid supplierId: ${product.supplierId}`);
+      }
+      return supplier !== undefined;
+    })
+    .map(product => ({
+      ...product,
+      supplier: supplierMap.get(product.supplierId)!
+    }));
+
+  console.log(`Found ${validProducts.length} products with valid suppliers out of ${allProducts.length} total products`);
+
   // Aggregate sales data per product
-  const productPerformance = products.map((product) => {
+  const productPerformance = validProducts.map((product) => {
     // Filter orderItems by date (if provided)
     const filteredOrderItems = product.orderItems.filter((item) => {
       if (!item.order) return false;
@@ -50,7 +72,7 @@ export async function getProductPerformanceData({ from, to }: { from?: string; t
       name: product.name, // Ensure this matches ProductPerformanceData
       price: product.price,
       imageUrl: product.imageUrl, // Keep as string | null
-      supplierName: product.supplier?.name || null, // Keep as string | null
+      supplierName: product.supplier.name, // Safe since we filtered out null suppliers
       published: product.published,
       outOfStock: product.outOfStock,
       quantitySold,
@@ -71,7 +93,7 @@ export async function getProductPerformanceData({ from, to }: { from?: string; t
     { label: 'إجمالي المنتجات المباعة', value: totalProductsSold },
     { label: 'إجمالي الإيرادات', value: totalRevenue.toFixed(2) },
     { label: 'الأكثر مبيعًا', value: bestSeller ? bestSeller.name : '-' },
-    { label: 'إجمالي المنتجات', value: products.length },
+    { label: 'إجمالي المنتجات', value: validProducts.length },
   ];
 
   // Chart Data

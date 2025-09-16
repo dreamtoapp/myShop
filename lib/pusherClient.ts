@@ -15,12 +15,9 @@ async function getPusherConfigFromAPI() {
 
     const config = await response.json();
 
-    // Check if all required fields are present
-    if (!config.pusherKey || !config.pusherCluster) {
-      console.warn('Incomplete Pusher configuration from API:', {
-        hasKey: !!config.pusherKey,
-        hasCluster: !!config.pusherCluster,
-      });
+    // Check if Pusher is properly configured
+    if (!config.isConfigured || !config.pusherKey || !config.pusherCluster) {
+      console.warn('Pusher not configured - real-time notifications disabled');
       return null;
     }
 
