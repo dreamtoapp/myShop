@@ -18,9 +18,7 @@ import {
     AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import AddImage from '@/components/AddImage';
-import Image from 'next/image';
 import { toast } from 'sonner';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 const featureSchema = z.object({
     title: z.string().min(2, 'العنوان مطلوب'),
@@ -56,14 +54,16 @@ export default function FeaturesTabClient({ aboutPageId }: { aboutPageId: string
     const [editId, setEditId] = useState<string | null>(null);
     const [error, setError] = useState<any>(null);
     const [loading, setLoading] = useState(false);
-    const titleInputRef = useRef<HTMLInputElement>(null);
+    const [listLoading, setListLoading] = useState(true);
+    const titleInputRef = useRef<HTMLInputElement>(null!);
 
     useEffect(() => {
         fetch('/api/about/features')
             .then(res => res.json())
             .then(res => {
                 if (res.success) setFeatures(res.features);
-            });
+            })
+            .finally(() => setListLoading(false));
     }, []);
 
     useEffect(() => {
@@ -137,10 +137,7 @@ export default function FeaturesTabClient({ aboutPageId }: { aboutPageId: string
         setLoading(false);
     }
 
-    function handleEdit(feature: Feature) {
-        setEditId(feature.id);
-        setForm({ title: feature.title, description: feature.description, imageUrl: feature.imageUrl });
-    }
+
 
     function handleCancelEdit() {
         setEditId(null);
@@ -150,159 +147,40 @@ export default function FeaturesTabClient({ aboutPageId }: { aboutPageId: string
 
     return (
         <div className="space-y-6" dir="rtl">
-            {/* Add/Edit Form Card */}
-            <Card>
-                <CardHeader className="text-right">
-                    <CardTitle>{editId ? 'تعديل الميزة' : 'إضافة ميزة جديدة'}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-right">
-                    <form onSubmit={handleAddOrEdit} className="space-y-4">
-                        <div>
-                            <Label htmlFor="featureTitle" className="text-sm font-medium text-right block">العنوان</Label>
-                            <Input
-                                id="featureTitle"
-                                ref={titleInputRef}
-                                value={form.title}
-                                onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                                className="mt-1 text-right"
-                                placeholder="أدخل عنوان الميزة"
-                                dir="rtl"
-                            />
-                            {error && typeof error === 'object' && error.fieldErrors?.title && (
-                                <p className="text-destructive text-sm mt-1 text-right">{error.fieldErrors.title[0]}</p>
-                            )}
-                        </div>
+            <FeatureForm
+                editId={editId}
+                loading={loading}
+                error={error}
+                form={form}
+                onChange={setForm}
+                onSubmit={handleAddOrEdit}
+                onCancel={handleCancelEdit}
+                titleInputRef={titleInputRef}
+            />
 
-                        <div>
-                            <Label htmlFor="featureDescription" className="text-sm font-medium text-right block">الوصف</Label>
-                            <Textarea
-                                id="featureDescription"
-                                value={form.description}
-                                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                                className="mt-1 min-h-[100px] text-right"
-                                placeholder="أدخل وصف الميزة"
-                                dir="rtl"
-                            />
-                            {error && typeof error === 'object' && error.fieldErrors?.description && (
-                                <p className="text-destructive text-sm mt-1 text-right">{error.fieldErrors.description[0]}</p>
-                            )}
-                        </div>
-
-                        <div>
-                            <Label htmlFor="featureImage" className="text-sm font-medium text-right block">صورة الميزة</Label>
-                            {editId ? (
-                                <div className="mt-1 w-48 h-32 border rounded-md overflow-hidden">
-                                    <AddImage
-                                        url={form.imageUrl}
-                                        alt="صورة الميزة"
-                                        recordId={editId}
-                                        table="feature"
-                                        tableField="imageUrl"
-                                        onUploadComplete={url => setForm(f => ({ ...f, imageUrl: url }))}
-                                        autoUpload
-                                    />
-                                </div>
-                            ) : (
-                                <Alert className="mt-2 text-right">
-                                    <AlertTitle>إرشادات الصورة</AlertTitle>
-                                    <AlertDescription>
-                                        أضف الميزة ثم ارفع الصورة بعد تحديد الميزة للتعديل
-                                    </AlertDescription>
-                                </Alert>
-                            )}
-                            {error && typeof error === 'object' && error.fieldErrors?.imageUrl && (
-                                <p className="text-destructive text-sm mt-1 text-right">{error.fieldErrors.imageUrl[0]}</p>
-                            )}
-                        </div>
-
-                        {error && typeof error === 'object' && error.fieldErrors?.aboutPageId && (
-                            <p className="text-destructive text-sm text-right">{error.fieldErrors.aboutPageId[0]}</p>
-                        )}
-                        {error && typeof error === 'object' && Array.isArray(error.formErrors) && error.formErrors.length > 0 && (
-                            <ul className="text-destructive text-sm text-right">
-                                {error.formErrors.map((msg: string, i: number) => <li key={i}>{msg}</li>)}
-                            </ul>
-                        )}
-                        {error && typeof error === 'string' && (
-                            <p className="text-destructive text-sm text-right">{error}</p>
-                        )}
-
-                        <div className="flex gap-2 pt-4 justify-end">
-                            <Button
-                                type="submit"
-                                disabled={loading}
-                                className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                            >
-                                {loading ? 'جاري الحفظ...' : (editId ? 'تحديث الميزة' : 'إضافة الميزة')}
-                            </Button>
-                            {editId && (
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={handleCancelEdit}
-                                >
-                                    إلغاء
-                                </Button>
-                            )}
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
-
-            {/* Features List Card */}
             <Card>
                 <CardHeader className="text-right">
                     <CardTitle>المميزات الحالية ({features.length})</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {features.length === 0 ? (
-                        <div className="text-center py-8 text-muted-foreground">
-                            لا توجد مميزات مضافة بعد
+                    {listLoading ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <SkeletonCard key={i} />
+                            ))}
                         </div>
+                    ) : features.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">لا توجد مميزات مضافة بعد</div>
                     ) : (
-                        <div className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {features.map((feature) => (
-                                <div key={feature.id} className="border rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4" dir="rtl">
-                                    <div className="flex-1 text-right">
-                                        <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
-                                        <p className="text-sm text-muted-foreground mb-3">{feature.description}</p>
-                                        {feature.imageUrl && feature.imageUrl.trim() !== '' && (
-                                            <Image
-                                                src={feature.imageUrl}
-                                                alt={feature.title}
-                                                width={96}
-                                                height={64}
-                                                className="w-24 h-16 object-cover rounded-md"
-                                            />
-                                        )}
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleEdit(feature)}
-                                        >
-                                            تعديل
-                                        </Button>
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button variant="destructive" size="sm">حذف</Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent dir="rtl">
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        هل أنت متأكد من حذف هذه الميزة؟ لا يمكن التراجع عن هذا الإجراء.
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDelete(feature.id)}>حذف</AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                    </div>
-                                </div>
+                                <FeatureCard
+                                    key={feature.id}
+                                    feature={feature}
+                                    aboutPageId={aboutPageId}
+                                    onUpdate={(updated) => setFeatures(prev => prev.map(f => f.id === updated.id ? updated : f))}
+                                    onDelete={() => handleDelete(feature.id)}
+                                />
                             ))}
                         </div>
                     )}
@@ -310,4 +188,202 @@ export default function FeaturesTabClient({ aboutPageId }: { aboutPageId: string
             </Card>
         </div>
     );
-} 
+}
+
+function FeatureForm({
+    editId,
+    loading,
+    error,
+    form,
+    onChange,
+    onSubmit,
+    onCancel,
+    titleInputRef,
+}: {
+    editId: string | null;
+    loading: boolean;
+    error: any;
+    form: FeatureFormValues;
+    onChange: React.Dispatch<React.SetStateAction<FeatureFormValues>>;
+    onSubmit: (e: any) => void;
+    onCancel: () => void;
+    titleInputRef: React.RefObject<HTMLInputElement>;
+}) {
+    return (
+        <Card>
+            <CardHeader className="text-right">
+                <CardTitle>{editId ? 'تعديل الميزة' : 'إضافة ميزة جديدة'}</CardTitle>
+            </CardHeader>
+            <CardContent className="text-right">
+                <form onSubmit={onSubmit} className="space-y-4">
+                    <div>
+                        <Label htmlFor="featureTitle" className="text-sm font-medium text-right block">العنوان</Label>
+                        <Input
+                            id="featureTitle"
+                            ref={titleInputRef}
+                            value={form.title}
+                            onChange={e => onChange(f => ({ ...f, title: e.target.value }))}
+                            className="mt-1 text-right"
+                            placeholder="أدخل عنوان الميزة"
+                            dir="rtl"
+                        />
+                        {error && typeof error === 'object' && error.fieldErrors?.title && (
+                            <p className="text-destructive text-sm mt-1 text-right">{error.fieldErrors.title[0]}</p>
+                        )}
+                    </div>
+
+                    <div>
+                        <Label htmlFor="featureDescription" className="text-sm font-medium text-right block">الوصف</Label>
+                        <Textarea
+                            id="featureDescription"
+                            value={form.description}
+                            onChange={e => onChange(f => ({ ...f, description: e.target.value }))}
+                            className="mt-1 min-h-[100px] text-right"
+                            placeholder="أدخل وصف الميزة"
+                            dir="rtl"
+                        />
+                        {error && typeof error === 'object' && error.fieldErrors?.description && (
+                            <p className="text-destructive text-sm mt-1 text-right">{error.fieldErrors.description[0]}</p>
+                        )}
+                    </div>
+
+                    <div>
+                        <Label htmlFor="featureImage" className="text-sm font-medium text-right block">صورة الميزة</Label>
+                        {editId ? (
+                            <div className="mt-1 w-full max-w-md aspect-[4/3] border rounded-md overflow-hidden">
+                                <AddImage
+                                    url={form.imageUrl}
+                                    alt="صورة الميزة"
+                                    recordId={editId}
+                                    table="feature"
+                                    tableField="imageUrl"
+                                    onUploadComplete={(url: string) => onChange(f => ({ ...f, imageUrl: url }))}
+                                    imageFit="contain"
+                                />
+                            </div>
+                        ) : null}
+                        {error && typeof error === 'object' && error.fieldErrors?.imageUrl && (
+                            <p className="text-destructive text-sm mt-1 text-right">{error.fieldErrors.imageUrl[0]}</p>
+                        )}
+                    </div>
+
+                    {error && typeof error === 'object' && error.fieldErrors?.aboutPageId && (
+                        <p className="text-destructive text-sm text-right">{error.fieldErrors.aboutPageId[0]}</p>
+                    )}
+                    {error && typeof error === 'object' && Array.isArray(error.formErrors) && error.formErrors.length > 0 && (
+                        <ul className="text-destructive text-sm text-right">
+                            {error.formErrors.map((msg: string, i: number) => <li key={i}>{msg}</li>)}
+                        </ul>
+                    )}
+                    {error && typeof error === 'string' && (
+                        <p className="text-destructive text-sm text-right">{error}</p>
+                    )}
+
+                    <div className="flex gap-2 pt-4 justify-end">
+                        <Button type="submit" disabled={loading} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                            {loading ? 'جاري الحفظ...' : (editId ? 'تحديث الميزة' : 'إضافة الميزة')}
+                        </Button>
+                        {editId && (
+                            <Button type="button" variant="outline" onClick={onCancel}>إلغاء</Button>
+                        )}
+                    </div>
+                </form>
+            </CardContent>
+        </Card>
+    );
+}
+
+function FeatureCard({ feature, aboutPageId, onUpdate, onDelete }: { feature: Feature; aboutPageId: string | null; onUpdate: (f: Feature) => void; onDelete: () => void }) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [local, setLocal] = useState<FeatureFormValues>({ title: feature.title, description: feature.description, imageUrl: feature.imageUrl });
+    const [saving, setSaving] = useState(false);
+
+    async function handleSave() {
+        try {
+            setSaving(true);
+            const res = await fetch('/api/about/features', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: feature.id, ...local, aboutPageId }),
+            });
+            const result = await res.json();
+            if (result.success) {
+                onUpdate(result.feature as Feature);
+                setIsEditing(false);
+            }
+        } finally {
+            setSaving(false);
+        }
+    }
+
+    return (
+        <Card className="overflow-hidden">
+            {/* Image updater (single source of truth) */}
+            <div className="p-4 pt-3">
+                <div className="mt-1 w-full max-w-md aspect-[4/3] border rounded-md overflow-hidden mx-auto">
+                    <AddImage
+                        url={local.imageUrl}
+                        alt="صورة الميزة"
+                        recordId={feature.id}
+                        table="feature"
+                        tableField="imageUrl"
+                        onUploadComplete={(url: string) => {
+                            setLocal(v => ({ ...v, imageUrl: url }));
+                            onUpdate({ id: feature.id, title: feature.title, description: feature.description, imageUrl: url });
+                        }}
+                        imageFit="contain"
+                    />
+                </div>
+            </div>
+            <CardContent className="p-4 space-y-3">
+                {isEditing ? (
+                    <>
+                        <Input value={local.title} onChange={e => setLocal(v => ({ ...v, title: e.target.value }))} className="text-right" dir="rtl" />
+                        <Textarea value={local.description} onChange={e => setLocal(v => ({ ...v, description: e.target.value }))} className="min-h-[80px] text-right" dir="rtl" />
+                        {/* Image editing handled separately above; keep text-only editing here */}
+                        <div className="flex gap-2 justify-end">
+                            <Button size="sm" onClick={handleSave} disabled={saving} className="bg-primary text-primary-foreground">{saving ? 'جاري الحفظ...' : 'حفظ'}</Button>
+                            <Button size="sm" variant="outline" onClick={() => { setLocal({ title: feature.title, description: feature.description, imageUrl: feature.imageUrl }); setIsEditing(false); }}>إلغاء</Button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <h3 className="font-semibold text-foreground mb-1 text-right">{feature.title}</h3>
+                        <p className="text-sm text-muted-foreground mb-3 text-right">{feature.description}</p>
+                        <div className="flex gap-2 justify-end">
+                            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>تعديل</Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="sm">حذف</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent dir="rtl">
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                                        <AlertDialogDescription>هل أنت متأكد من حذف هذه الميزة؟ لا يمكن التراجع عن هذا الإجراء.</AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                        <AlertDialogAction onClick={onDelete}>حذف</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    </>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
+function SkeletonCard() {
+    return (
+        <Card className="overflow-hidden">
+            <div className="w-full h-40 bg-muted animate-pulse" />
+            <CardContent className="p-4 space-y-2">
+                <div className="h-4 bg-muted rounded w-3/4 animate-pulse" />
+                <div className="h-3 bg-muted rounded w-full animate-pulse" />
+                <div className="h-3 bg-muted rounded w-5/6 animate-pulse" />
+            </CardContent>
+        </Card>
+    );
+}

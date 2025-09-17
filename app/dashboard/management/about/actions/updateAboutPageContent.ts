@@ -2,15 +2,17 @@
 import { z } from 'zod';
 import db from '@/lib/prisma';
 
+// Accept partial updates: each field optional; tabs can send only their fields
 const aboutSchema = z.object({
-  heroTitle: z.string().min(2),
-  heroSubtitle: z.string().min(2),
-  heroImageUrl: z.string().url(),
-  missionTitle: z.string().min(2),
-  missionText: z.string().min(2),
-  ctaTitle: z.string().min(2),
-  ctaText: z.string().min(2),
-  ctaButtonText: z.string().min(2),
+  heroTitle: z.string().min(2).optional(),
+  heroSubtitle: z.string().min(2).optional(),
+  // Allow initial save without image; accept empty string or valid URL
+  heroImageUrl: z.union([z.string().url(), z.literal('')]).optional(),
+  missionTitle: z.string().min(2).optional(),
+  missionText: z.string().min(2).optional(),
+  ctaTitle: z.string().min(2).optional(),
+  ctaText: z.string().min(2).optional(),
+  ctaButtonText: z.string().min(2).optional(),
   brandId: z.string().optional(),
   ctaButtonLink: z.string().optional(),
   contactLink: z.string().optional(),
@@ -23,6 +25,7 @@ export async function updateAboutPageContent(data: AboutFormValues) {
   if (!parsed.success) {
     return { success: false, error: parsed.error.flatten() };
   }
+  const input = parsed.data;
   try {
     // Only one AboutPageContent should exist
     const existing = await db.aboutPageContent.findFirst();
@@ -30,22 +33,22 @@ export async function updateAboutPageContent(data: AboutFormValues) {
     if (existing) {
       aboutPage = await db.aboutPageContent.update({
         where: { id: existing.id },
-        data: { ...data },
+        data: { ...input },
       });
     } else {
       aboutPage = await db.aboutPageContent.create({
         data: {
-          heroTitle: data.heroTitle,
-          heroSubtitle: data.heroSubtitle,
-          heroImageUrl: data.heroImageUrl,
-          missionTitle: data.missionTitle,
-          missionText: data.missionText,
-          ctaTitle: data.ctaTitle,
-          ctaText: data.ctaText,
-          ctaButtonText: data.ctaButtonText,
-          brandId: data.brandId || '',
-          ctaButtonLink: data.ctaButtonLink || '',
-          contactLink: data.contactLink || '',
+          heroTitle: input.heroTitle ?? '',
+          heroSubtitle: input.heroSubtitle ?? '',
+          heroImageUrl: input.heroImageUrl ?? '',
+          missionTitle: input.missionTitle ?? '',
+          missionText: input.missionText ?? '',
+          ctaTitle: input.ctaTitle ?? '',
+          ctaText: input.ctaText ?? '',
+          ctaButtonText: input.ctaButtonText ?? '',
+          brandId: input.brandId || '',
+          ctaButtonLink: input.ctaButtonLink || '',
+          contactLink: input.contactLink || '',
         },
       });
     }

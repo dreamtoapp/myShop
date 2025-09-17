@@ -5,6 +5,7 @@ import TestimonialsSection from './components/TestimonialsSection';
 import CallToActionSection from './components/CallToActionSection';
 import { getAboutPageContent } from './actions/getAboutPageContent';
 import FAQSection from './components/FAQSection';
+import { getAppConfig } from '@/helpers/appConfig';
 
 // SEO metadata for the About page
 export const metadata = {
@@ -14,6 +15,7 @@ export const metadata = {
 
 const AboutPage = async () => {
   const aboutPage = await getAboutPageContent();
+  const { appName } = await getAppConfig();
   if (!aboutPage) return <div>لا يوجد محتوى لصفحة من نحن حالياً.</div>;
 
   return (
@@ -55,7 +57,7 @@ const AboutPage = async () => {
       </section>
       {/* Features Section */}
       <section className="rounded-2xl bg-background/95 shadow-md mb-12 py-8 px-2" aria-labelledby="about-features-title">
-        <WhyChooseUsSection features={aboutPage.features} />
+        <WhyChooseUsSection features={aboutPage.features} companyName={appName} />
       </section>
       {/* Testimonials Section */}
       <section className="rounded-2xl bg-feature-suppliers/10 shadow-inner mb-12 py-8 px-2" aria-labelledby="about-testimonials-title">

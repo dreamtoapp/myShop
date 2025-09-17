@@ -28,6 +28,7 @@ interface AddImageProps {
   acceptMimeTypes?: string[]; // default common images
   maxFileSizeMB?: number; // default 5MB
   requiredMinDimensions?: { width: number; height: number }; // default undefined (off)
+  imageFit?: 'cover' | 'contain';
 }
 
 const AddImage: React.FC<AddImageProps> = ({
@@ -46,6 +47,7 @@ const AddImage: React.FC<AddImageProps> = ({
   acceptMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
   maxFileSizeMB = 5,
   requiredMinDimensions,
+  imageFit = 'cover',
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | undefined>(url);
@@ -243,7 +245,7 @@ const AddImage: React.FC<AddImageProps> = ({
           alt={alt}
           fill
           sizes="100%"
-          className="object-cover rounded-md transition-transform duration-300 group-hover:scale-105"
+          className={`${imageFit === 'contain' ? 'object-contain' : 'object-cover'} rounded-md bg-muted`}
           priority
           onError={() => setPreview(undefined)}
         />

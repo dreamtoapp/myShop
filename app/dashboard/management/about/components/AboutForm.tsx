@@ -6,16 +6,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import AddImage from '@/components/AddImage';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Icon } from '@/components/icons/Icon';
 
+// About tab collects only hero fields; other fields live in separate tabs
 const aboutSchema = z.object({
     heroTitle: z.string().min(2, 'العنوان الرئيسي مطلوب'),
     heroSubtitle: z.string().min(2, 'الوصف الرئيسي مطلوب'),
-    heroImageUrl: z.string().url('رابط الصورة غير صالح'),
-    missionTitle: z.string().min(2, 'عنوان الرسالة مطلوب'),
-    missionText: z.string().min(2, 'نص الرسالة مطلوب'),
-    ctaTitle: z.string().min(2, 'عنوان الدعوة مطلوب'),
-    ctaText: z.string().min(2, 'نص الدعوة مطلوب'),
-    ctaButtonText: z.string().min(2, 'نص زر الدعوة مطلوب'),
+    // Allow initial save without image; accept empty string or valid URL
+    heroImageUrl: z.union([z.string().url('رابط الصورة غير صالح'), z.literal('')]).optional(),
 });
 
 type AboutFormValues = z.infer<typeof aboutSchema>;
@@ -34,11 +33,57 @@ export default function AboutForm({ defaultValues, onSubmit, onCancel }: {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" dir="rtl">
-            {/* Hero Section */}
-            <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground border-b pb-2 text-right">قسم الهيرو</h3>
+            {/* Hero Image Standalone Card (moved to top) */}
+            <Card dir="rtl">
+                <CardHeader className="text-right">
+                    <CardTitle>صورة الهيرو</CardTitle>
+                </CardHeader>
+                <CardContent className="text-right">
+                    <div className="flex flex-wrap items-start gap-4">
+                        <div className="relative mt-1 w-full aspect-[2/1] border rounded-md overflow-hidden">
+                            <AddImage
+                                url={watch('heroImageUrl')}
+                                alt="صورة الهيرو"
+                                recordId={defaultValues?.id || ''}
+                                table="aboutPageContent"
+                                tableField="heroImageUrl"
+                                onUploadComplete={url => setValue('heroImageUrl', url, { shouldValidate: true })}
+                                imageFit="contain"
+                            />
+                            {!defaultValues?.id && (
+                                <div className="absolute inset-0 bg-background/60 backdrop-blur-sm flex items-center justify-center p-4">
+                                    <div role="note" aria-live="polite" className="max-w-md w-full rounded-md border border-amber-200 bg-amber-50/80 text-amber-800 px-5 py-4 text-center">
+                                        <div className="inline-flex items-center justify-center gap-2 mb-2">
+                                            <Icon name="AlertCircle" className="h-5 w-5 text-amber-700" />
+                                            <span className="sr-only">تنبيه</span>
+                                        </div>
+                                        <p className="text-base font-medium mb-0">احفظ البيانات أولًا، ثم ارفع صورة الهيرو.</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <div className="min-w-[240px] max-w-full text-sm">
+                            {!defaultValues?.id && (
+                                <p className="text-yellow-700 mb-2 text-right">تنبيه: احفظ البيانات أولًا، ثم ارفع صورة الهيرو.</p>
+                            )}
 
-                <div className="space-y-4">
+                        </div>
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground text-right">
+                        الأنواع المسموحة: JPEG, PNG, WEBP, AVIF — الأبعاد الموصى بها: 1200×600 بكسل (2:1) — الحد الأقصى للحجم: 5MB
+                    </p>
+                    {errors.heroImageUrl && (
+                        <p className="text-destructive text-sm mt-2 text-right">{errors.heroImageUrl.message}</p>
+                    )}
+                </CardContent>
+            </Card>
+
+            {/* Hero Section Card */}
+            <Card dir="rtl">
+                <CardHeader className="text-right">
+                    <CardTitle>معلومات المتجر الأساسية</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 text-right">
                     <div className="text-right">
                         <Label htmlFor="heroTitle" className="text-sm font-medium text-right block">العنوان الرئيسي</Label>
                         <Input
@@ -67,118 +112,32 @@ export default function AboutForm({ defaultValues, onSubmit, onCancel }: {
                         )}
                     </div>
 
-                    <div className="text-right">
-                        <Label htmlFor="heroImageUrl" className="text-sm font-medium text-right block">صورة الهيرو</Label>
-                        <div className="mt-1 w-48 h-32 border rounded-md overflow-hidden">
-                            <AddImage
-                                url={watch('heroImageUrl')}
-                                alt="صورة الهيرو"
-                                recordId={defaultValues?.id || ''}
-                                table="aboutPageContent"
-                                tableField="heroImageUrl"
-                                onUploadComplete={url => setValue('heroImageUrl', url, { shouldValidate: true })}
-                                autoUpload
-                            />
-                        </div>
-                        {errors.heroImageUrl && (
-                            <p className="text-destructive text-sm mt-1 text-right">{errors.heroImageUrl.message}</p>
-                        )}
-                    </div>
-                </div>
-            </div>
+                    {/* Hero image moved to its own standalone card below */}
+                </CardContent>
+            </Card>
 
-            {/* Mission Section */}
-            <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground border-b pb-2 text-right">قسم الرسالة</h3>
 
-                <div className="space-y-4">
-                    <div className="text-right">
-                        <Label htmlFor="missionTitle" className="text-sm font-medium text-right block">عنوان الرسالة</Label>
-                        <Input
-                            id="missionTitle"
-                            {...register('missionTitle')}
-                            className="mt-1 text-right"
-                            placeholder="أدخل عنوان الرسالة"
-                            dir="rtl"
-                        />
-                        {errors.missionTitle && (
-                            <p className="text-destructive text-sm mt-1 text-right">{errors.missionTitle.message}</p>
-                        )}
-                    </div>
 
-                    <div className="text-right">
-                        <Label htmlFor="missionText" className="text-sm font-medium text-right block">نص الرسالة</Label>
-                        <Textarea
-                            id="missionText"
-                            {...register('missionText')}
-                            className="mt-1 min-h-[100px] text-right"
-                            placeholder="أدخل نص الرسالة"
-                            dir="rtl"
-                        />
-                        {errors.missionText && (
-                            <p className="text-destructive text-sm mt-1 text-right">{errors.missionText.message}</p>
-                        )}
-                    </div>
-                </div>
-            </div>
+            {/* Mission moved to "رسالتنا" tab */}
 
-            {/* CTA Section */}
-            <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground border-b pb-2 text-right">قسم الدعوة للعمل</h3>
-
-                <div className="space-y-4">
-                    <div className="text-right">
-                        <Label htmlFor="ctaTitle" className="text-sm font-medium text-right block">عنوان الدعوة</Label>
-                        <Input
-                            id="ctaTitle"
-                            {...register('ctaTitle')}
-                            className="mt-1 text-right"
-                            placeholder="أدخل عنوان الدعوة"
-                            dir="rtl"
-                        />
-                        {errors.ctaTitle && (
-                            <p className="text-destructive text-sm mt-1 text-right">{errors.ctaTitle.message}</p>
-                        )}
-                    </div>
-
-                    <div className="text-right">
-                        <Label htmlFor="ctaText" className="text-sm font-medium text-right block">نص الدعوة</Label>
-                        <Textarea
-                            id="ctaText"
-                            {...register('ctaText')}
-                            className="mt-1 min-h-[100px] text-right"
-                            placeholder="أدخل نص الدعوة"
-                            dir="rtl"
-                        />
-                        {errors.ctaText && (
-                            <p className="text-destructive text-sm mt-1 text-right">{errors.ctaText.message}</p>
-                        )}
-                    </div>
-
-                    <div className="text-right">
-                        <Label htmlFor="ctaButtonText" className="text-sm font-medium text-right block">نص زر الدعوة</Label>
-                        <Input
-                            id="ctaButtonText"
-                            {...register('ctaButtonText')}
-                            className="mt-1 text-right"
-                            placeholder="أدخل نص زر الدعوة"
-                            dir="rtl"
-                        />
-                        {errors.ctaButtonText && (
-                            <p className="text-destructive text-sm mt-1 text-right">{errors.ctaButtonText.message}</p>
-                        )}
-                    </div>
-                </div>
-            </div>
+            {/* CTA moved to تبويب قسم الدعوة للعمل */}
 
             {/* Form Actions */}
-            <div className="flex gap-4 pt-6 border-t justify-end">
+            <div id="about-form-actions" className="flex gap-4 pt-6 border-t justify-end">
                 <Button
                     type="submit"
                     disabled={isSubmitting}
+                    aria-busy={isSubmitting}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
-                    {isSubmitting ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+                    {isSubmitting ? (
+                        <span className="inline-flex items-center gap-2">
+                            <Icon name="Loader2" className="h-4 w-4 animate-spin" />
+                            جاري الحفظ...
+                        </span>
+                    ) : (
+                        'حفظ التغييرات'
+                    )}
                 </Button>
                 {onCancel && (
                     <Button

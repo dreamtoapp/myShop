@@ -1,25 +1,45 @@
 "use client";
 import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useRouter } from 'next/navigation';
 import AboutTabClient from './AboutTabClient';
 import FeaturesTabClient from './FeaturesTabClient';
 import FAQTabClient from './FAQTabClient';
-import { updateAboutPageContent } from '../actions/updateAboutPageContent';
+// import { updateAboutPageContent } from '../actions/updateAboutPageContent';
+import { updateAboutHero } from '../actions/updateAboutHero';
+import MissionTabClient from './MissionTabClient';
 
 export default function AboutAdminClient({ aboutPage }: { aboutPage: any }) {
     const aboutPageId = aboutPage?.id || null;
     const [status, setStatus] = useState<string | undefined>(undefined);
     const [error, setError] = useState<string | undefined>(undefined);
+    const router = useRouter();
 
     async function handleAboutSubmit(values: any) {
         setStatus(undefined);
         setError(undefined);
         try {
-            const result = await updateAboutPageContent(values);
+            const result = await updateAboutHero({
+                heroTitle: values.heroTitle,
+                heroSubtitle: values.heroSubtitle,
+                heroImageUrl: values.heroImageUrl ?? '',
+            });
             if (result.success) {
                 setStatus('success');
+                // Ensure UI reflects new id immediately (enable image upload overlay to disappear)
+                router.refresh();
             } else {
-                setError(result.error?.toString() || 'فشل في الحفظ');
+                const err = result.error as any;
+                const msg = typeof err === 'string'
+                    ? err
+                    : (Array.isArray(err?.formErrors) && err.formErrors.length > 0)
+                        ? err.formErrors.join(' • ')
+                        : (err?.fieldErrors
+                            ? Object.values(err.fieldErrors as Record<string, string[]>)
+                                .flat()
+                                .join(' • ')
+                            : '') || 'فشل في الحفظ';
+                setError(msg);
             }
         } catch (e: any) {
             setError(e.message || 'Unknown error');
@@ -36,7 +56,8 @@ export default function AboutAdminClient({ aboutPage }: { aboutPage: any }) {
             <Tabs defaultValue="about" className="w-full" dir="rtl">
                 <TabsList className="mb-6 w-full justify-start" dir="rtl">
                     <TabsTrigger value="about">عن المتجر</TabsTrigger>
-                    <TabsTrigger value="features">المميزات</TabsTrigger>
+                    <TabsTrigger value="mission">رسالتنا</TabsTrigger>
+                    <TabsTrigger value="features">لماذا تختارنا</TabsTrigger>
                     <TabsTrigger value="faq">الأسئلة الشائعة</TabsTrigger>
                 </TabsList>
 
@@ -51,6 +72,10 @@ export default function AboutAdminClient({ aboutPage }: { aboutPage: any }) {
 
                 <TabsContent value="features" className="mt-0" dir="rtl">
                     <FeaturesTabClient aboutPageId={aboutPageId} />
+                </TabsContent>
+
+                <TabsContent value="mission" className="mt-0" dir="rtl">
+                    <MissionTabClient aboutPage={aboutPage} />
                 </TabsContent>
 
                 <TabsContent value="faq" className="mt-0" dir="rtl">

@@ -19,9 +19,9 @@ interface Feature {
     imageUrl?: string;
 }
 
-const WhyChooseUsSection = ({ features }: { features: Feature[] }) => (
+const WhyChooseUsSection = ({ features, companyName }: { features: Feature[]; companyName: string }) => (
     <section className='mb-20 animate-fade-in-up bg-gradient-to-b from-background/80 to-feature-suppliers/5 py-12 rounded-2xl shadow-inner'>
-        <h2 className='text-3xl font-bold text-center mb-10 font-arabic'>لماذا تختار أمواج؟</h2>
+        <h2 className='text-3xl font-bold text-center mb-10 font-arabic'>لماذا تختار {companyName}؟</h2>
         <div className='grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3'>
             {features.map((feature, index) => {
                 const iconName = iconMap[feature.icon] || 'Star';
@@ -32,12 +32,12 @@ const WhyChooseUsSection = ({ features }: { features: Feature[] }) => (
                     >
                         {/* Image at the top, fills width */}
                         {feature.imageUrl ? (
-                            <div className="relative w-full h-44">
+                            <div className="relative w-full h-44 bg-muted">
                                 <Image
                                     src={feature.imageUrl}
                                     alt={feature.title}
                                     fill
-                                    className="object-cover w-full h-full rounded-t-xl"
+                                    className="object-contain w-full h-full rounded-t-xl"
                                     loading="lazy"
                                     sizes="(max-width: 768px) 100vw, 33vw"
                                 />
