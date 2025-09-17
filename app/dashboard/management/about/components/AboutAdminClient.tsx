@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import AboutTabClient from './AboutTabClient';
 import FeaturesTabClient from './FeaturesTabClient';
 import FAQTabClient from './FAQTabClient';
+import TestimonialsTabClient from './TestimonialsTabClient';
 // import { updateAboutPageContent } from '../actions/updateAboutPageContent';
 import { updateAboutHero } from '../actions/updateAboutHero';
 import MissionTabClient from './MissionTabClient';
@@ -58,6 +59,7 @@ export default function AboutAdminClient({ aboutPage }: { aboutPage: any }) {
                     <TabsTrigger value="about">عن المتجر</TabsTrigger>
                     <TabsTrigger value="mission">رسالتنا</TabsTrigger>
                     <TabsTrigger value="features">لماذا تختارنا</TabsTrigger>
+                    <TabsTrigger value="testimonials">آراء العملاء</TabsTrigger>
                     <TabsTrigger value="faq">الأسئلة الشائعة</TabsTrigger>
                 </TabsList>
 
@@ -76,6 +78,10 @@ export default function AboutAdminClient({ aboutPage }: { aboutPage: any }) {
 
                 <TabsContent value="mission" className="mt-0" dir="rtl">
                     <MissionTabClient aboutPage={aboutPage} />
+                </TabsContent>
+
+                <TabsContent value="testimonials" className="mt-0" dir="rtl">
+                    <TestimonialsTabClient aboutPageId={aboutPageId} />
                 </TabsContent>
 
                 <TabsContent value="faq" className="mt-0" dir="rtl">

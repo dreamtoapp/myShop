@@ -331,10 +331,10 @@ const AddImage: React.FC<AddImageProps> = ({
       {/* Error message with retry (Alert by default, fallback to inline) */}
       {error && (
         useShadcnAlert ? (
-          <div className="absolute top-2 left-2 right-2">
-            <Alert variant="destructive">
-              <AlertTitle>فشل رفع الصورة{errorCode ? ` (${errorCode})` : ''}</AlertTitle>
-              <AlertDescription>
+          <div className="absolute top-2 left-2 right-2 z-20">
+            <Alert variant="destructive" className="bg-destructive/95 backdrop-blur-sm border-destructive shadow-lg">
+              <AlertTitle className="text-destructive-foreground font-semibold">فشل رفع الصورة{errorCode ? ` (${errorCode})` : ''}</AlertTitle>
+              <AlertDescription className="text-destructive-foreground">
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate">{error}</span>
                   <div className="flex items-center gap-2">
@@ -342,7 +342,7 @@ const AddImage: React.FC<AddImageProps> = ({
                       <button
                         type="button"
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); setErrorCode(undefined); handleUpload(file); }}
-                        className="px-2 py-0.5 rounded bg-background text-foreground border border-border"
+                        className="px-3 py-1 rounded bg-background text-foreground border border-border hover:bg-background/90 font-medium"
                       >
                         إعادة المحاولة
                       </button>
@@ -351,7 +351,7 @@ const AddImage: React.FC<AddImageProps> = ({
                       type="button"
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); setErrorCode(undefined); }}
                       aria-label="إغلاق"
-                      className="px-2 py-0.5 rounded border border-border"
+                      className="px-2 py-1 rounded border border-border hover:bg-background/20 text-destructive-foreground"
                     >
                       ×
                     </button>
@@ -361,14 +361,14 @@ const AddImage: React.FC<AddImageProps> = ({
             </Alert>
           </div>
         ) : (
-          <div role="alert" aria-live="polite" className="absolute top-2 left-2 right-2 bg-destructive text-destructive-foreground text-xs p-2 rounded shadow flex items-center justify-between gap-2">
-            <span className="truncate">{error}</span>
+          <div role="alert" aria-live="polite" className="absolute top-2 left-2 right-2 bg-destructive/95 backdrop-blur-sm text-destructive-foreground text-sm p-3 rounded shadow-lg border border-destructive flex items-center justify-between gap-2 z-20">
+            <span className="truncate font-medium">{error}</span>
             <div className="flex items-center gap-2">
               {file && !loading && (
                 <button
                   type="button"
                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); setErrorCode(undefined); handleUpload(file); }}
-                  className="px-2 py-0.5 rounded bg-background text-foreground border border-border hover:bg-background/80"
+                  className="px-3 py-1 rounded bg-background text-foreground border border-border hover:bg-background/90 font-medium"
                 >
                   إعادة المحاولة
                 </button>
@@ -377,7 +377,7 @@ const AddImage: React.FC<AddImageProps> = ({
                 type="button"
                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); setError(''); setErrorCode(undefined); }}
                 aria-label="إغلاق"
-                className="px-2 py-0.5 rounded border border-border hover:bg-background/30"
+                className="px-2 py-1 rounded border border-border hover:bg-background/20 text-destructive-foreground"
               >
                 ×
               </button>

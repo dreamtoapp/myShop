@@ -18,6 +18,7 @@ const SUPPORTED_TABLES = {
   offer: 'offer',
   aboutPageContent: 'aboutPageContent',
   feature: 'feature',
+  testimonial: 'testimonial',
 } as const;
 
 type TableName = keyof typeof SUPPORTED_TABLES;
@@ -102,6 +103,14 @@ export async function POST(req: NextRequest) {
       const modelKey = SUPPORTED_TABLES[table];
       model = (db as any)[modelKey];
 
+      console.log('[IMAGE API DEBUG]', {
+        table,
+        modelKey,
+        hasModel: !!model,
+        hasUpdate: !!model?.update,
+        supportedTables: Object.keys(SUPPORTED_TABLES)
+      });
+
       if (!model?.update) {
         return NextResponse.json(
           { error: `Invalid model or model not supported for updates: ${table}` },
@@ -168,6 +177,10 @@ export async function POST(req: NextRequest) {
         case 'offer':
           revalidateTag('promotions');
           revalidatePath('/');
+          break;
+        case 'testimonial':
+          revalidateTag('about');
+          revalidatePath('/about');
           break;
         default:
           break;

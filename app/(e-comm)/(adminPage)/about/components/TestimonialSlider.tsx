@@ -3,11 +3,11 @@
 import Carousel, { ArrowProps } from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 // NOTE: Defined locally as the original type source is unavailable.
 // For better maintainability, this should be a shared type.
@@ -94,26 +94,36 @@ const TestimonialSlider = ({ testimonials }: TestimonialSliderProps) => {
                         transition={{ delay: idx * 0.1, duration: 0.5, type: 'spring' }}
                     >
                         <Card
-                            className="h-full flex flex-col justify-center items-center text-center p-6 min-h-[220px] shadow-lg border border-feature-users/50 card-hover-effect card-border-glow bg-background/90 rounded-xl"
+                            className="h-full flex flex-col justify-center items-center text-center p-0 min-h-[280px] shadow-lg border border-feature-users/50 card-hover-effect card-border-glow bg-background/90 rounded-xl overflow-hidden"
                         >
-                            <Avatar className="h-16 w-16 border-4 border-feature-users shadow-md mb-2">
-                                <AvatarImage src={testimonial.imageUrl && testimonial.imageUrl.includes('unsplash.com') ? `${testimonial.imageUrl}&w=100&q=80` : testimonial.imageUrl || ''} alt={testimonial.author || '?'} loading="lazy" />
-                                <AvatarFallback className="text-xl font-medium">
-                                    {typeof testimonial.author === 'string' && testimonial.author ? testimonial.author.charAt(0) : '?'}
-                                </AvatarFallback>
-                            </Avatar>
-                            <h3 className="text-lg font-semibold mt-2 font-arabic">{testimonial.author || '?'}</h3>
-                            <div className='flex items-center gap-1 mt-2'>
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                    <Star
-                                        key={i}
-                                        className={`h-5 w-5 transition-all duration-200 ${i < Math.floor(testimonial.rating) ? 'text-yellow-400 fill-yellow-400 scale-110' : 'text-gray-300'}`}
+                            {/* Full-width image at top */}
+                            {testimonial.imageUrl && (
+                                <div className="relative w-full h-32 mb-4">
+                                    <Image
+                                        src={testimonial.imageUrl.includes('unsplash.com') ? `${testimonial.imageUrl}&w=400&q=80` : testimonial.imageUrl}
+                                        alt={testimonial.author || 'Client'}
+                                        fill
+                                        className="object-cover"
+                                        loading="lazy"
                                     />
-                                ))}
+                                </div>
+                            )}
+
+                            {/* Content section */}
+                            <div className="px-6 pb-6 flex-1 flex flex-col justify-center">
+                                <h3 className="text-lg font-semibold font-arabic">{testimonial.author || '?'}</h3>
+                                <div className='flex items-center justify-center gap-1 mt-2'>
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                        <Star
+                                            key={i}
+                                            className={`h-5 w-5 transition-all duration-200 ${i < Math.floor(testimonial.rating) ? 'text-yellow-400 fill-yellow-400 scale-110' : 'text-gray-300'}`}
+                                        />
+                                    ))}
+                                </div>
+                                <p className='text-sm text-muted-foreground leading-relaxed mt-4 font-arabic line-clamp-3'>
+                                    {testimonial.text}
+                                </p>
                             </div>
-                            <p className='text-sm text-muted-foreground leading-relaxed mt-4 font-arabic line-clamp-3'>
-                                {testimonial.text}
-                            </p>
                         </Card>
                     </motion.div>
                 ))}
