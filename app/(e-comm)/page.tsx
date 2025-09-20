@@ -6,6 +6,7 @@ import FeaturedPromotions from './homepage/component/offer/FeaturedPromotions';
 import { SWRConfig } from 'swr';
 import ProductInfiniteGrid from './homepage/component/ProductInfiniteGrid';
 import { companyInfo } from './actions/companyDetail';
+import HomepageHeroSection from './homepage/component/hero/HomepageHeroSection';
 const PAGE_SIZE = 8;
 
 const CriticalCSS = dynamic(() => import('./homepage/component/CriticalCSS'), { ssr: true });
@@ -38,10 +39,11 @@ export default async function HomePage(props: { searchParams: Promise<{ slug?: s
   return (
     <>
       <CriticalCSS />
+      <HomepageHeroSection
+        showHeroImage={company?.showHeroImage || false}
+        profilePicture={company?.profilePicture}
+      />
       <div className='container mx-auto flex flex-col gap-8 bg-background text-foreground px-4 sm:px-6 lg:px-8'>
-        {/* <PreloadScript /> */}
-        {/* <HomepageHeroSection /> */}
-
         <section className="space-y-6" aria-label="Featured promotions">
           <FeaturedPromotions />
         </section>

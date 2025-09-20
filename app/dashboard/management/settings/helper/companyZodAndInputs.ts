@@ -19,7 +19,8 @@ export const CompanySchema = z.object({
   profilePicture: z.string().url('رابط الصورة غير صالح').optional().or(z.literal('')),
   bio: z.string().trim().optional().or(z.literal('')),
   taxNumber: z.string().trim().optional().or(z.literal('')),
-  taxQrImage: z.string().url('رابط QR غير صالح').optional().or(z.literal('')),
+  commercialRegistrationNumber: z.string().trim().optional().or(z.literal('')).nullable(),
+  saudiBusinessId: z.string().trim().optional().or(z.literal('')).nullable(),
   twitter: z.string().url('رابط تويتر غير صالح').optional().or(z.literal('')),
   linkedin: z.string().url('رابط لينكدإن غير صالح').optional().or(z.literal('')),
   instagram: z.string().url('رابط انستغرام غير صالح').optional().or(z.literal('')),
@@ -43,6 +44,22 @@ export const CompanySchema = z.object({
   shippingFee: z.number().min(0, 'رسوم التوصيل يجب أن تكون 0 أو أكثر').optional(),
   minShipping: z.number().min(0, 'حد التوصيل المجاني يجب أن يكون 0 أو أكثر').optional(),
   taxPercentage: z.number().min(0, 'نسبة الضريبة يجب أن تكون 0 أو أكثر').max(100, 'نسبة الضريبة يجب أن تكون 100 أو أقل').optional(),
+
+  // Platform Display Settings
+  showHeroImage: z.boolean().optional(),
+  showStoreLocation: z.boolean().optional(),
+  showCustomerCount: z.boolean().optional(),
+  showProductCount: z.boolean().optional(),
+  showVision2030: z.boolean().optional(),
+
+  // Tax Settings
+  isTaxEnabled: z.boolean().optional(),
+
+  // Notification Settings
+  emailNotifications: z.boolean().optional(),
+
+  // Currency Settings
+  defaultCurrency: z.enum(['SAR', 'USD', 'EGP', 'AED']).optional(),
 
   // Cloudinary Settings (advanced UI)
   cloudinaryCloudName: z.string().trim().optional().or(z.literal('')),

@@ -61,6 +61,12 @@ export default async function EcommerceLayout({ children }: { children: React.Re
           clientCount={clientCount}
           userId={userSummary?.id}
           workingHours={typedCompanyData?.workingHours}
+          showStoreLocation={typedCompanyData?.showStoreLocation}
+          latitude={typedCompanyData?.latitude}
+          longitude={typedCompanyData?.longitude}
+          showProductCount={typedCompanyData?.showProductCount}
+          showCustomerCount={typedCompanyData?.showCustomerCount}
+          showVision2030={typedCompanyData?.showVision2030}
         />
       </div>
     );

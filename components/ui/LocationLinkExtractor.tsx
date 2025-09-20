@@ -45,7 +45,7 @@ export default function LocationLinkExtractor({ onExtract }: LocationLinkExtract
                     className="btn-save"
                     onClick={handleExtract}
                 >
-                    <MapPin className="h-4 w-4 mr-1" /> DEBUG استخراج الإحداثيات
+                    <MapPin className="h-4 w-4 mr-1" /> استخراج الإحداثيات
                 </Button>
             </div>
             {linkError && (

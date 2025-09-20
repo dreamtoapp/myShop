@@ -202,11 +202,11 @@ export default function CompanyProfileForm({ company }: CompanyProfileFormProps)
                 {hasImage && (
                   <div className="md:col-span-1">
                     <AddImage
-                      url={company?.taxQrImage || ''}
+                      url={company?.logo || ''}
                       alt={`${company?.fullName || 'المتجر'} شعار`}
                       recordId={company?.id || ''}
                       table="company"
-                      tableField="taxQrImage"
+                      tableField="logo"
                     />
                   </div>
                 )}

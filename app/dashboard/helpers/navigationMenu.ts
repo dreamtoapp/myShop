@@ -74,21 +74,17 @@ export const navigationItems = [
     href: '/dashboard/management/settings/company-profile',
     icon: 'Building2',
     children: [
-      { label: 'معلومات المتجر', href: '/dashboard/management/settings/company-profile', icon: 'Building2' },
-      { label: 'إعدادات المنصة', href: '/dashboard/management/settings/platform', icon: 'Settings' },
-      { label: 'الموقع والعنوان', href: '/dashboard/management/settings/location', icon: 'MapPin' },
 
-      { label: 'الروابط الاجتماعية', href: '/dashboard/management/settings/social-media', icon: 'Share2' },
-      { label: 'الشعار والهوية', href: '/dashboard/management/settings/branding', icon: 'Palette' },
-      { label: 'المستندات الحكومية', href: '/dashboard/management/settings/compliance', icon: 'FileText' },
+      { label: 'من نحن', href: '/dashboard/management/about', icon: 'Info' },
+      { label: 'المناوبات', href: '/dashboard/shifts', icon: 'Clock' },
       // السياسات ضمن معلومات المتجر
       { label: 'سياسة الموقع', href: '/dashboard/management/policies/website', icon: 'Globe' },
       { label: 'سياسة الإرجاع', href: '/dashboard/management/policies/return', icon: 'Undo' },
       { label: 'سياسة الخصوصية', href: '/dashboard/management/policies/privacy', icon: 'Shield' },
       { label: 'سياسة الشحن', href: '/dashboard/management/policies/shipping', icon: 'Truck' },
       // عناصر إضافية مطلوبة ضمن معلومات المتجر
-      { label: 'المناوبات', href: '/dashboard/shifts', icon: 'Clock' },
-      { label: 'من نحن', href: '/dashboard/management/about', icon: 'Info' },
+
+
       { label: 'دليل الاستخدام', href: '/dashboard/guidelines', icon: 'BookOpen' },
     ]
   },

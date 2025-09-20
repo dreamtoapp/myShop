@@ -32,6 +32,12 @@ interface FooterProps {
   clientCount?: number | string;
   userId?: string;
   workingHours?: string;
+  showStoreLocation?: boolean;
+  latitude?: string;
+  longitude?: string;
+  showProductCount?: boolean;
+  showCustomerCount?: boolean;
+  showVision2030?: boolean;
 }
 
 // Company Header Component
@@ -82,26 +88,42 @@ function TrustBadges() {
 function CompanyStats({
   productCount,
   clientCount,
-  workingHours
+  workingHours,
+  showProductCount,
+  showCustomerCount
 }: {
   productCount?: number | string;
   clientCount?: number | string;
   workingHours?: string;
+  showProductCount?: boolean;
+  showCustomerCount?: boolean;
 }) {
+  // Calculate grid columns based on what's visible
+  const visibleItems = [
+    showProductCount,
+    showCustomerCount,
+    true // working hours always visible
+  ].filter(Boolean).length;
+
   return (
-    <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-700">
-      <div className="text-center">
-        <div className="text-lg font-bold text-slate-100">
-          {productCount ?? '...'}
+    <div className={`grid gap-4 pt-4 border-t border-slate-700 ${visibleItems === 1 ? 'grid-cols-1' : visibleItems === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+      {showProductCount && (
+        <div className="text-center">
+          <div className="text-lg font-bold text-slate-100">
+            {productCount ?? '...'}
+          </div>
+          <div className="text-xs text-slate-400">منتج</div>
         </div>
-        <div className="text-xs text-slate-400">منتج</div>
-      </div>
-      <div className="text-center">
-        <div className="text-lg font-bold text-slate-100">
-          {clientCount ?? '...'}
+      )}
+      {showCustomerCount && (
+        <div className="text-center">
+          <div className="text-lg font-bold text-slate-100">
+            {clientCount ?? '...'}
+          </div>
+          <div className="text-xs text-slate-400">عميل راضي</div>
         </div>
-        <div className="text-xs text-slate-400">عميل راضي</div>
-      </div>
+      )}
+      {/* Working hours always visible */}
       <div className="text-center">
         <div className="text-lg font-bold text-slate-100">{workingHours ?? '24/7'}</div>
         <div className="text-xs text-slate-400">م.التوصيل</div>
@@ -214,7 +236,9 @@ function CompanyInfo({
   twitter,
   linkedin,
   tiktok,
-  snapchat
+  snapchat,
+  showProductCount,
+  showCustomerCount
 }: {
   aboutus?: string;
   companyName?: string;
@@ -227,6 +251,8 @@ function CompanyInfo({
   linkedin?: string;
   tiktok?: string;
   snapchat?: string;
+  showProductCount?: boolean;
+  showCustomerCount?: boolean;
 }) {
   return (
     <div className="space-y-6">
@@ -237,6 +263,8 @@ function CompanyInfo({
         productCount={productCount}
         clientCount={clientCount}
         workingHours={workingHours}
+        showProductCount={showProductCount}
+        showCustomerCount={showCustomerCount}
       />
       <SocialMediaSection
         facebook={facebook}
@@ -300,12 +328,18 @@ function ContactSection({
   email,
   phone,
   whatsappNumber,
-  address
+  address,
+  showStoreLocation,
+  latitude,
+  longitude
 }: {
   email?: string;
   phone?: string;
   whatsappNumber?: string;
   address?: string;
+  showStoreLocation?: boolean;
+  latitude?: string;
+  longitude?: string;
 }) {
   return (
     <div className="space-y-4">
@@ -341,14 +375,30 @@ function ContactSection({
           buttonVariant="footer"
         />
       )}
-      {address && (
-        <div className="flex items-start gap-3">
-          <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center mt-0.5">
-            <Icon name="MapPin" className="h-4 w-4 text-blue-400" />
+      {showStoreLocation && address && (
+        <div className="space-y-2">
+          <div className="flex items-start gap-3">
+            <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center mt-0.5">
+              <Icon name="MapPin" className="h-4 w-4 text-blue-400" />
+            </div>
+            <span className="text-sm text-slate-400 leading-relaxed">
+              {address}
+            </span>
           </div>
-          <span className="text-sm text-slate-400 leading-relaxed">
-            {address}
-          </span>
+          {latitude && longitude && (
+            <div className="mr-11">
+              <Link
+                href={`https://www.google.com/maps?q=${latitude},${longitude}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                <Icon name="MapPin" className="h-3 w-3" />
+                عرض على الخريطة
+                <Icon name="ExternalLink" className="h-3 w-3" />
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -372,7 +422,12 @@ function FooterMainContent({
   productCount,
   clientCount,
   userId,
-  workingHours
+  workingHours,
+  showStoreLocation,
+  latitude,
+  longitude,
+  showProductCount,
+  showCustomerCount
 }: FooterProps) {
   return (
     <div className="container mx-auto px-4 py-8">
@@ -391,6 +446,8 @@ function FooterMainContent({
             linkedin={linkedin}
             tiktok={tiktok}
             snapchat={snapchat}
+            showProductCount={showProductCount}
+            showCustomerCount={showCustomerCount}
           />
         </section>
 
@@ -412,6 +469,9 @@ function FooterMainContent({
             phone={phone}
             whatsappNumber={whatsappNumber}
             address={address}
+            showStoreLocation={showStoreLocation}
+            latitude={latitude}
+            longitude={longitude}
           />
           <NewsletterClientWrapper />
         </section>
@@ -447,7 +507,7 @@ function FooterCopyright() {
 }
 
 // Footer Compliance Badges Component
-function FooterComplianceBadges({ compliance }: { compliance: any }) {
+function FooterComplianceBadges({ compliance, showVision2030 }: { compliance: any; showVision2030?: boolean }) {
   return (
     <div className="mt-6">
       <div className="flex flex-wrap items-center justify-center sm:justify-end gap-4">
@@ -481,32 +541,34 @@ function FooterComplianceBadges({ compliance }: { compliance: any }) {
             qrPayload={compliance.taxNumber}
           />
         )}
-        <Link
-          href="https://www.vision2030.gov.sa/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="opacity-80 hover:opacity-100 transition-opacity"
-        >
-          <Image
-            src="/assets/visionlogo.svg"
-            alt="Saudi Vision 2030"
-            width={108}
-            height={36}
-            className="h-7 w-auto"
-          />
-        </Link>
+        {showVision2030 && (
+          <Link
+            href="https://www.vision2030.gov.sa/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="opacity-80 hover:opacity-100 transition-opacity"
+          >
+            <Image
+              src="/assets/visionlogo.svg"
+              alt="Saudi Vision 2030"
+              width={108}
+              height={36}
+              className="h-7 w-auto"
+            />
+          </Link>
+        )}
       </div>
     </div>
   );
 }
 
 // Footer Bottom Section Component
-function FooterBottomSection({ compliance }: { compliance: any }) {
+function FooterBottomSection({ compliance, showVision2030 }: { compliance: any; showVision2030?: boolean }) {
   return (
     <div className="bg-slate-800/50 py-6">
       <div className="container mx-auto px-4">
         <FooterCopyright />
-        <FooterComplianceBadges compliance={compliance} />
+        <FooterComplianceBadges compliance={compliance} showVision2030={showVision2030} />
       </div>
     </div>
   );
@@ -581,7 +643,13 @@ const Footer = async ({
   productCount,
   clientCount,
   userId,
-  workingHours
+  workingHours,
+  showStoreLocation,
+  latitude,
+  longitude,
+  showProductCount,
+  showCustomerCount,
+  showVision2030
 }: FooterProps) => {
 
   const compliance = await db.company.findFirst({
@@ -607,11 +675,16 @@ const Footer = async ({
         clientCount={clientCount}
         userId={userId}
         workingHours={workingHours}
+        showStoreLocation={showStoreLocation}
+        latitude={latitude}
+        longitude={longitude}
+        showProductCount={showProductCount}
+        showCustomerCount={showCustomerCount}
       />
 
       <Separator className="border-slate-700" />
 
-      <FooterBottomSection compliance={compliance} />
+      <FooterBottomSection compliance={compliance} showVision2030={showVision2030} />
 
       <FooterStructuredData
         companyName={companyName}

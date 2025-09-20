@@ -28,11 +28,11 @@ export async function saveSocialMedia(data: SocialMediaData) {
       return { ok: false as const, message: 'NO_COMPANY' };
     }
 
-    // Sanitize data - convert empty strings to null
+    // Sanitize data - convert empty strings to empty string (not null)
     const sanitizedData = Object.fromEntries(
       Object.entries(data).map(([key, value]) => [
         key,
-        value && value.trim() !== '' ? value.trim() : null
+        value && value.trim() !== '' ? value.trim() : ''
       ])
     );
 

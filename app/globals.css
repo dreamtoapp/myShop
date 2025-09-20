@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Professional shimmer animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 :root {
   --font-cairo: 'Cairo', sans-serif;
   --font-roboto: 'Roboto', sans-serif;

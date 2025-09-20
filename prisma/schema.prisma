@@ -370,6 +370,22 @@ model Company {
   requireWhatsappOtp Boolean @default(false)
   // Location behavior toggles
   requireLocation   Boolean @default(true)
+
+  // Platform Display Settings
+  showHeroImage        Boolean @default(false)
+  showStoreLocation    Boolean @default(false)
+  showCustomerCount    Boolean @default(false)
+  showProductCount     Boolean @default(false)
+  showVision2030       Boolean @default(false)
+  
+  // Tax Settings
+  isTaxEnabled         Boolean @default(false)
+  
+  // Notification Settings
+  emailNotifications   Boolean @default(false)
+  
+  // Currency Settings
+  defaultCurrency      String  @default("SAR")
 }
 
 model NewLetter {
