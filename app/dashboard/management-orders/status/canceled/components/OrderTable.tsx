@@ -23,6 +23,8 @@ import {
 import { Icon } from '@/components/icons/Icon';
 import { cn } from '@/lib/utils';
 import { Order } from '@/types/databaseTypes';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 import { restoreOrder } from '../actions/restore-order';
 
@@ -40,6 +42,7 @@ export default function OrderTable({
   updatePage,
   totalPages
 }: OrderTableProps) {
+  const { currency } = useCurrency();
 
   const renderPagination = () => {
     const pages = [];
@@ -116,7 +119,7 @@ export default function OrderTable({
                   </Link>
                 </TableCell>
                 <TableCell>{order.customer.name || 'غير معروف'}</TableCell>
-                <TableCell className="font-semibold">{order.amount} ر.س</TableCell>
+                <TableCell className="font-semibold">{formatCurrency(order.amount, currency)}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className="bg-blue-50 text-blue-700">
                     {order.paymentMethod}

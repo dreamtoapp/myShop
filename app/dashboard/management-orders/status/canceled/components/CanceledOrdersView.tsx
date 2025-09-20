@@ -32,6 +32,8 @@ import { Order } from '@/types/databaseTypes';
 import { Badge } from '@/components/ui/badge';
 
 import { restoreOrder } from '../actions/restore-order';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface CanceledOrdersViewProps {
     orders: Order[];
@@ -48,6 +50,7 @@ export default function CanceledOrdersView({
     pageSize,
     reasonFilter
 }: CanceledOrdersViewProps) {
+    const { currency } = useCurrency();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -130,7 +133,7 @@ export default function CanceledOrdersView({
             ...orders.map(order => [
                 order.orderNumber || '—',
                 order.customer?.name || order.customer?.email || '—',
-                `${order.amount} ر.س`,
+                `${formatAmount(order.amount)}`,
                 getCancellationReasonLabel(order.resonOfcancel || 'other'),
                 order.updatedAt ? format(new Date(order.updatedAt), 'yyyy-MM-dd') : '—'
             ].join(','))
@@ -224,12 +227,8 @@ export default function CanceledOrdersView({
     };
 
     // Format currency for display
-    const formatCurrency = (amount: number) => {
-        const formatted = new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(amount);
-        return `${formatted} ر.س`;
+    const formatAmount = (amount: number) => {
+        return formatCurrency(amount, currency);
     };
 
     // Format number for display

@@ -23,6 +23,8 @@ import {
 } from 'recharts';
 import Image from 'next/image';
 import { Icon } from '@/components/icons/Icon';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 // Define a specific type for the product performance data used in the table
 interface ProductPerformanceData {
@@ -56,6 +58,7 @@ export default function ProductPerformanceClient({
   initialFrom,
   initialTo,
 }: ProductPerformanceProps) {
+  const { currency } = useCurrency();
   const [from, setFrom] = useState(initialFrom || '');
   const [to, setTo] = useState(initialTo || '');
 
@@ -100,10 +103,7 @@ export default function ProductPerformanceClient({
       // Special case: revenue
       if (label.includes('إيراد')) {
         return (
-          Number(value).toLocaleString('ar-EG', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }) + ' ر.س'
+          formatCurrency(Number(value), currency)
         );
       }
       return Number(value).toLocaleString('ar-EG');
@@ -176,7 +176,7 @@ export default function ProductPerformanceClient({
                   <Tooltip formatter={(value: number) => value.toLocaleString('ar-EG')} />
                   <Legend />
                   <Line type='monotone' dataKey='quantitySold' stroke={quantityBarColor} name='الكمية المباعة' activeDot={{ r: 6 }} dot={{ r: 3 }} />
-                  <Line type='monotone' dataKey='revenue' stroke={revenueBarColor} name='الإيرادات (ر.س)' activeDot={{ r: 6 }} dot={{ r: 3 }} />
+                  <Line type='monotone' dataKey='revenue' stroke={revenueBarColor} name={`الإيرادات (${currency})`} activeDot={{ r: 6 }} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
               <div className="mt-2 text-xs text-muted-foreground text-center">عرض الأداء اليومي للمنتجات</div>
@@ -222,9 +222,9 @@ export default function ProductPerformanceClient({
                     </div>
                   </TableCell>
                   <TableCell>{p.supplierName || '-'}</TableCell>
-                  <TableCell>{p.price.toLocaleString('ar-EG')} ر.س</TableCell>
+                  <TableCell>{formatCurrency(p.price, currency)}</TableCell>
                   <TableCell>{p.quantitySold.toLocaleString('ar-EG')}</TableCell>
-                  <TableCell>{p.revenue.toLocaleString('ar-EG')} ر.س</TableCell>
+                  <TableCell>{formatCurrency(p.revenue, currency)}</TableCell>
                   <TableCell>{p.orderCount.toLocaleString('ar-EG')}</TableCell>
                   <TableCell>
                     {p.outOfStock ? (

@@ -11,6 +11,8 @@ import CartProgressIndicator from './CartProgressIndicator';
 import OrderSummary from './OrderSummary';
 import { Badge } from "@/components/ui/badge";
 import { useState } from 'react';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 // Types
 type GuestCartItem = { product: any; quantity: number };
@@ -23,6 +25,7 @@ function isServerItem(item: ServerCartItem | GuestCartItem): item is ServerCartI
 
 // Cart Item Component
 function CartItem({ item }: { item: ServerCartItem | GuestCartItem }) {
+    const { currency } = useCurrency();
     return (
         <div
             key={isServerItem(item) ? item.id : item.product?.id}
@@ -47,10 +50,10 @@ function CartItem({ item }: { item: ServerCartItem | GuestCartItem }) {
                     {/* Price Info */}
                     <div className="space-y-1">
                         <div className="text-sm text-muted-foreground">
-                            {item.product?.price?.toLocaleString()} ر.س × {item.quantity}
+                            {formatCurrency(item.product?.price || 0, currency)} × {item.quantity}
                         </div>
                         <Badge variant="outline" className="font-bold  border-green-600 text-primary text-sm text-green-600">
-                            {((item.product?.price || 0) * (item.quantity || 1)).toLocaleString()} ر.س
+                            {formatCurrency((item.product?.price || 0) * (item.quantity || 1), currency)}
                         </Badge>
                     </div>
                 </div>

@@ -14,12 +14,15 @@ import {
 
 import type { OrderAnalyticsData } from '../actions/get-order-analytics';
 import OrderStatusChart from './OrderStatusChart';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface OrderAnalyticsDashboardClientProps {
   data: OrderAnalyticsData;
 }
 
 const OrderAnalyticsDashboardClient: React.FC<OrderAnalyticsDashboardClientProps> = ({ data }) => {
+  const { currency } = useCurrency();
   const avgOrderValue = data?.totalOrders && data?.totalRevenue
     ? (data.totalRevenue / data.totalOrders).toFixed(2)
     : '0.00';
@@ -61,11 +64,11 @@ const OrderAnalyticsDashboardClient: React.FC<OrderAnalyticsDashboardClientProps
         </div>
         <div className="bg-card p-4 rounded-xl shadow-md" aria-label="إجمالي الإيرادات">
           <h3 className="text-base font-semibold mb-1">إجمالي الإيرادات</h3>
-          <span className="text-2xl font-bold text-green-600">{data?.totalRevenue} ر.س</span>
+          <span className="text-2xl font-bold text-green-600">{formatCurrency(data?.totalRevenue || 0, currency)}</span>
         </div>
         <div className="bg-card p-4 rounded-xl shadow-md" aria-label="متوسط قيمة الطلب">
           <h3 className="text-base font-semibold mb-1">متوسط قيمة الطلب</h3>
-          <span className="text-2xl font-bold text-blue-600">{avgOrderValue} ر.س</span>
+          <span className="text-2xl font-bold text-blue-600">{formatCurrency(parseFloat(avgOrderValue), currency)}</span>
         </div>
         <div className="bg-card p-4 rounded-xl w-full shadow-md" aria-label="طلبات اليوم">
           <h3 className="text-base font-semibold mb-1">طلبات اليوم</h3>
@@ -123,7 +126,7 @@ const OrderAnalyticsDashboardClient: React.FC<OrderAnalyticsDashboardClientProps
               <Tooltip />
               <Legend />
               <Line type="monotone" dataKey="orders" stroke="hsl(var(--chart-1))" name="عدد الطلبات" activeDot={{ r: 6 }} />
-              <Line type="monotone" dataKey="revenue" stroke="hsl(var(--chart-2))" name="الإيرادات (ر.س)" activeDot={{ r: 6 }} />
+              <Line type="monotone" dataKey="revenue" stroke="hsl(var(--chart-2))" name={`الإيرادات (${currency})`} activeDot={{ r: 6 }} />
             </LineChart>
           </ResponsiveContainer>
         ) : (
@@ -157,7 +160,7 @@ const OrderAnalyticsDashboardClient: React.FC<OrderAnalyticsDashboardClientProps
               <XAxis dataKey="name" tick={{ fill: 'hsl(var(--foreground))', fontSize: 13, fontWeight: 500 }} interval={0} angle={-20} textAnchor="end" height={60} />
               <YAxis allowDecimals={false} />
               <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="total" stroke="hsl(var(--chart-4))" name="إجمالي الشراء (ر.س)" strokeWidth={3} activeDot={{ r: 7 }} />
+              <Line type="monotone" dataKey="total" stroke="hsl(var(--chart-4))" name={`إجمالي الشراء (${currency})`} strokeWidth={3} activeDot={{ r: 7 }} />
             </LineChart>
           </ResponsiveContainer>
         ) : (

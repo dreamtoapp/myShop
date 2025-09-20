@@ -4,6 +4,7 @@ import { ChevronDown, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { formatCurrency } from '../../../../../../lib/formatCurrency';
+import { useCurrency } from '@/store/currencyStore';
 
 interface CartItem {
     id: string;
@@ -21,6 +22,8 @@ interface CartItemsToggleProps {
 }
 
 export default function CartItemsToggle({ items }: CartItemsToggleProps) {
+    const { currency } = useCurrency();
+
     return (
         <Collapsible>
             {/* Cart Items Toggle */}
@@ -57,10 +60,10 @@ export default function CartItemsToggle({ items }: CartItemsToggleProps) {
                         </div>
                         <div className="text-right flex-shrink-0">
                             <p className="font-bold text-sm text-foreground">
-                                {formatCurrency((item.product?.price || 0) * (item.quantity || 1))}
+                                {formatCurrency((item.product?.price || 0) * (item.quantity || 1), currency)}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                                {formatCurrency(item.product?.price || 0)} × {item.quantity}
+                                {formatCurrency(item.product?.price || 0, currency)} × {item.quantity}
                             </p>
                         </div>
                     </div>

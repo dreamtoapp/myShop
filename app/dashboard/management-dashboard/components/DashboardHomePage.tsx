@@ -9,6 +9,8 @@ import { Icon } from '@/components/icons/Icon';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import CompanyDataAlert from '@/components/CompanyDataAlert';
 import { CompanyDataStatus } from '@/helpers/companyDataValidator';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
 
 interface DashboardHomePageProps {
   summary: {
@@ -45,8 +47,8 @@ function formatNumberEn(num: number) {
   return num.toLocaleString('en-US');
 }
 
-function formatCurrency(amount: number) {
-  return `${amount.toLocaleString('en-US')} ر.س`;
+function formatAmount(amount: number, currency: CurrencyCode) {
+  return formatCurrency(amount, currency);
 }
 
 const statusHints: Record<string, string> = {
@@ -62,6 +64,7 @@ function getStatusHint(status: string): string {
 }
 
 export default function DashboardHomePage({ summary: initialSummary, companyDataStatus }: DashboardHomePageProps) {
+  const { currency } = useCurrency();
   const [summary, setSummary] = useState(initialSummary);
 
   const fetchSummary = async () => {
@@ -345,7 +348,7 @@ export default function DashboardHomePage({ summary: initialSummary, companyData
                   <YAxis
                     stroke="hsl(var(--muted-foreground))"
                     fontSize={12}
-                    tickFormatter={(value) => `${value.toLocaleString()} ر.س`}
+                    tickFormatter={(value) => formatAmount(value, currency)}
                   />
                   <Tooltip
                     contentStyle={{
@@ -354,7 +357,7 @@ export default function DashboardHomePage({ summary: initialSummary, companyData
                       borderRadius: '12px',
                       boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
                     }}
-                    formatter={(value: any) => [`${value.toLocaleString()} ر.س`, 'المبيعات']}
+                    formatter={(value: any) => [formatAmount(value, currency), 'المبيعات']}
                     labelStyle={{
                       color: 'hsl(var(--foreground))',
                       fontWeight: '600',
@@ -500,7 +503,7 @@ export default function DashboardHomePage({ summary: initialSummary, companyData
                 <YAxis
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
-                  tickFormatter={(value) => `${value.toLocaleString()} ر.س`}
+                  tickFormatter={(value) => formatAmount(value, currency)}
                 />
                 <Tooltip
                   contentStyle={{
@@ -510,7 +513,7 @@ export default function DashboardHomePage({ summary: initialSummary, companyData
                     boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
                   }}
                   formatter={(value: any) => [
-                    `${value.toLocaleString()} ر.س`,
+                    formatAmount(value, currency),
                     'المبيعات'
                   ]}
                   labelStyle={{

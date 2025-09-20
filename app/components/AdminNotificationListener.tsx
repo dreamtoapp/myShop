@@ -2,12 +2,15 @@
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface AdminNotificationListenerProps {
     showToast?: boolean;
 }
 
 export default function AdminNotificationListener({ showToast = true }: AdminNotificationListenerProps) {
+    const { currency } = useCurrency();
     const { data: session } = useSession();
 
     useEffect(() => {
@@ -62,7 +65,7 @@ export default function AdminNotificationListener({ showToast = true }: AdminNot
                         // Handle new order (existing behavior)
                         if (showToast) {
                             toast.success('🆕 طلب جديد', {
-                                description: `طلب #${data.orderId} من ${data.customer} - ${data.total?.toFixed(2)} ر.س`,
+                                description: `طلب #${data.orderId} من ${data.customer} - ${formatCurrency(data.total || 0, currency)}`,
                                 action: {
                                     label: 'عرض',
                                     onClick: () => window.location.href = '/dashboard/management-orders'
@@ -140,7 +143,7 @@ export default function AdminNotificationListener({ showToast = true }: AdminNot
                 pusher.connection.unbind('failed');
             }
         };
-    }, [session?.user?.id, session?.user?.role, showToast]);
+    }, [session?.user?.id, session?.user?.role, showToast, currency]);
 
     return null;
 } 

@@ -11,6 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface InventoryTableProps {
   products: Array<{
@@ -26,6 +28,7 @@ interface InventoryTableProps {
 }
 
 export function InventoryTable({ products }: InventoryTableProps) {
+  const { currency } = useCurrency();
   // KPI calculations
   const totalProducts = products.length;
   const outOfStockCount = products.filter(p => p.outOfStock).length;
@@ -120,7 +123,7 @@ export function InventoryTable({ products }: InventoryTableProps) {
                       <span>{p.name}</span>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{p.supplier?.name || '-'}</TableCell>
-                    <TableCell>{p.price?.toLocaleString('ar-EG', { minimumFractionDigits: 2 })} ر.س</TableCell>
+                    <TableCell>{formatCurrency(p.price || 0, currency)}</TableCell>
                     <TableCell>
                       {p.outOfStock ? (
                         <span className='font-semibold text-destructive-foreground'>غير متوفر</span>

@@ -15,6 +15,8 @@ import RatingDisplay from './RatingDisplay';
 import ProductRatingDialog from './ProductRatingDialog';
 import DriverRatingDialog from './DriverRatingDialog';
 import AppRatingDialog from './AppRatingDialog';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
 
 interface RatingsClientProps {
     productReviews: any[];
@@ -101,7 +103,7 @@ function UnifiedRatingsStatistics({ productReviews, driverRatings, appRatings }:
 }
 
 // Product Review Card (moved from server component)
-function ProductReviewCard({ review, index }: { review: any; index: number }) {
+function ProductReviewCard({ review, index, currency }: { review: any; index: number; currency: CurrencyCode }) {
     const isRecent = () => {
         const reviewDate = new Date(review.createdAt);
         const sevenDaysAgo = new Date();
@@ -146,7 +148,7 @@ function ProductReviewCard({ review, index }: { review: any; index: number }) {
                                 </h3>
                                 {review.product?.price && (
                                     <div className="text-sm text-muted-foreground">
-                                        السعر: {review.product.price.toLocaleString('ar-SA')} ر.س
+                                        السعر: {formatCurrency(review.product.price, currency)}
                                     </div>
                                 )}
                             </div>
@@ -205,7 +207,7 @@ function ProductReviewCard({ review, index }: { review: any; index: number }) {
 }
 
 // Driver Rating Card (moved from server component)
-function DriverRatingCard({ rating, index }: { rating: any; index: number }) {
+function DriverRatingCard({ rating, index, currency }: { rating: any; index: number; currency: CurrencyCode }) {
     return (
         <Card
             className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-feature-suppliers/30 card-hover-effect group"
@@ -229,7 +231,7 @@ function DriverRatingCard({ rating, index }: { rating: any; index: number }) {
                                     رقم الطلب: {rating.orderId} • زمن التوصيل: {rating.deliveryTime}
                                 </div>
                                 <div className="text-sm text-muted-foreground">
-                                    قيمة الطلب: {rating.orderTotal.toLocaleString('ar-SA')} ر.س
+                                    قيمة الطلب: {formatCurrency(rating.orderTotal, currency)}
                                 </div>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -368,6 +370,7 @@ export default function RatingsClient({
     driverRatings,
     appRatings
 }: RatingsClientProps) {
+    const { currency } = useCurrency();
     const [productDialogOpen, setProductDialogOpen] = useState(false);
     const [driverDialogOpen, setDriverDialogOpen] = useState(false);
     const [appDialogOpen, setAppDialogOpen] = useState(false);
@@ -441,12 +444,12 @@ export default function RatingsClient({
                     <div className="space-y-4">
                         {/* Product Reviews */}
                         {productReviews.map((review: any, index: number) => (
-                            <ProductReviewCard key={`product-${review.id}`} review={review} index={index} />
+                            <ProductReviewCard key={`product-${review.id}`} review={review} index={index} currency={currency} />
                         ))}
 
                         {/* Driver Ratings */}
                         {driverRatings.map((rating: any, index: number) => (
-                            <DriverRatingCard key={`driver-${rating.id}`} rating={rating} index={index + productReviews.length} />
+                            <DriverRatingCard key={`driver-${rating.id}`} rating={rating} index={index + productReviews.length} currency={currency} />
                         ))}
 
                         {/* App Ratings */}
@@ -478,7 +481,7 @@ export default function RatingsClient({
                             <EmptyState type="products" />
                         ) : (
                             productReviews.map((review: any, index: number) => (
-                                <ProductReviewCard key={review.id} review={review} index={index} />
+                                <ProductReviewCard key={review.id} review={review} index={index} currency={currency} />
                             ))
                         )}
                     </div>
@@ -501,7 +504,7 @@ export default function RatingsClient({
                             <EmptyState type="drivers" />
                         ) : (
                             driverRatings.map((rating: any, index: number) => (
-                                <DriverRatingCard key={rating.id} rating={rating} index={index} />
+                                <DriverRatingCard key={rating.id} rating={rating} index={index} currency={currency} />
                             ))
                         )}
                     </div>

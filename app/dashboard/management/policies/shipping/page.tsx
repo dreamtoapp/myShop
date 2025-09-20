@@ -1,23 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/icons/Icon';
 import { toast } from 'sonner';
+import { useCurrency } from '@/store/currencyStore';
+import { getCurrencySymbol } from '@/lib/formatCurrency';
 
 interface ShippingPolicy {
-    id?: string;
-    title: string;
-    content: string;
-    isActive: boolean;
-    isPublished: boolean;
-    version: number;
+  id?: string;
+  title: string;
+  content: string;
+  isActive: boolean;
+  isPublished: boolean;
+  version: number;
 }
 
-const DEFAULT_SHIPPING_POLICY_TEMPLATE = `سياسة الشحن والتوصيل
+export default function ShippingPolicyPage() {
+  const { currency } = useCurrency();
+  const currencySymbol = getCurrencySymbol(currency);
+
+  const getDefaultTemplate = useCallback(() => {
+    const currentDate = new Date().toLocaleDateString('ar-SA');
+    return `سياسة الشحن والتوصيل
 
 مرحباً بكم في [اسم المتجر]. نحن نلتزم بتوفير خدمة شحن سريعة وموثوقة لجميع عملائنا في المملكة العربية السعودية. تشرح هذه السياسة تفاصيل خدمات الشحن والتوصيل التي نقدمها.
 
@@ -34,11 +42,11 @@ const DEFAULT_SHIPPING_POLICY_TEMPLATE = `سياسة الشحن والتوصيل
 
 3. طرق الشحن المتاحة
    نوفر عدة خيارات للشحن:
-   • التوصيل السريع (1-2 يوم عمل): 50 ريال
-   • التوصيل العادي (3-5 أيام عمل): 25 ريال
-   • التوصيل الاقتصادي (5-7 أيام عمل): 15 ريال
-   • التوصيل المجاني: للطلبات فوق 200 ريال
-   • التوصيل في نفس اليوم: 100 ريال (في المدن الرئيسية)
+   • التوصيل السريع (1-2 يوم عمل): 50 ${currencySymbol}
+   • التوصيل العادي (3-5 أيام عمل): 25 ${currencySymbol}
+   • التوصيل الاقتصادي (5-7 أيام عمل): 15 ${currencySymbol}
+   • التوصيل المجاني: للطلبات فوق 200 ${currencySymbol}
+   • التوصيل في نفس اليوم: 100 ${currencySymbol} (في المدن الرئيسية)
 
 4. شركات الشحن المعتمدة
    نتعاون مع شركات شحن موثوقة:
@@ -50,317 +58,253 @@ const DEFAULT_SHIPPING_POLICY_TEMPLATE = `سياسة الشحن والتوصيل
    • شركات الشحن المحلية المعتمدة
 
 5. وقت المعالجة
-   نعالج الطلبات خلال:
-   • الطلبات قبل 2 مساءً: شحن في نفس اليوم
-   • الطلبات بعد 2 مساءً: شحن في اليوم التالي
-   • أيام العطل الرسمية: لا يتم الشحن
-   • الطلبات المخصصة: 3-5 أيام عمل إضافية
+   • الطلبات العادية: 1-2 يوم عمل
+   • الطلبات المخصصة: 3-5 أيام عمل
+   • الطلبات الموسمية: قد تستغرق وقتاً أطول
 
-6. تتبع الشحنة
-   نوفر خدمة تتبع شاملة:
-   • رقم تتبع فريد لكل شحنة
-   • تحديثات فورية على حالة الشحنة
-   • إشعارات عبر البريد الإلكتروني والرسائل النصية
-   • رابط تتبع مباشر على موقعنا
-   • تطبيق جوال لتتبع الشحنات
+6. رسوم الشحن الإضافية
+   قد تطبق رسوم إضافية في الحالات التالية:
+   • المناطق النائية: 30 ${currencySymbol} إضافي
+   • الشحن في العطل الرسمية: 50 ${currencySymbol}
+   • الشحن السريع خارج المدن الرئيسية: 75 ${currencySymbol}
+   • إعادة المحاولة: 15 ${currencySymbol}
+   • تغيير العنوان: 20 ${currencySymbol}
 
-7. تسليم الشحنة
-   عند وصول الشحنة:
-   • يتم الاتصال بالعميل لتأكيد الموعد
-   • تسليم الشحنة في العنوان المحدد
-   • طلب توقيع العميل كإيصال استلام
-   • إمكانية تفويض شخص آخر للتسلم
-   • خيار استلام الشحنة من أقرب فرع
+7. الشحن الدولي
+   نقدم خدمة الشحن الدولي إلى الدول المجاورة:
+   • دول الخليج العربي
+   • دول الشرق الأوسط
+   • دول شمال أفريقيا
+   رسوم الشحن الدولي تبدأ من 150 ${currencySymbol} حسب الوجهة.
 
-8. الشحنات المرفوضة
-   قد يتم رفض الشحنة في الحالات التالية:
-   • العنوان غير صحيح أو غير مكتمل
-   • العميل غير متاح في العنوان
-   • رفض العميل استلام الشحنة
-   • عدم دفع رسوم الشحن الإضافية
-   • الشحنة تحتوي على مواد محظورة
+8. تتبع الشحن
+   يمكنك تتبع طلبك من خلال:
+   • رقم التتبع المرسل عبر الرسائل النصية
+   • الموقع الإلكتروني
+   • تطبيق الهاتف المحمول
+   • خدمة العملاء
 
-9. رسوم الشحن الإضافية
-   قد تطبق رسوم إضافية:
-   • المناطق النائية: 30 ريال إضافي
-   • الشحن في العطل الرسمية: 50 ريال
-   • الشحن السريع خارج المدن الرئيسية: 75 ريال
-   • إعادة المحاولة: 15 ريال
-   • تغيير العنوان: 20 ريال
+9. سياسة الإرجاع والاستبدال
+   • يمكن إرجاع المنتجات خلال 14 يوم من تاريخ الاستلام
+   • يجب أن تكون المنتجات في حالتها الأصلية
+   • رسوم الإرجاع: 25 ${currencySymbol}
+   • الاستبدال مجاني خلال 7 أيام
 
-10. الشحنات الدولية
-    نوفر خدمة الشحن الدولي إلى:
-    • دول مجلس التعاون الخليجي
-    • الدول العربية
-    • أوروبا وأمريكا الشمالية
-    • آسيا وأفريقيا
-    • أستراليا ونيوزيلندا
-    رسوم الشحن الدولي تبدأ من 150 ريال حسب الوجهة.
+10. التأخير في التوصيل
+    في حالة التأخير في التوصيل:
+    • محاولة ثانية مجانية
+    • إشعار فوري للعميل
+    • تعويض مناسب حسب الحالة
+    • محاولة ثالثة برسوم 15 ${currencySymbol}
 
-11. الشحنات الكبيرة والثقيلة
-    للمنتجات الكبيرة والثقيلة:
-    • أثاث منزلي ومكتبي
-    • أجهزة كهربائية كبيرة
-    • معدات رياضية
-    • منتجات صناعية
-    • شحنات تجارية
-    يتم تقديم عرض سعر مخصص لهذه الشحنات.
+11. الشحن المجاني
+    • للطلبات التي تزيد عن 200 ${currencySymbol}
+    • لا يشمل الطلبات المخصصة
+    • لا يشمل الشحن الدولي
+    • لا يشمل الشحن السريع في بعض المناطق
 
-12. التأمين على الشحنات
-    نؤمن على جميع الشحنات:
-    • تأمين أساسي: يغطي القيمة الكاملة
-    • تأمين إضافي: للمنتجات عالية القيمة
-    • تعويض فوري في حالة التلف أو الفقدان
-    • تقرير مفصل عن أي حادث
-    • استبدال المنتج أو استرداد المبلغ
+12. خدمة العملاء
+    فريق خدمة العملاء متاح:
+    • من السبت إلى الخميس: 8:00 ص - 10:00 م
+    • الجمعة: 2:00 م - 10:00 م
+    • عبر الهاتف والواتساب والبريد الإلكتروني
 
-13. الشحنات الحساسة
-    نتعامل بحذر مع:
-    • المنتجات الإلكترونية الحساسة
-    • المنتجات الزجاجية والهشة
-    • المنتجات الغذائية القابلة للتلف
-    • المنتجات الطبية والصيدلانية
-    • المنتجات الفنية والتحف
-    نستخدم عبوات وتغليف خاص لهذه المنتجات.
+13. التحديثات
+    نحتفظ بالحق في تحديث سياسة الشحن في أي وقت. سيتم إشعار العملاء بالتغييرات المهمة.
 
-14. سياسة إعادة الشحن
-    في حالة فشل التسليم:
-    • محاولة ثانية مجانية خلال 24 ساعة
-    • محاولة ثالثة برسوم 15 ريال
-    • إعادة الشحنة للمستودع بعد 3 محاولات
-    • خصم رسوم الشحن من المبلغ المسترد
-    • إمكانية تغيير العنوان برسوم إضافية
-
-15. التواصل والدعم
+14. التواصل معنا
     للاستفسارات حول الشحن:
-    • البريد الإلكتروني: [البريد الإلكتروني]
-    • الهاتف: [رقم الهاتف]
-    • الواتساب: [رقم الواتساب]
-    • الدردشة المباشرة: متاحة 24/7
-    • ساعات العمل: [الأوقات]
+    • الهاتف: +966 XX XXX XXXX
+    • البريد الإلكتروني: shipping@company.com
+    • الواتساب: +966 XX XXX XXXX
 
-16. الشكاوى والاقتراحات
-    نرحب بملاحظاتكم:
-    • تقييم خدمة الشحن بعد كل طلب
-    • تقديم شكوى عبر موقعنا الإلكتروني
-    • التواصل مع مدير خدمة العملاء
-    • اقتراحات لتحسين الخدمة
+15. ملاحظات مهمة
+    • يرجى التأكد من صحة العنوان قبل تأكيد الطلب
+    • في حالة عدم وجود المستلم، سيتم إعادة المحاولة
+    • الطلبات المدفوعة مقدماً تحظى بالأولوية
     • استطلاعات رضا العملاء
 
-آخر تحديث: ${new Date().toLocaleDateString('ar-SA')}`;
+آخر تحديث: ${currentDate}`;
+  }, [currencySymbol]);
 
-export default function ShippingPolicyPage() {
-    const [policy, setPolicy] = useState<ShippingPolicy>({
-        title: 'سياسة الشحن',
-        content: '',
-        isActive: true,
-        isPublished: false,
-        version: 1
-    });
-    const [isLoading, setIsLoading] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
+  const [policy, setPolicy] = useState<ShippingPolicy>({
+    title: 'سياسة الشحن',
+    content: '',
+    isActive: true,
+    isPublished: false,
+    version: 1
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-    useEffect(() => {
-        loadPolicy();
-    }, []);
-
-    const loadPolicy = async () => {
-        setIsLoading(true);
-        try {
-            const response = await fetch('/api/policies/shipping');
-            if (response.ok) {
-                const data = await response.json();
-                setPolicy(data);
-            }
-        } catch (error) {
-            console.error('Error loading policy:', error);
-            toast.error('فشل في تحميل السياسة');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleSave = async () => {
-        if (!policy.content.trim()) {
-            toast.error('يرجى إدخال محتوى السياسة');
-            return;
-        }
-
-        setIsSaving(true);
-        try {
-            const response = await fetch('/api/policies/shipping', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: policy.title,
-                    content: policy.content,
-                    isActive: true,
-                    isPublished: false
-                })
-            });
-
-            if (response.ok) {
-                const savedPolicy = await response.json();
-                setPolicy(savedPolicy);
-                toast.success('تم حفظ السياسة');
-            } else {
-                const errorData = await response.json();
-                toast.error(errorData.error || 'حدث خطأ أثناء الحفظ');
-            }
-        } catch (error) {
-            console.error('Error saving policy:', error);
-            toast.error('حدث خطأ أثناء الحفظ');
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleTogglePublish = async () => {
-        if (!policy.id) {
-            toast.error('يرجى حفظ السياسة أولاً');
-            return;
-        }
-
-        try {
-            const action = policy.isPublished ? 'unpublish' : 'publish';
-            const response = await fetch(`/api/policies/shipping/${action}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: policy.id })
-            });
-
-            if (response.ok) {
-                const updatedPolicy = await response.json();
-                setPolicy(updatedPolicy);
-                const message = policy.isPublished ? 'تم إلغاء النشر' : 'تم النشر';
-                toast.success(message);
-            } else {
-                const errorData = await response.json();
-                toast.error(errorData.error || 'حدث خطأ');
-            }
-        } catch (error) {
-            console.error('Error toggling publish:', error);
-            toast.error('حدث خطأ');
-        }
-    };
-
-    const loadTemplate = () => {
-        setPolicy(prev => ({ ...prev, content: DEFAULT_SHIPPING_POLICY_TEMPLATE }));
-        toast.success('تم تحميل القالب الافتراضي');
-    };
-
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="flex items-center gap-2">
-                    <Icon name="Loader2" className="h-5 w-5 animate-spin" />
-                    <span>جاري التحميل...</span>
-                </div>
-            </div>
-        );
+  const loadPolicy = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/policies/shipping');
+      if (response.ok) {
+        const data = await response.json();
+        setPolicy(data);
+      } else {
+        // If no policy exists, use default template
+        setPolicy(prev => ({ ...prev, content: getDefaultTemplate() }));
+      }
+    } catch (error) {
+      console.error('Error loading policy:', error);
+      toast.error('حدث خطأ في تحميل السياسة');
+    } finally {
+      setIsLoading(false);
     }
+  }, [getDefaultTemplate]);
 
+  useEffect(() => {
+    loadPolicy();
+  }, [loadPolicy]);
+
+  const savePolicy = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/policies/shipping', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(policy),
+      });
+
+      if (response.ok) {
+        toast.success('تم حفظ السياسة بنجاح');
+      } else {
+        throw new Error('Failed to save policy');
+      }
+    } catch (error) {
+      console.error('Error saving policy:', error);
+      toast.error('حدث خطأ في حفظ السياسة');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const publishPolicy = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/policies/shipping', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...policy, isPublished: true }),
+      });
+
+      if (response.ok) {
+        setPolicy(prev => ({ ...prev, isPublished: true }));
+        toast.success('تم نشر السياسة بنجاح');
+      } else {
+        throw new Error('Failed to publish policy');
+      }
+    } catch (error) {
+      console.error('Error publishing policy:', error);
+      toast.error('حدث خطأ في نشر السياسة');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const loadTemplate = () => {
+    setPolicy(prev => ({ ...prev, content: getDefaultTemplate() }));
+    toast.success('تم تحميل القالب الافتراضي');
+  };
+
+  if (isLoading) {
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold">سياسة الشحن</h1>
-                    <p className="text-sm text-muted-foreground">إدارة سياسة الشحن</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={loadTemplate}
-                        disabled={isLoading}
-                    >
-                        <Icon name="FileText" className="h-4 w-4" />
-                        <span className="mr-2">تحميل قالب</span>
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleSave}
-                        disabled={isSaving || !policy.content.trim()}
-                    >
-                        {isSaving ? (
-                            <Icon name="Loader2" className="h-4 w-4 animate-spin" />
-                        ) : (
-                            <Icon name="Save" className="h-4 w-4" />
-                        )}
-                        <span className="mr-2">حفظ</span>
-                    </Button>
-                    <Button
-                        size="sm"
-                        variant={policy.isPublished ? "destructive" : "default"}
-                        onClick={handleTogglePublish}
-                        disabled={!policy.id || !policy.content.trim()}
-                    >
-                        <Icon name={policy.isPublished ? "EyeOff" : "Truck"} className="h-4 w-4" />
-                        <span className="mr-2">{policy.isPublished ? "إلغاء النشر" : "نشر"}</span>
-                    </Button>
-                </div>
-            </div>
-
-            <div className="grid gap-4">
-                <div className="flex items-center gap-4 text-sm">
-                    <Badge variant={policy.isPublished ? "default" : "secondary"}>
-                        {policy.isPublished ? "منشور" : "مسودة"}
-                    </Badge>
-                    <span className="text-muted-foreground">الإصدار: {policy.version}</span>
-                    {policy.isPublished && (
-                        <span className="text-muted-foreground">
-                            آخر تحديث: {new Date().toLocaleDateString('ar-SA')}
-                        </span>
-                    )}
-                </div>
-
-                <Card>
-                    <CardContent className="pt-6">
-                        <Textarea
-                            placeholder="اكتب محتوى سياسة الشحن هنا..."
-                            value={policy.content}
-                            onChange={(e) => setPolicy(prev => ({ ...prev, content: e.target.value }))}
-                            className="min-h-[400px] text-right leading-relaxed resize-none"
-                            style={{
-                                direction: 'rtl',
-                                textAlign: 'right',
-                                fontFamily: 'inherit',
-                                lineHeight: '1.8'
-                            }}
-                        />
-                        <div className="text-destructive font-semibold mt-2">ملاحظة: لإظهار النقاط الموجزة للعملاء في صفحة الدفع، ابدأ كل نقطة موجزة في السياسة بـ [*] في بداية السطر.</div>
-                        <div className="mt-2 text-xs text-muted-foreground space-y-1">
-                            <div><strong>نصائح:</strong></div>
-                            <div>• استخدم &quot;تحميل قالب&quot; للحصول على قالب شامل لسياسة الشحن</div>
-                            <div>• قم بتخصيص المعلومات بين الأقواس المربعة [...]</div>
-                            <div>• تأكد من تحديث رسوم الشحن والمناطق بدقة</div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {policy.content && (
-                    <Card>
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-lg">معاينة</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div
-                                className="p-4 border rounded-lg bg-muted/30 min-h-[200px] text-right leading-relaxed"
-                                style={{
-                                    direction: 'rtl',
-                                    textAlign: 'right',
-                                    whiteSpace: 'pre-wrap',
-                                    fontFamily: 'inherit',
-                                    lineHeight: '1.8'
-                                }}
-                            >
-                                {policy.content}
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
-            </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Icon name="Loader2" className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">جاري التحميل...</p>
         </div>
+      </div>
     );
-} 
+  }
+
+  return (
+    <div className="container mx-auto p-6 max-w-4xl">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold mb-2">سياسة الشحن</h1>
+        <p className="text-muted-foreground">
+          إدارة سياسة الشحن والتوصيل للمتجر
+        </p>
+      </div>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Icon name="Truck" className="h-5 w-5" />
+              سياسة الشحن والتوصيل
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Badge variant={policy.isPublished ? 'default' : 'secondary'}>
+                {policy.isPublished ? 'منشورة' : 'مسودة'}
+              </Badge>
+              <Badge variant={policy.isActive ? 'default' : 'destructive'}>
+                {policy.isActive ? 'نشطة' : 'غير نشطة'}
+              </Badge>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              عنوان السياسة
+            </label>
+            <input
+              type="text"
+              value={policy.title}
+              onChange={(e) => setPolicy(prev => ({ ...prev, title: e.target.value }))}
+              className="w-full p-2 border rounded-md"
+              placeholder="عنوان السياسة"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              محتوى السياسة
+            </label>
+            <Textarea
+              value={policy.content}
+              onChange={(e) => setPolicy(prev => ({ ...prev, content: e.target.value }))}
+              placeholder="اكتب محتوى سياسة الشحن هنا..."
+              className="min-h-[400px]"
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={policy.isActive}
+                onChange={(e) => setPolicy(prev => ({ ...prev, isActive: e.target.checked }))}
+                className="rounded"
+              />
+              <span className="text-sm">تفعيل السياسة</span>
+            </label>
+          </div>
+
+          <div className="flex gap-2 pt-4">
+            <Button onClick={loadTemplate} variant="outline">
+              <Icon name="FileText" className="h-4 w-4 mr-2" />
+              تحميل القالب الافتراضي
+            </Button>
+            <Button onClick={savePolicy} disabled={isSaving}>
+              <Icon name="Save" className="h-4 w-4 mr-2" />
+              {isSaving ? 'جاري الحفظ...' : 'حفظ'}
+            </Button>
+            <Button onClick={publishPolicy} disabled={isSaving || policy.isPublished} variant="default">
+              <Icon name="Send" className="h-4 w-4 mr-2" />
+              {isSaving ? 'جاري النشر...' : 'نشر'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

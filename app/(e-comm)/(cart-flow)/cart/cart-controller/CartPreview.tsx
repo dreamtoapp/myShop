@@ -10,6 +10,8 @@ import { Icon } from '@/components/icons/Icon';
 import { checkIsLogin } from '@/lib/check-is-login';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 import CartQuantityControls from './CartQuantityControls';
 import {
@@ -88,6 +90,7 @@ function EmptyState({ closePopover }: { closePopover?: () => void }) {
 
 // Single cart item row
 function CartItemRow({ item }: { item: any }) {
+    const { currency } = useCurrency();
     const lineTotal = item.product.price * item.quantity;
     return (
         <div className="flex items-center gap-3 py-3 rounded-lg hover:bg-muted/50 transition-colors duration-200">
@@ -106,10 +109,10 @@ function CartItemRow({ item }: { item: any }) {
                 </h4>
                 <p className="text-xs flex items-center justify-between mb-1">
                     <span className="text-muted-foreground">
-                        {item.product.price?.toLocaleString()} ر.س
+                        {formatCurrency(item.product.price, currency)}
                     </span>
                     <span className="font-bold text-foreground whitespace-nowrap">
-                        {lineTotal.toLocaleString()} ر.س
+                        {formatCurrency(lineTotal, currency)}
                     </span>
                 </p>
                 <div className="flex items-center gap-4 mt-2">
@@ -126,13 +129,14 @@ function CartItemRow({ item }: { item: any }) {
 
 // Subtotal and note
 function SummarySection({ total }: { total: number }) {
+    const { currency } = useCurrency();
     return (
         <>
             <Separator className="my-2" />
             <div className="flex items-center justify-between px-1 text-lg font-bold">
                 <span>المجموع الفرعي</span>
                 <span className="text-feature-commerce">
-                    {total.toLocaleString()} ر.س
+                    {formatCurrency(total, currency)}
                 </span>
             </div>
             <p className="text-xs text-muted-foreground">الشحن والضرائب تحسب عند إتمام الطلب.</p>

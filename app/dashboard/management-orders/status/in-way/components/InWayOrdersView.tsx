@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils';
 import { Order } from '@/types/databaseTypes';
 import { TimeAgo } from '@/components/ui/time-ago';
 import { OrderStatus } from '@prisma/client';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
 
 interface InWayOrdersViewProps {
   orders: Order[];
@@ -96,7 +98,7 @@ interface OrderCardProps {
   order: Order;
 }
 
-function OrderCard({ order }: OrderCardProps) {
+function OrderCard({ order, currency }: OrderCardProps & { currency: CurrencyCode }) {
   const isHighValue = order.amount > 500;
 
   return (
@@ -199,7 +201,7 @@ function OrderCard({ order }: OrderCardProps) {
             <Icon name="DollarSign" className="h-4 w-4 text-status-high-value" />
             <div>
               <p className="text-xs font-semibold text-muted-foreground">المبلغ الإجمالي</p>
-              <p className="text-lg font-bold text-status-high-value">{order.amount} ر.س</p>
+              <p className="text-lg font-bold text-status-high-value">{formatCurrency(order.amount, currency)}</p>
             </div>
           </div>
 
@@ -275,7 +277,7 @@ interface OrdersListProps {
   onDriverSortChange: (sort: 'asc' | 'desc') => void;
 }
 
-function OrdersList({ orders, driverSort, onDriverSortChange }: OrdersListProps) {
+function OrdersList({ orders, driverSort, onDriverSortChange, currency }: OrdersListProps & { currency: CurrencyCode }) {
   // Sort orders by driver name
   const sortedOrders = [...orders].sort((a, b) => {
     const nameA = a.driver?.name || '';
@@ -298,7 +300,7 @@ function OrdersList({ orders, driverSort, onDriverSortChange }: OrdersListProps)
       {/* Orders Cards Grid with stable layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 auto-rows-max">
         {sortedOrders.map((order) => (
-          <OrderCard key={order.id} order={order} />
+          <OrderCard key={order.id} order={order} currency={currency} />
         ))}
       </div>
     </div>
@@ -354,6 +356,7 @@ function EmptyState() {
 
 // Main Component
 export default function InWayOrdersView({ orders }: InWayOrdersViewProps) {
+  const { currency } = useCurrency();
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [driverSort, setDriverSort] = useState<'asc' | 'desc'>('asc');
 
@@ -374,6 +377,7 @@ export default function InWayOrdersView({ orders }: InWayOrdersViewProps) {
             orders={orders}
             driverSort={driverSort}
             onDriverSortChange={setDriverSort}
+            currency={currency}
           />
         ) : (
           <MapView />

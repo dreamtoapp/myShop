@@ -4,6 +4,7 @@ import CustomMobileBottomNav from './homepage/component/Header/CustomMobileBotto
 import { fetchEcommLayoutData } from './helpers/layoutData';
 import FilterAlert from '@/components/FilterAlert';
 import RealtimeNotificationListener from './(adminPage)/user/notifications/components/RealtimeNotificationListener';
+import { CurrencyInitializer } from '@/components/CurrencyInitializer';
 // import NotificationTest from '@/app/components/NotificationTest';
 
 export default async function EcommerceLayout({ children }: { children: React.ReactNode }) {
@@ -35,6 +36,8 @@ export default async function EcommerceLayout({ children }: { children: React.Re
         />
         <FilterAlert />
         <CustomMobileBottomNav whatsappNumber={typedCompanyData?.whatsappNumber} />
+        {/* Currency initializer - initialize currency store with company default */}
+        <CurrencyInitializer currency={typedCompanyData?.defaultCurrency || 'SAR'} />
         {/* Real-time notification listener - only for logged-in users */}
         {session && <RealtimeNotificationListener />}
         {/* Test component for notifications - DEVELOPMENT ONLY */}

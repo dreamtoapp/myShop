@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Eye, Edit3, BarChart2, Package, DollarSign, Info, CheckCircle, XCircle, Images } from 'lucide-react';
 import { toast } from 'sonner';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 import AddImage from '@/components/AddImage';
 import ProductDeleteButton from './ProductDeleteButton';
@@ -26,6 +28,7 @@ interface ProductCardProps {
 
 // Enhanced ProductCard with AddImage integration
 export default function ProductCard({ product }: ProductCardProps) {
+  const { currency } = useCurrency();
   const currentImageUrl = product.imageUrl;
   const hasGallery = product.images && product.images.length > 0;
 
@@ -108,7 +111,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-feature-commerce icon-enhanced" />
             <span className="text-lg font-bold text-feature-commerce">
-              {product.price.toLocaleString('ar-SA', { style: 'currency', currency: 'SAR' })}
+              {formatCurrency(product.price, currency)}
             </span>
           </div>
 

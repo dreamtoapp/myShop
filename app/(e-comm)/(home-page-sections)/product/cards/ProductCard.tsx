@@ -6,6 +6,8 @@ import ProductCardMedia from './ProductCardMedia';
 import ProductCardActions from './ProductCardActions';
 import { useRouter } from 'next/navigation';
 import { Eye, MessageCircle, Star } from 'lucide-react';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 
 interface ProductCardProps {
@@ -27,6 +29,7 @@ const ProductCard = memo(({
     logo = '/fallback/dreamToApp2-dark.png'
 }: ProductCardProps) => {
     const router = useRouter();
+    const { currency } = useCurrency();
     const [currentCartState, setCurrentCartState] = useState(isInCart);
 
     // Memoized calculations for performance
@@ -54,7 +57,7 @@ const ProductCard = memo(({
     const trackProductView = useCallback(() => {
         if (typeof window !== 'undefined' && window.gtag) {
             window.gtag('event', 'view_item', {
-                currency: 'USD',
+                currency: currency,
                 value: product.price,
                 items: [{
                     item_id: product.id,
@@ -66,7 +69,7 @@ const ProductCard = memo(({
                 }]
             });
         }
-    }, [product, index]);
+    }, [product, index, currency]);
 
     // Mouse/touch navigation on media area
     const handleMediaClick = useCallback((e: React.MouseEvent) => {
@@ -96,10 +99,10 @@ const ProductCard = memo(({
         "offers": {
             "@type": "Offer",
             "price": product.price,
-            "priceCurrency": "USD",
+            "priceCurrency": currency,
             "availability": stockInfo.isOutOfStock ? "OutOfStock" : "InStock"
         }
-    }), [product, stockInfo.isOutOfStock]);
+    }), [product, stockInfo.isOutOfStock, currency]);
 
     return (
         <>
@@ -138,11 +141,11 @@ const ProductCard = memo(({
                         {/* Price Section - Enhanced Visual Hierarchy */}
                         <div className="flex items-center gap-3">
                             <span className="text-lg sm:text-xl font-bold text-feature-commerce">
-                                {product.price.toLocaleString('ar-SA', { style: 'currency', currency: 'SAR' })}
+                                {formatCurrency(product.price, currency)}
                             </span>
                             {pricingInfo.hasDiscount && (
                                 <span className="text-sm line-through text-muted-foreground/70">
-                                    {product.compareAtPrice?.toLocaleString('ar-SA', { style: 'currency', currency: 'SAR' })}
+                                    {formatCurrency(product.compareAtPrice!, currency)}
                                 </span>
                             )}
                         </div>

@@ -10,6 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 // Define type for orders fetched
 type OrderWithCustomer = Prisma.OrderGetPayload<{ include: { customer: true } }>;
@@ -26,6 +28,7 @@ async function fetchDriverOrders(driverId: string, page: number, pageSize: numbe
 }
 
 export function DriverOrdersModal({ driverId, driverName }: DriverOrdersModalProps) {
+  const { currency } = useCurrency();
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [orders, setOrders] = useState<OrderWithCustomer[]>([]); // Use specific type
@@ -86,7 +89,7 @@ export function DriverOrdersModal({ driverId, driverName }: DriverOrdersModalPro
                   <TableCell>{order.id}</TableCell>
                   <TableCell>{order.status}</TableCell>
                   <TableCell>
-                    {order.amount?.toLocaleString('ar-EG', { minimumFractionDigits: 2 })} ر.س
+                    {formatCurrency(order.amount || 0, currency)}
                   </TableCell>
                   <TableCell>{order.customer?.name || '-'}</TableCell>
                   <TableCell>

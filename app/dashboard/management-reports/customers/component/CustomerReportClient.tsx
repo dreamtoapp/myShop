@@ -21,6 +21,8 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from 'recharts';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 // Define type for customer data used in the table
 interface CustomerReportData {
@@ -51,6 +53,7 @@ export default function CustomerReportClient({
   initialFrom,
   initialTo,
 }: CustomerReportProps) {
+  const { currency } = useCurrency();
   const [from, setFrom] = useState(initialFrom || '');
   const [to, setTo] = useState(initialTo || '');
   const [tableSearchTerm, setTableSearchTerm] = useState('');
@@ -85,10 +88,7 @@ export default function CustomerReportClient({
     if (typeof value === 'number' || (typeof value === 'string' && !isNaN(Number(value)))) {
       if (label.includes('إنفاق')) {
         return (
-          Number(value).toLocaleString('ar-EG', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }) + ' ر.س'
+          formatCurrency(Number(value), currency)
         );
       }
       return Number(value).toLocaleString('ar-EG');
@@ -168,7 +168,7 @@ export default function CustomerReportClient({
                   <Tooltip />
                   <Legend />
                   <Bar dataKey='orderCount' fill={chartFill1} name='عدد الطلبات' />
-                  <Bar dataKey='totalSpend' fill={chartFill2} name='إجمالي الإنفاق (ر.س)' />
+                  <Bar dataKey='totalSpend' fill={chartFill2} name={`إجمالي الإنفاق (${currency})`} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -214,7 +214,7 @@ export default function CustomerReportClient({
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}{' '}
-                      ر.س
+                      {currency}
                     </TableCell>
                     <TableCell>{new Date(c.createdAt).toLocaleDateString('ar-EG')}</TableCell>
                   </TableRow>

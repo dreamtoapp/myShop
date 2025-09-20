@@ -21,6 +21,8 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from 'recharts';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface KpiItem {
   label: string;
@@ -49,6 +51,7 @@ export default function FinanceReportClient({
   initialFrom,
   initialTo,
 }: FinanceReportProps) {
+  const { currency } = useCurrency();
   const [from, setFrom] = useState(initialFrom || '');
   const [to, setTo] = useState(initialTo || '');
 
@@ -89,10 +92,7 @@ export default function FinanceReportClient({
     const numericValue = typeof value === 'string' ? parseFloat(value) : value;
 
     if (!isNaN(numericValue)) {
-      return numericValue.toLocaleString('ar-EG', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }) + ' ر.س';
+      return formatCurrency(numericValue, currency);
     }
     return value.toString();
   };
@@ -154,8 +154,8 @@ export default function FinanceReportClient({
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line type='monotone' dataKey='revenue' stroke={revenueLineColor} name='الإيرادات (ر.س)' activeDot={{ r: 6 }} />
-                  <Line type='monotone' dataKey='expenses' stroke={expensesLineColor} name='المصروفات (ر.س)' activeDot={{ r: 6 }} />
+                  <Line type='monotone' dataKey='revenue' stroke={revenueLineColor} name={`الإيرادات (${currency})`} activeDot={{ r: 6 }} />
+                  <Line type='monotone' dataKey='expenses' stroke={expensesLineColor} name={`المصروفات (${currency})`} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -189,7 +189,7 @@ export default function FinanceReportClient({
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}{' '}
-                    ر.س
+                    {currency}
                   </TableCell>
                   <TableCell>{t.note}</TableCell>
                   <TableCell>{new Date(t.createdAt).toLocaleDateString('ar-EG')}</TableCell>

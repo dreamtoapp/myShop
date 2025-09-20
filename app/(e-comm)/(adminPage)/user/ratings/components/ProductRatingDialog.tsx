@@ -16,6 +16,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { getUserRateableProducts, submitProductRating, type RateableProduct } from '../actions/ratingActions';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface ProductRatingDialogProps {
     isOpen: boolean;
@@ -23,6 +25,7 @@ interface ProductRatingDialogProps {
 }
 
 export default function ProductRatingDialog({ isOpen, onClose }: ProductRatingDialogProps) {
+    const { currency } = useCurrency();
     const [selectedProduct, setSelectedProduct] = useState<string>('');
     const [rating, setRating] = useState<number>(0);
     const [comment, setComment] = useState<string>('');
@@ -131,7 +134,7 @@ export default function ProductRatingDialog({ isOpen, onClose }: ProductRatingDi
                                 ) : (
                                     products.map((product) => (
                                         <SelectItem key={product.id} value={product.id}>
-                                            {product.name} - {product.price} ر.س
+                                            {product.name} - {formatCurrency(product.price, currency)}
                                         </SelectItem>
                                     ))
                                 )}

@@ -34,6 +34,8 @@ import { Order } from '@/types/databaseTypes';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import GoogleMapsLink from '@/components/GoogleMapsLink';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 import AssignToDriver from './AssignToDriver';
 import CancelOrderDialog from './CancelOrderDialog';
@@ -58,6 +60,7 @@ export default function OrderTable({
   sortOrder = 'desc',
   orderType = 'pending',
 }: OrderTableProps) {
+  const { currency } = useCurrency();
   // Note: sortBy and sortOrder are not currently used in the implementation
   // They are kept for future feature development
   void sortBy;
@@ -160,7 +163,7 @@ export default function OrderTable({
             <div className="flex flex-col items-end min-w-[100px] sm:min-w-[140px]">
               <span className="font-bold text-lg text-status-high-value flex items-center gap-1">
                 <DollarSign className="h-4 w-4 text-status-high-value" />
-                {order.amount} ر.س
+                {formatCurrency(order.amount, currency)}
               </span>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
+import { useCurrency } from '@/store/currencyStore';
 
 interface AnalyticsOrder {
   orderId: string;
@@ -54,6 +55,7 @@ export default function ExportAnalyticsPdfButton({
   fileName = 'تقرير-تحليلات-المنتج',
   className = '',
 }: ExportAnalyticsPdfButtonProps) {
+  const { currency } = useCurrency();
   const handleExport = useCallback(() => {
     try {
       // Create CSV content
@@ -69,7 +71,7 @@ export default function ExportAnalyticsPdfButton({
       // Note: data.bestSeller is not included in this summary line for brevity, can be added if needed.
 
       // Add sales by month
-      csvContent += 'الشهر,عدد الطلبات,الإيرادات (ر.س)\n'; // Simplified: 'sales' and 'revenue' in salesByMonth are the same (monthly revenue)
+      csvContent += `الشهر,عدد الطلبات,الإيرادات (${currency})\n`; // Simplified: 'sales' and 'revenue' in salesByMonth are the same (monthly revenue)
       data.salesByMonth.forEach((row) => {
         // Assuming row.sales is the monthly revenue. row.orders might not be available from getAnalytics.ts yet.
         csvContent += `${row.month},${row.orders || 0},${row.sales.toFixed(2)}\n`;
@@ -77,7 +79,7 @@ export default function ExportAnalyticsPdfButton({
 
       // Add order history if exists
       if (data.orderHistory && data.orderHistory.length > 0) {
-        csvContent += '\nرقم الطلب,التاريخ,العميل,الكمية,الحالة,السعر (ر.س)\n';
+        csvContent += `\nرقم الطلب,التاريخ,العميل,الكمية,الحالة,السعر (${currency})\n`;
         data.orderHistory.forEach((order) => {
           csvContent += `${order.orderId},${order.date},${order.customer},${order.quantity},${order.status},${order.price}\n`;
         });
@@ -98,7 +100,7 @@ export default function ExportAnalyticsPdfButton({
     } catch (error) {
       toast.error('حدث خطأ أثناء تصدير البيانات');
     }
-  }, [data, fileName]);
+  }, [data, fileName, currency]);
 
   return (
     <Button onClick={handleExport} className={className} variant='outline'>

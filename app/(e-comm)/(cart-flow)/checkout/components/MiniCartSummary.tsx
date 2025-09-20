@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '../../../../../lib/formatCurrency';
 import CartItemsToggle from './client/CartItemsToggle';
 import { useCartStore } from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/cartStore';
+import { useCurrency } from '@/store/currencyStore';
 
 interface PlatformSettings {
   taxPercentage: number;
@@ -18,6 +19,7 @@ interface MiniCartSummaryProps {
 
 export default function MiniCartSummary({ platformSettings }: MiniCartSummaryProps) {
   const { cart: zustandCart } = useCartStore();
+  const { currency } = useCurrency();
   const items = Object.values(zustandCart);
   const subtotal = items.reduce((sum, item) => sum + (item.product?.price || 0) * (item.quantity || 1), 0);
   const deliveryFee = subtotal >= platformSettings.minShipping ? 0 : platformSettings.shippingFee;
@@ -78,7 +80,7 @@ export default function MiniCartSummary({ platformSettings }: MiniCartSummaryPro
               <Tag className="h-3 w-3 md:h-4 md:w-4 text-blue-700 flex-shrink-0" />
               <span className="font-semibold text-slate-800 text-sm md:text-base">الإجمالي الفرعي</span>
             </div>
-            <span className="font-bold text-slate-900 text-sm md:text-base">{formatCurrency(subtotal)}</span>
+            <span className="font-bold text-slate-900 text-sm md:text-base">{formatCurrency(subtotal, currency)}</span>
           </div>
 
           {/* Delivery Fee */}
@@ -95,11 +97,11 @@ export default function MiniCartSummary({ platformSettings }: MiniCartSummaryPro
             <span className={`font-bold text-sm md:text-base ${isFreeDelivery ? 'text-emerald-700' : 'text-slate-900'} flex-shrink-0`}>
               {isFreeDelivery ? (
                 <span className="flex items-center gap-1 md:gap-2">
-                  <span className="line-through text-slate-500 text-xs md:text-sm">{formatCurrency(platformSettings.shippingFee)}</span>
+                  <span className="line-through text-slate-500 text-xs md:text-sm">{formatCurrency(platformSettings.shippingFee, currency)}</span>
                   <span className="text-emerald-700">مجاني</span>
                 </span>
               ) : (
-                formatCurrency(deliveryFee)
+                formatCurrency(deliveryFee, currency)
               )}
             </span>
           </div>
@@ -116,9 +118,9 @@ export default function MiniCartSummary({ platformSettings }: MiniCartSummaryPro
 
               <div className="mb-2 md:mb-3">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0 text-xs md:text-sm text-blue-800 mb-2">
-                  <span className="font-medium">أضف {formatCurrency(platformSettings.minShipping - subtotal)}</span>
+                  <span className="font-medium">أضف {formatCurrency(platformSettings.minShipping - subtotal, currency)}</span>
                   <Badge className="px-1.5 py-0.5 md:px-2 md:py-1 bg-blue-600 text-white text-xs md:text-sm font-semibold rounded-full self-start sm:self-auto">
-                    {formatCurrency(platformSettings.minShipping)} الحد الأدنى
+                    {formatCurrency(platformSettings.minShipping, currency)} الحد الأدنى
                   </Badge>
                 </div>
               </div>
@@ -138,7 +140,7 @@ export default function MiniCartSummary({ platformSettings }: MiniCartSummaryPro
               <Percent className="h-3 w-3 md:h-4 md:w-4 text-purple-700 flex-shrink-0" />
               <span className="font-semibold text-slate-800 text-sm md:text-base">ضريبة القيمة المضافة ({platformSettings.taxPercentage}%)</span>
             </div>
-            <span className="font-bold text-slate-900 text-sm md:text-base flex-shrink-0">{formatCurrency(taxAmount)}</span>
+            <span className="font-bold text-slate-900 text-sm md:text-base flex-shrink-0">{formatCurrency(taxAmount, currency)}</span>
           </div>
 
           <Separator className="my-3 md:my-6" />
@@ -150,7 +152,7 @@ export default function MiniCartSummary({ platformSettings }: MiniCartSummaryPro
                 <Receipt className="h-4 w-4 md:h-5 md:w-5 text-blue-700" />
                 <span className="text-lg md:text-xl font-bold text-blue-900">الإجمالي النهائي</span>
               </div>
-              <span className="text-xl md:text-2xl font-bold text-blue-900">{formatCurrency(total)}</span>
+              <span className="text-xl md:text-2xl font-bold text-blue-900">{formatCurrency(total, currency)}</span>
             </div>
           </div>
         </div>

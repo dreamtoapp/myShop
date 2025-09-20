@@ -33,6 +33,8 @@ import {
 import { Order } from '@/types/databaseTypes';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface DeliveredOrdersViewProps {
   orders: Order[];
@@ -49,6 +51,7 @@ export default function DeliveredOrdersView({
   pageSize,
   dateRange
 }: DeliveredOrdersViewProps) {
+  const { currency } = useCurrency();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -120,7 +123,7 @@ export default function DeliveredOrdersView({
       ...orders.map(order => [
         order.orderNumber || '—',
         order.customer?.name || order.customer?.email || '—',
-        `${order.amount} ر.س`,
+        `${formatAmount(order.amount)}`,
         order.driver?.name || '—',
         order.deliveredAt ? format(new Date(order.deliveredAt), 'yyyy-MM-dd') : '—'
       ].join(','))
@@ -196,8 +199,8 @@ export default function DeliveredOrdersView({
   };
 
   // Format currency
-  const formatCurrency = (amount: number) => {
-    return `${amount.toLocaleString('ar-SA')} ر.س`;
+  const formatAmount = (amount: number) => {
+    return formatCurrency(amount, currency);
   };
 
   return (

@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 import { sendOrderEmail } from '../action/sendOrderEmail';
 import type { Order, UserWithCustomerOrders, OrderStatus } from './page';
 import Image from 'next/image';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
 
 interface UserStatementContentProps {
     user: UserWithCustomerOrders;
@@ -16,6 +18,7 @@ interface UserStatementContentProps {
 }
 
 export default function UserStatementContent({ user, totalSpent, orderCounts }: UserStatementContentProps) {
+    const { currency } = useCurrency();
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
     return (
@@ -55,7 +58,7 @@ export default function UserStatementContent({ user, totalSpent, orderCounts }: 
                 <div className='mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
                     <SummaryCard
                         title='إجمالي الإنفاق'
-                        value={`${totalSpent.toFixed(2)} ر.س`}
+                        value={formatCurrency(totalSpent, currency)}
                         icon={<DollarSign className='h-6 w-6' />}
                         variant='success'
                         description='المبلغ الإجمالي للطلبات'
@@ -125,7 +128,7 @@ export default function UserStatementContent({ user, totalSpent, orderCounts }: 
                                                 </div>
                                                 <div>
                                                     <p className='font-medium text-foreground text-sm mb-1'>المبلغ</p>
-                                                    <p className='font-semibold text-status-high-value'>{order.amount.toFixed(2)} ر.س</p>
+                                                    <p className='font-semibold text-status-high-value'>{formatCurrency(order.amount, currency)}</p>
                                                 </div>
                                             </div>
 
@@ -153,6 +156,7 @@ export default function UserStatementContent({ user, totalSpent, orderCounts }: 
                     customerName={user.name}
                     customerEmail={user.email}
                     onClose={() => setSelectedOrder(null)}
+                    currency={currency}
                 />
             )}
         </div>
@@ -164,12 +168,14 @@ function OrderDetailsModal({
     order,
     customerName,
     customerEmail,
-    onClose
+    onClose,
+    currency
 }: {
     order: Order;
     customerName: string;
     customerEmail: string;
     onClose: () => void;
+    currency: CurrencyCode;
 }) {
     const [isEmailSending, setIsEmailSending] = useState(false);
 
@@ -236,7 +242,7 @@ function OrderDetailsModal({
                                 <DollarSign className='h-4 w-4 text-muted-foreground' />
                                 <span className='text-sm font-medium text-foreground'>إجمالي المبلغ</span>
                             </div>
-                            <p className='text-xl font-bold text-status-high-value'>{order.amount.toFixed(2)} ر.س</p>
+                            <p className='text-xl font-bold text-status-high-value'>{formatCurrency(order.amount, currency)}</p>
                             <p className='text-sm text-muted-foreground'>{order.paymentMethod || 'نقد عند التسليم'}</p>
                         </div>
 
@@ -316,13 +322,13 @@ function OrderDetailsModal({
                                             {item.product?.name || 'منتج غير متوفر'}
                                         </h4>
                                         <p className='text-sm text-muted-foreground'>
-                                            الكمية: {item.quantity} × {item.price.toFixed(2)} ر.س
+                                            الكمية: {item.quantity} × {formatCurrency(item.price, currency)}
                                         </p>
                                     </div>
 
                                     <div className='text-left'>
                                         <p className='font-semibold text-foreground'>
-                                            {(item.quantity * item.price).toFixed(2)} ر.س
+                                            {formatCurrency(item.quantity * item.price, currency)}
                                         </p>
                                     </div>
                                 </div>
@@ -333,7 +339,7 @@ function OrderDetailsModal({
                         <div className='mt-4 pt-3 border-t border-border'>
                             <div className='flex items-center justify-between'>
                                 <span className='font-medium text-foreground'>إجمالي الطلبية:</span>
-                                <span className='text-xl font-bold text-status-high-value'>{order.amount.toFixed(2)} ر.س</span>
+                                <span className='text-xl font-bold text-status-high-value'>{formatCurrency(order.amount, currency)}</span>
                             </div>
                         </div>
                     </div>

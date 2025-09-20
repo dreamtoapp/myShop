@@ -10,8 +10,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { unassignOrder } from '../actions/unassign-order';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 export default function AssignedOrdersView({ drivers }: { drivers: any[] }) {
+    const { currency } = useCurrency();
     const [removingOrderId, setRemovingOrderId] = React.useState<string | null>(null);
     const [localDrivers, setLocalDrivers] = React.useState(drivers);
     const [viewOrder, setViewOrder] = React.useState<any | null>(null);
@@ -89,7 +92,7 @@ export default function AssignedOrdersView({ drivers }: { drivers: any[] }) {
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <Icon name="DollarSign" className="h-4 w-4 text-status-pending" />
-                                                            <span className="text-lg font-semibold text-status-pending">{order.amount} ر.س</span>
+                                                            <span className="text-lg font-semibold text-status-pending">{formatCurrency(order.amount, currency)}</span>
                                                         </div>
                                                     </div>
                                                 </AccordionTrigger>
@@ -237,7 +240,7 @@ export default function AssignedOrdersView({ drivers }: { drivers: any[] }) {
                                 <span className="font-bold">العميل:</span> {viewOrder.customer?.name || '—'}
                             </div>
                             <div>
-                                <span className="font-bold">المبلغ:</span> {viewOrder.amount} ر.س
+                                <span className="font-bold">المبلغ:</span> {formatCurrency(viewOrder.amount, currency)}
                             </div>
                             <div>
                                 <span className="font-bold">العنوان:</span> {viewOrder.address?.district || ''} {viewOrder.address?.street ? '، ' + viewOrder.address.street : ''}
@@ -247,7 +250,7 @@ export default function AssignedOrdersView({ drivers }: { drivers: any[] }) {
                                 <ul className="list-disc pr-5 mt-1">
                                     {viewOrder.items?.map((item: any, idx: number) => (
                                         <li key={idx} className="text-sm">
-                                            {item.product?.name || 'صنف'} × {item.quantity} - {item.price} ر.س
+                                            {item.product?.name || 'صنف'} × {item.quantity} - {formatCurrency(item.price, currency)}
                                         </li>
                                     ))}
                                 </ul>

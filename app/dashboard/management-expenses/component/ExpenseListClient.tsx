@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import ExpenseForm from './ExpenseForm';
 import { createExpense, updateExpense, deleteExpense } from '../action/expenseActions';
+import { useCurrency } from '@/store/currencyStore';
 
 interface Expense {
   id: string;
@@ -40,6 +41,7 @@ export default function ExpenseListClient({
   search,
   category,
 }: ExpenseListClientProps) {
+  const { currency } = useCurrency();
   const [searchValue, setSearchValue] = useState(search);
   const [catValue, setCatValue] = useState(category);
   const [showAdd, setShowAdd] = useState(false);
@@ -137,7 +139,7 @@ export default function ExpenseListClient({
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}{' '}
-                    ر.س
+                    {currency}
                   </TableCell>
                   <TableCell>{e.category ?? '-'}</TableCell>
                   <TableCell>{e.note ?? '-'}</TableCell>

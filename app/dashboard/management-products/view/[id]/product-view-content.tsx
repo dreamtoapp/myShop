@@ -9,6 +9,8 @@ import { User as PrismaUser } from '@prisma/client';
 import { Review as PrismaReview } from '@prisma/client';
 import { Category as PrismaCategory } from '@prisma/client';
 import { Supplier as PrismaSupplier } from '@prisma/client';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 // Define more specific types for related data if not using Prisma types directly
 interface ReviewWithUser extends PrismaReview {
@@ -35,6 +37,7 @@ interface ProductViewContentProps {
 
 
 export default function ProductViewContent({ product }: ProductViewContentProps) {
+  const { currency } = useCurrency();
   const filledStarColor = "text-yellow-500 fill-yellow-500";
   const emptyStarColor = "text-muted-foreground fill-muted";
 
@@ -124,16 +127,16 @@ export default function ProductViewContent({ product }: ProductViewContentProps)
         <div className="rounded-lg border bg-card p-6 shadow-lg">
           <div className="flex items-baseline justify-between mb-2">
             <span className="text-3xl font-bold text-primary">
-              {product.price.toLocaleString('ar-EG', { style: 'currency', currency: 'SAR' })}
+              {formatCurrency(product.price, currency)}
             </span>
             {product.compareAtPrice && product.compareAtPrice > product.price && (
               <span className="text-lg text-muted-foreground line-through">
-                {product.compareAtPrice.toLocaleString('ar-EG', { style: 'currency', currency: 'SAR' })}
+                {formatCurrency(product.compareAtPrice, currency)}
               </span>
             )}
           </div>
           {product.costPrice && (
-            <p className="text-xs text-muted-foreground">سعر التكلفة: {product.costPrice.toLocaleString('ar-EG', { style: 'currency', currency: 'SAR' })}</p>
+            <p className="text-xs text-muted-foreground">سعر التكلفة: {formatCurrency(product.costPrice, currency)}</p>
           )}
 
           <Separator className="my-4" />

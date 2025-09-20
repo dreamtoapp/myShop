@@ -9,6 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface DriversReportTableProps {
   drivers: Array<{
@@ -28,6 +30,7 @@ interface DriversReportTablePropsWithPage extends DriversReportTableProps {
 }
 
 export function DriversReportTable({ drivers }: DriversReportTablePropsWithPage) {
+  const { currency } = useCurrency();
   // KPI calculations
   const totalDrivers = drivers.length;
   const totalOrders = drivers.reduce((sum, d) => sum + (d.orders?.length || 0), 0);
@@ -65,7 +68,7 @@ export function DriversReportTable({ drivers }: DriversReportTablePropsWithPage)
         <Card><CardContent className="py-4 text-center"><div className="text-lg font-semibold">إجمالي الطلبات</div><div className="text-2xl font-bold">{totalOrders}</div></CardContent></Card>
         <Card><CardContent className="py-4 text-center"><div className="text-lg font-semibold">الطلبات المكتملة</div><div className="text-2xl font-bold text-success-foreground">{totalCompleted}</div></CardContent></Card>
         <Card><CardContent className="py-4 text-center"><div className="text-lg font-semibold">الطلبات الملغاة</div><div className="text-2xl font-bold text-destructive-foreground">{totalCancelled}</div></CardContent></Card>
-        <Card className="md:col-span-2"><CardContent className="py-4 text-center"><div className="text-lg font-semibold">إجمالي الأرباح</div><div className="text-2xl font-bold text-primary">{totalEarnings.toLocaleString('ar-EG', { minimumFractionDigits: 2 })} ر.س</div></CardContent></Card>
+        <Card className="md:col-span-2"><CardContent className="py-4 text-center"><div className="text-lg font-semibold">إجمالي الأرباح</div><div className="text-2xl font-bold text-primary">{formatCurrency(totalEarnings, currency)}</div></CardContent></Card>
       </div>
       {/* Search & Filters */}
       <div className="flex flex-col md:flex-row md:items-end gap-4 mb-4 bg-muted/40 rounded-lg p-4 border border-border shadow-sm">
@@ -117,7 +120,7 @@ export function DriversReportTable({ drivers }: DriversReportTablePropsWithPage)
                       <TableCell>{totalOrders}</TableCell>
                       <TableCell>{completedOrders}</TableCell>
                       <TableCell>{cancelledOrders}</TableCell>
-                      <TableCell>{totalEarnings.toLocaleString('ar-EG', { minimumFractionDigits: 2 })} ر.س</TableCell>
+                      <TableCell>{formatCurrency(totalEarnings, currency)}</TableCell>
                       <TableCell>
                         <a href={`/dashboard/reports/drivers/${driver.id}`} className='text-blue-600 underline hover:text-blue-800'>مزيد من المعلومات</a>
                       </TableCell>

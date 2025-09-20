@@ -27,6 +27,8 @@ import {
   Line,
 } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 // Define structure for individual orders in the table
 interface OrderData {
@@ -67,6 +69,7 @@ export default function OrderAnalyticsClient({
   initialFrom,
   initialTo,
 }: OrderAnalyticsProps) {
+  const { currency } = useCurrency();
   const [from, setFrom] = useState(initialFrom || '');
   const [to, setTo] = useState(initialTo || '');
 
@@ -117,11 +120,7 @@ export default function OrderAnalyticsClient({
       return (
         <div className='flex flex-col items-center gap-1 rtl:text-right text-card-foreground'>
           <span className='text-xl font-bold text-primary'> {/* Use text-primary */}
-            {Number(value.amount).toLocaleString('ar-EG', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}{' '}
-            ر.س
+            {formatCurrency(Number(value.amount), currency)}
           </span>
           <span className='text-xs text-muted-foreground'> {/* Use text-muted-foreground */}
             رقم الطلب: <span dir='ltr'>{value.orderNumber}</span>
@@ -133,10 +132,7 @@ export default function OrderAnalyticsClient({
     if (typeof value === 'number' || (typeof value === 'string' && !isNaN(Number(value)))) {
       if (label.includes('إيراد') || label.includes('قيمة')) {
         return (
-          Number(value).toLocaleString('ar-EG', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }) + ' ر.س'
+          formatCurrency(Number(value), currency)
         );
       }
       return Number(value).toLocaleString('ar-EG');
@@ -190,7 +186,7 @@ export default function OrderAnalyticsClient({
             <Tooltip />
             <Legend />
             <Line type='monotone' dataKey='orders' stroke={orderTrendLineColor} name='عدد الطلبات' activeDot={{ r: 6 }} />
-            <Line type='monotone' dataKey='revenue' stroke={revenueTrendLineColor} name='الإيرادات (ر.س)' activeDot={{ r: 6 }} />
+            <Line type='monotone' dataKey='revenue' stroke={revenueTrendLineColor} name={`الإيرادات (${currency})`} activeDot={{ r: 6 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -371,7 +367,7 @@ export default function OrderAnalyticsClient({
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}{' '}
-                    ر.س
+                    {currency}
                   </TableCell>
                   <TableCell>{new Date(o.createdAt).toLocaleDateString('ar-EG')}</TableCell>
                 </TableRow>

@@ -43,6 +43,8 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useRefresh } from './RefreshContext';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 // Enhanced status styles with better color coding
 const STATUS_STYLES = {
@@ -76,6 +78,7 @@ const StatusIcon = ({ status }: { status: OrderStatus }) => {
 
 // Enhanced order header with better visual hierarchy
 const OrderHeader = ({ order, statusStyle }: { order: Order, statusStyle: string }) => {
+    const { currency } = useCurrency();
     const createdAt = useMemo(
         () => formatDistanceToNow(new Date(order.createdAt), { addSuffix: true, locale: ar }),
         [order.createdAt],
@@ -91,7 +94,7 @@ const OrderHeader = ({ order, statusStyle }: { order: Order, statusStyle: string
                 <div className="text-left">
                     <CardTitle className="text-lg font-bold text-feature-commerce flex items-center gap-1">
                         <Icon name="CreditCard" className="h-4 w-4" />
-                        {order.amount.toFixed(2)} ر.س
+                        {formatCurrency(order.amount, currency)}
                     </CardTitle>
                 </div>
             </div>
@@ -219,6 +222,7 @@ const CustomerCardAction = ({
 // Collapsible Order Items component
 const OrderItemsPreview = ({ items }: { items: any[] }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const { currency } = useCurrency();
 
     if (!items || items.length === 0) {
         return null;
@@ -249,7 +253,7 @@ const OrderItemsPreview = ({ items }: { items: any[] }) => {
                     <div key={index} className="flex items-center justify-between text-xs">
                         <span className="truncate flex-1">{item.product.name || `منتج ${index + 1}`}</span>
                         <span className="text-muted-foreground ml-2">
-                            {item.quantity || 1} × {item.price || 0} ر.س
+                            {item.quantity || 1} × {formatCurrency(item.price || 0, currency)}
                         </span>
                     </div>
                 ))}
