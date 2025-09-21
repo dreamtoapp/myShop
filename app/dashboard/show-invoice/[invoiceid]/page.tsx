@@ -7,11 +7,13 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Icon } from '@/components/icons/Icon';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
 
 import { getOrderData } from '../actions/Actions';
 import { getDriver } from '../actions/driver-list';
 import ConfirmDriver from '../components/ConfirmDriver';
 import SendOrderViaEmail from '../components/SendOrderViaEmail';
+import db from '@/lib/prisma';
 
 // Order Type Definition
 
@@ -27,6 +29,11 @@ export default async function InvoicePage({ params, searchParams }: ParamsProp) 
   const order = await getOrderData(orderId as string);
   const resolvedSearchParams = await searchParams;
   const status = resolvedSearchParams.status;
+
+  // Get company currency setting
+  const company = await db.company.findFirst();
+  const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
+
   let drivers;
   if (status) {
     drivers = await getDriver();
@@ -209,12 +216,12 @@ export default async function InvoicePage({ params, searchParams }: ParamsProp) 
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">السعر الواحد:</span>
-                          <span className="font-medium">{item.price.toFixed(2)} ر.س</span>
+                          <span className="font-medium">{formatCurrency(item.price, currency)}</span>
                         </div>
                         <Separator />
                         <div className="flex justify-between font-medium">
                           <span>الإجمالي:</span>
-                          <span className="text-feature-products">{(item.quantity * item.price).toFixed(2)} ر.س</span>
+                          <span className="text-feature-products">{formatCurrency(item.quantity * item.price, currency)}</span>
                         </div>
                       </div>
                     </CardContent>
@@ -243,8 +250,8 @@ export default async function InvoicePage({ params, searchParams }: ParamsProp) 
                               {item.quantity}
                             </Badge>
                           </td>
-                          <td className="p-4 text-foreground">{item.price.toFixed(2)} ر.س</td>
-                          <td className="p-4 font-medium text-feature-products">{(item.quantity * item.price).toFixed(2)} ر.س</td>
+                          <td className="p-4 text-foreground">{formatCurrency(item.price, currency)}</td>
+                          <td className="p-4 font-medium text-feature-products">{formatCurrency(item.quantity * item.price, currency)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -269,7 +276,7 @@ export default async function InvoicePage({ params, searchParams }: ParamsProp) 
                   <Icon name="DollarSign" className="h-5 w-5 text-feature-analytics" />
                   <div>
                     <p className="text-sm text-muted-foreground">الإجمالي الفرعي</p>
-                    <p className="text-xl font-bold text-foreground">{subtotal.toFixed(2)} ر.س</p>
+                    <p className="text-xl font-bold text-foreground">{formatCurrency(subtotal, currency)}</p>
                   </div>
                 </div>
 
@@ -278,7 +285,7 @@ export default async function InvoicePage({ params, searchParams }: ParamsProp) 
                   <Icon name="Calculator" className="h-5 w-5 text-feature-analytics" />
                   <div>
                     <p className="text-sm text-muted-foreground">الضريبة (15%)</p>
-                    <p className="text-xl font-bold text-foreground">{taxAmount.toFixed(2)} ر.س</p>
+                    <p className="text-xl font-bold text-foreground">{formatCurrency(taxAmount, currency)}</p>
                   </div>
                 </div>
 
@@ -287,7 +294,7 @@ export default async function InvoicePage({ params, searchParams }: ParamsProp) 
                   <Icon name="Receipt" className="h-5 w-5 text-feature-analytics" />
                   <div>
                     <p className="text-sm text-feature-analytics">المبلغ الإجمالي</p>
-                    <p className="text-2xl font-bold text-feature-analytics">{total.toFixed(2)} ر.س</p>
+                    <p className="text-2xl font-bold text-feature-analytics">{formatCurrency(total, currency)}</p>
                   </div>
                 </div>
               </div>

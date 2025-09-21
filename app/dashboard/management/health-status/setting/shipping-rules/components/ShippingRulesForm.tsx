@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Clock, Truck, MapPin, DollarSign } from 'lucide-react';
 import { saveShippingRules } from '../actions/saveShippingRules';
 import { toast } from 'sonner';
+import { useCurrency } from '@/store/currencyStore';
+import { getCurrencySymbol } from '@/lib/formatCurrency';
 
 interface ShippingRulesFormProps {
   initialValues: {
@@ -18,6 +20,9 @@ interface ShippingRulesFormProps {
 }
 
 export default function ShippingRulesForm({ initialValues }: ShippingRulesFormProps) {
+  const { currency } = useCurrency();
+  const currencySymbol = getCurrencySymbol(currency);
+
   const [values, setValues] = useState({
     workingHours: initialValues.workingHours ?? '',
     shippingFee: String(initialValues.shippingFee ?? ''),
@@ -103,7 +108,7 @@ export default function ShippingRulesForm({ initialValues }: ShippingRulesFormPr
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Shipping Fee */}
           <div className={`rounded-lg border p-4 transition-colors ${values.shippingFee?.trim() ? 'bg-primary/5 border-primary' : 'bg-muted/20 border-destructive'}`}>
-            <label className="block text-sm font-medium text-foreground mb-2">رسوم التوصيل (ريال)</label>
+            <label className="block text-sm font-medium text-foreground mb-2">رسوم التوصيل ({currencySymbol})</label>
             <div className="relative">
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 <DollarSign className="w-5 h-5 text-foreground" />
@@ -122,7 +127,7 @@ export default function ShippingRulesForm({ initialValues }: ShippingRulesFormPr
 
           {/* Free Shipping Threshold */}
           <div className={`rounded-lg border p-4 transition-colors ${values.minShipping?.trim() ? 'bg-primary/5 border-primary' : 'bg-muted/20 border-destructive'}`}>
-            <label className="block text-sm font-medium text-foreground mb-2">حد التوصيل المجاني (ريال)</label>
+            <label className="block text-sm font-medium text-foreground mb-2">حد التوصيل المجاني ({currencySymbol})</label>
             <div className="relative">
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 <DollarSign className="w-5 h-5 text-foreground" />
@@ -180,6 +185,7 @@ export default function ShippingRulesForm({ initialValues }: ShippingRulesFormPr
     </div>
   );
 }
+
 
 
 

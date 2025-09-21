@@ -22,6 +22,8 @@ import {
   getProductReviews,
 } from '../actions/actions';
 import { PageProps } from '@/types/commonTypes';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
+import db from '@/lib/prisma';
 
 // --- Metadata ---
 export async function generateMetadata({ params }: PageProps<{ slug: string }>): Promise<Metadata> {
@@ -61,7 +63,12 @@ export default async function ProductPage({ params }: PageProps<{ slug: string }
   const product = await getProductBySlug(slug);
   if (!product) return notFound();
   const reviews = await getProductReviews(product.id);
-  const formattedPrice = new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(product.price);
+
+  // Get company currency setting
+  const company = await db.company.findFirst();
+  const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
+
+  const formattedPrice = formatCurrency(product.price, currency);
   const discountPercentage = 0;
   const formattedSalePrice = null;
   const mainImage = product.imageUrl || '/fallback/product-fallback.avif';

@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useCurrency } from '@/store/currencyStore';
 
 const LOCALES = [
   { code: 'ar-SA', label: 'العربية' },
@@ -23,6 +24,7 @@ const LOCALES = [
 ];
 
 export default function ProductSeoForm({ productId, arSeo, enSeo, productData }: any) {
+  const { currency } = useCurrency();
   const [activeLocale, setActiveLocale] = useState<'ar-SA' | 'en-US'>('ar-SA');
   const [form, setForm] = useState({
     'ar-SA': {
@@ -327,7 +329,7 @@ export default function ProductSeoForm({ productId, arSeo, enSeo, productData }:
                       offers: {
                         '@type': 'Offer',
                         price: productData.price != null ? String(productData.price) : '',
-                        priceCurrency: productData.priceCurrency || 'SAR',
+                        priceCurrency: productData.priceCurrency || currency,
                         availability: productData.outOfStock
                           ? 'https://schema.org/OutOfStock'
                           : 'https://schema.org/InStock',

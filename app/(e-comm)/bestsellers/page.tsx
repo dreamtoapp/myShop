@@ -1,9 +1,13 @@
 import { getBestSellers } from './actions/getBestSellers';
 import { Icon } from '@/components/icons/Icon';
 import BestSellerProductCard from './compnents/BestSellerProductCard';
+import db from '@/lib/prisma';
+import { CurrencyCode } from '@/lib/formatCurrency';
 
 export default async function BestSellersPage() {
     const { products } = await getBestSellers({ page: 1, limit: 12 });
+    const company = await db.company.findFirst();
+    const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -24,6 +28,7 @@ export default async function BestSellersPage() {
                             imageUrl={product.imageUrl || ''}
                             salesCount={typeof product.salesCount === 'number' ? product.salesCount : 0}
                             rank={idx}
+                            currency={currency}
                         />
                     ))}
             </div>

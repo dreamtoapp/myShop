@@ -1,6 +1,7 @@
 'use server';
 import db from '@/lib/prisma';
 import { UserRole } from '@prisma/client';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
 
 export interface MilestoneItem {
   title: string;
@@ -15,6 +16,10 @@ export async function getMilestonesReportData(): Promise<{ milestones: Milestone
   const milestones: MilestoneItem[] = [];
 
   try {
+    // Get company currency setting
+    const company = await db.company.findFirst();
+    const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
+
     // 1. First Order Date
     const firstOrder = await db.order.findFirst({
       orderBy: { createdAt: 'asc' },
@@ -85,8 +90,8 @@ export async function getMilestonesReportData(): Promise<{ milestones: Milestone
           if (cumulativeSales >= target && !achievedSalesTargets.has(target)) {
             if (order.createdAt) {
               milestones.push({
-                title: `تجاوز المبيعات ${target.toLocaleString('ar-EG')} ر.س`,
-                description: `تم تحقيق إجمالي مبيعات يتجاوز ${target.toLocaleString('ar-EG')} ر.س.`,
+                title: `تجاوز المبيعات ${formatCurrency(target, currency)}`,
+                description: `تم تحقيق إجمالي مبيعات يتجاوز ${formatCurrency(target, currency)}.`,
                 date: order.createdAt,
                 icon: '💰',
               });

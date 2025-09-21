@@ -6,10 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Icon } from '@/components/icons/Icon';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
+import db from '@/lib/prisma';
 
 export default async function Page({ params }: { params: Promise<{ orderid: string }> }) {
     const { orderid } = await params;
     const trackInfo = await fetchTrackInfo(orderid);
+
+    // Get company currency setting
+    const company = await db.company.findFirst();
+    const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
 
     // Fallback coordinates if none provided
     const latitude = trackInfo?.latitude || 0;
@@ -105,7 +111,7 @@ export default async function Page({ params }: { params: Promise<{ orderid: stri
                                 <div>
                                     <p className="text-xs text-muted-foreground font-medium">إجمالي المبلغ</p>
                                     <p className="font-semibold text-feature-commerce">
-                                        {trackInfo?.order.amount ? `${trackInfo.order.amount} ريال` : 'غير محدد'}
+                                        {trackInfo?.order.amount ? formatCurrency(trackInfo.order.amount, currency) : 'غير محدد'}
                                     </p>
                                 </div>
                             </div>
@@ -327,7 +333,7 @@ export default async function Page({ params }: { params: Promise<{ orderid: stri
                                         </div>
                                         <div className="text-left">
                                             <p className="font-semibold text-feature-products">
-                                                {item.price ? `${item.price} ريال` : 'غير محدد'}
+                                                {item.price ? formatCurrency(item.price, currency) : 'غير محدد'}
                                             </p>
                                         </div>
                                     </div>

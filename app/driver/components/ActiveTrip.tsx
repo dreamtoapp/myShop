@@ -22,6 +22,8 @@ import { deleverOrder } from '../actions/deleverOrder';
 import CancelOrder from './CancelOrder';
 import StartNewTripButton from './StartNewTripButton';
 import ResumeTripButton from './ResumeTripButton';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 // Small components for clarity
 function OrderSummary({ order }: { order: Order }) {
   return (
@@ -159,6 +161,8 @@ function AddressSection({ order }: { order: Order }) {
 }
 
 function ProductList({ order }: { order: Order }) {
+  const { currency } = useCurrency();
+
   return (
     <Card className='w-full rounded-lg bg-card p-4 shadow-sm'>
       <Collapsible>
@@ -179,7 +183,7 @@ function ProductList({ order }: { order: Order }) {
                   <span>{item.product?.name}</span>
                   <div className='flex gap-4'>
                     <span className='text-muted-foreground'>x{item.quantity}</span>
-                    <span className='font-medium'>{item.price} ريال</span>
+                    <span className='font-medium'>{formatCurrency(item.price, currency)}</span>
                   </div>
                 </div>
               ))}
@@ -189,7 +193,7 @@ function ProductList({ order }: { order: Order }) {
       </Collapsible>
       <div className='mt-4 flex items-center justify-between border-t border-border pt-2'>
         <span className='font-semibold text-muted-foreground'>الإجمالي</span>
-        <span className='text-xl font-bold text-success'>{order.amount.toFixed(2)} ريال</span>
+        <span className='text-xl font-bold text-success'>{formatCurrency(order.amount, currency)}</span>
       </div>
     </Card>
   );

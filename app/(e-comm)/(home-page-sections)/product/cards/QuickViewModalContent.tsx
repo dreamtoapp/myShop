@@ -9,6 +9,8 @@ import { X } from 'lucide-react';
 import type { Product } from '@/types/databaseTypes';
 import type { Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 export default function QuickViewModalContent({
     product,
@@ -21,6 +23,7 @@ export default function QuickViewModalContent({
     formatNum: (n: number) => string;
     setOpen: Dispatch<SetStateAction<boolean>>;
 }) {
+    const { currency } = useCurrency();
     const closeButtonRef = useRef<HTMLButtonElement>(null);
     const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
     const discountPercent = hasDiscount && product.compareAtPrice
@@ -39,14 +42,14 @@ export default function QuickViewModalContent({
                 <div className="flex flex-col gap-1 flex-1 min-w-0">
                     <span className="text-lg sm:text-2xl font-bold truncate text-foreground" title={product.name}>{product.name}</span>
                     <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xl font-bold text-feature-commerce">{product.price.toLocaleString()} ر.س</span>
+                        <span className="text-xl font-bold text-feature-commerce">{formatCurrency(product.price, currency)}</span>
                         {hasDiscount && (
                             <span className="ml-2 px-2 py-0.5 rounded-full bg-destructive/10 text-destructive text-xs font-semibold animate-pulse">
                                 خصم {discountPercent}%
                             </span>
                         )}
                         {product.compareAtPrice && product.compareAtPrice > product.price && (
-                            <span className="text-sm line-through text-muted-foreground">{product.compareAtPrice.toLocaleString()} ر.س</span>
+                            <span className="text-sm line-through text-muted-foreground">{formatCurrency(product.compareAtPrice, currency)}</span>
                         )}
                     </div>
                 </div>

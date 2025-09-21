@@ -10,8 +10,12 @@ import { Order } from '@/types/databaseTypes';
 
 import { startTrip } from '../actions/startTrip';
 import { setOrderInTransit } from '../actions/setOrderInTransit';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 export default function DriverOrderCard({ order, activeTrip }: { order: Order, activeTrip: boolean }) {
+  const { currency } = useCurrency();
+
   // Helper: Status badge
   const statusBadge = (status: string) => {
     let color = 'bg-yellow-500';
@@ -34,9 +38,11 @@ export default function DriverOrderCard({ order, activeTrip }: { order: Order, a
           variant='secondary'
           className='ml-auto'
           onClick={() => {
-            const lat = order.address.latitude;
-            const lng = order.address.longitude;
-            window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank', 'noopener,noreferrer');
+            const lat = order.address?.latitude;
+            const lng = order.address?.longitude;
+            if (lat && lng) {
+              window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank', 'noopener,noreferrer');
+            }
           }}
         >
           <Icon name="Navigation" size="xs" /> توجيه
@@ -74,7 +80,7 @@ export default function DriverOrderCard({ order, activeTrip }: { order: Order, a
         <div key={item.id || idx} className='flex justify-between items-center border-b border-border py-1'>
           <span>{item.product?.name}</span>
           <span className='text-muted-foreground'>x{item.quantity}</span>
-          <span className='font-bold'>{item.price} ريال</span>
+          <span className='font-bold'>{formatCurrency(item.price, currency)}</span>
         </div>
       ))}
     </div>
@@ -92,7 +98,7 @@ export default function DriverOrderCard({ order, activeTrip }: { order: Order, a
   const total = (
     <div className='flex justify-between items-center mt-2'>
       <span className='font-bold text-lg'>الإجمالي</span>
-      <span className='font-bold text-primary text-xl'>{order.amount.toFixed(2)} ريال</span>
+      <span className='font-bold text-primary text-xl'>{formatCurrency(order.amount, currency)}</span>
     </div>
   );
 

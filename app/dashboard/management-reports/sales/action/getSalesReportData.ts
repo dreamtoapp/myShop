@@ -1,7 +1,12 @@
 import db from '@/lib/prisma';
 import { Prisma } from '@prisma/client'; // Import Prisma
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
 
 export async function getSalesReportData({ from, to }: { from?: string; to?: string }) {
+  // Get company currency setting
+  const company = await db.company.findFirst();
+  const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
+
   // Parse date range
   let orderItemWhereInput: Prisma.OrderItemWhereInput = {};
   if (from && to) {
@@ -100,11 +105,11 @@ export async function getSalesReportData({ from, to }: { from?: string; to?: str
 
   return {
     kpis: [
-      { label: 'إجمالي المبيعات', value: totalSales.toLocaleString('ar-EG') + ' ر.س', icon: '💰' },
+      { label: 'إجمالي المبيعات', value: formatCurrency(totalSales, currency), icon: '💰' },
       { label: 'عدد الطلبات', value: orderCount.toLocaleString('ar-EG'), icon: '📦' },
       {
         label: 'متوسط قيمة الطلب',
-        value: avgOrderValue.toLocaleString('ar-EG') + ' ر.س',
+        value: formatCurrency(avgOrderValue, currency),
         icon: '🧾',
       },
       { label: 'المنتج الأكثر مبيعًا', value: topProduct, icon: '⭐' },
@@ -119,5 +124,6 @@ export async function getSalesReportData({ from, to }: { from?: string; to?: str
       totalAllSales,
       remaining: remainingCount,
     },
+    currency,
   };
 }

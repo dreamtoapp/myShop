@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from '@/components/link';
 import { Icon } from '@/components/icons/Icon';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
 
 export interface BestSellerProductCardProps {
     id: string;
@@ -10,6 +11,7 @@ export interface BestSellerProductCardProps {
     imageUrl?: string;
     salesCount: number;
     rank?: number;
+    currency: CurrencyCode;
 }
 
 export default function BestSellerProductCard({
@@ -19,7 +21,8 @@ export default function BestSellerProductCard({
     price,
     imageUrl,
     salesCount,
-    rank
+    rank,
+    currency
 }: BestSellerProductCardProps) {
     return (
         <div
@@ -48,7 +51,7 @@ export default function BestSellerProductCard({
             </div>
             <div className="p-3">
                 <div className="font-semibold text-base truncate mb-1">{name}</div>
-                <div className="text-sm text-muted-foreground mb-1">{price.toLocaleString()} ر.س</div>
+                <div className="text-sm text-muted-foreground mb-1">{formatCurrency(price, currency)}</div>
                 <div className="text-xs text-muted-foreground">مبيعات: {salesCount}</div>
                 <Link href={`/product/${slug}`} className="mt-2 inline-block w-full text-center bg-primary text-primary-foreground rounded px-3 py-1 font-semibold hover:bg-primary/90 transition">
                     عرض المنتج

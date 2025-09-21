@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import { getOrderData } from '../actions/getOrderData';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
+import db from '@/lib/prisma';
 
 // Order Type Definition
 
@@ -13,6 +15,10 @@ export default async function ClientInvoicePage({ params }: PageProps<{ invoicei
   const { invoiceid } = resolvedParams;
 
   const order = await getOrderData(invoiceid as string);
+
+  // Get company currency setting
+  const company = await db.company.findFirst();
+  const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
 
   return (
     <div className='mx-auto my-10 max-w-3xl'>
@@ -57,21 +63,21 @@ export default async function ClientInvoicePage({ params }: PageProps<{ invoicei
                   <tr key={index} className='border'>
                     <td className='border p-2'>{item.productName}</td>
                     <td className='border p-2'>{item.quantity}</td>
-                    <td className='border p-2'>{item.price.toFixed(2)} ريال</td>
-                    <td className='border p-2'>{(item.quantity * item.price).toFixed(2)} ريال</td>
+                    <td className='border p-2'>{formatCurrency(item.price, currency)}</td>
+                    <td className='border p-2'>{formatCurrency(item.quantity * item.price, currency)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <h3 className='mt-4 text-xl font-semibold'>الملخص</h3>
             <p>
-              <strong>الإجمالي الفرعي:</strong> {order?.amount.toFixed(2)} ريال
+              <strong>الإجمالي الفرعي:</strong> {formatCurrency(order?.amount || 0, currency)}
             </p>
             <p>
-              <strong>الضريبة (15%):</strong> {((order?.amount || 0) * 0.15).toFixed(2)} ريال
+              <strong>الضريبة (15%):</strong> {formatCurrency((order?.amount || 0) * 0.15, currency)}
             </p>
             <p className='text-lg font-bold'>
-              <strong>الإجمالي:</strong> {((order?.amount || 0) * 1.15).toFixed(2)} ريال
+              <strong>الإجمالي:</strong> {formatCurrency((order?.amount || 0) * 1.15, currency)}
             </p>
           </CardContent>
         </Card>

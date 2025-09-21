@@ -6,6 +6,7 @@ import { ar } from 'date-fns/locale';
 import db from '@/lib/prisma';
 import { getAppConfig } from '@/helpers/appConfig';
 import { Order } from '../[id]/page';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
 
 interface EmailOptions {
   to: string;
@@ -56,6 +57,10 @@ const createTransporter = async () => {
 const generateOrderEmailTemplate = async (order: Order, customerName: string, companyData: CompanyData) => {
   const { appName } = await getAppConfig();
 
+  // Get company currency setting
+  const company = await db.company.findFirst();
+  const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
+
   const orderItems = order.items.map(item => `
     <tr style="border-bottom: 1px solid #eee;">
       <td style="padding: 12px; text-align: right;">
@@ -71,8 +76,8 @@ const generateOrderEmailTemplate = async (order: Order, customerName: string, co
         </div>
       </td>
       <td style="padding: 12px; text-align: center; font-weight: 600;">${item.quantity}</td>
-      <td style="padding: 12px; text-align: center; color: #059669;">${item.price.toFixed(2)} ر.س</td>
-      <td style="padding: 12px; text-align: center; color: #dc2626; font-weight: 600;">${(item.quantity * item.price).toFixed(2)} ر.س</td>
+      <td style="padding: 12px; text-align: center; color: #059669;">${formatCurrency(item.price, currency)}</td>
+      <td style="padding: 12px; text-align: center; color: #dc2626; font-weight: 600;">${formatCurrency(item.quantity * item.price, currency)}</td>
     </tr>
   `).join('');
 
@@ -196,7 +201,7 @@ const generateOrderEmailTemplate = async (order: Order, customerName: string, co
 
             <div class="total-section">
                 <div style="margin-bottom: 8px; color: #6b7280; font-weight: 600;">إجمالي المبلغ</div>
-                <div class="total-amount">${order.amount.toFixed(2)} ر.س</div>
+                <div class="total-amount">${formatCurrency(order.amount, currency)}</div>
             </div>
         </div>
 
@@ -223,6 +228,9 @@ export const sendOrderEmail = async ({ to, orderData, customerName }: EmailOptio
       website: company.website,
     } : {};
 
+    // Get company currency setting
+    const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
+
     const transporter = await createTransporter();
     if (!transporter) {
       console.warn('Email service not configured - skipping email delivery');
@@ -236,7 +244,7 @@ export const sendOrderEmail = async ({ to, orderData, customerName }: EmailOptio
       from: `"${companyData.fullName || appName || 'Online Shop'}" <${company?.emailUser || 'noreply@example.com'}>`,
       to,
       subject: `تفاصيل الطلبية #${orderData.orderNumber}`,
-      text: `تفاصيل الطلبية #${orderData.orderNumber}\n\nالمبلغ الإجمالي: ${orderData.amount.toFixed(2)} ر.س\nحالة الطلبية: ${orderData.status}\n\nشكراً لاختياركم ${companyData.fullName || 'متجرنا'}.`,
+      text: `تفاصيل الطلبية #${orderData.orderNumber}\n\nالمبلغ الإجمالي: ${formatCurrency(orderData.amount, currency)}\nحالة الطلبية: ${orderData.status}\n\nشكراً لاختياركم ${companyData.fullName || 'متجرنا'}.`,
       html: htmlTemplate,
     };
 

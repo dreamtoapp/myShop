@@ -6,6 +6,7 @@ import { getCart } from "@/app/(e-comm)/(cart-flow)/cart/actions/cartServerActio
 import { z } from "zod";
 import { OrderNumberGenerator } from "@/app/(e-comm)/(cart-flow)/checkout/actions/orderNumberGenerator";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { formatCurrency, CurrencyCode } from "@/lib/formatCurrency";
 
 // Validation schema
 const checkoutSchema = z.object({
@@ -134,6 +135,10 @@ async function createOrderInDatabase(orderData: any) {
 
 // Single Responsibility: Send notifications to admins
 async function notifyAdmins(order: any, customerName: string, total: number) {
+  // Get company currency setting
+  const company = await db.company.findFirst();
+  const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
+
   const adminUsers = await db.user.findMany({
     where: { role: { in: ['ADMIN', 'MARKETER'] } },
     select: { id: true }
@@ -146,7 +151,7 @@ async function notifyAdmins(order: any, customerName: string, total: number) {
     db.userNotification.create({
       data: {
         title: 'طلب جديد',
-        body: `طلب جديد #${order.orderNumber} بقيمة ${total.toFixed(2)} ر.س من ${customerName}`,
+        body: `طلب جديد #${order.orderNumber} بقيمة ${formatCurrency(total, currency)} من ${customerName}`,
         type: 'ORDER',
         read: false,
         userId: admin.id,

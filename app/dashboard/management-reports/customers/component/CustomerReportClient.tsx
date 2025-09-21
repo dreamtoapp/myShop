@@ -210,11 +210,7 @@ export default function CustomerReportClient({
                     <TableCell>{c.email || '-'}</TableCell>
                     <TableCell>{c.orderCount.toLocaleString('ar-EG')}</TableCell>
                     <TableCell>
-                      {Number(c.totalSpend).toLocaleString('ar-EG', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}{' '}
-                      {currency}
+                      {formatCurrency(Number(c.totalSpend), currency)}
                     </TableCell>
                     <TableCell>{new Date(c.createdAt).toLocaleDateString('ar-EG')}</TableCell>
                   </TableRow>

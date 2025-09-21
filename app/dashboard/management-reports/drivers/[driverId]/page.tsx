@@ -11,6 +11,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { PageProps } from '@/types/commonTypes';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
+import db from '@/lib/prisma';
 
 // Define types based on Prisma payloads
 type DriverWithOrders = Prisma.UserGetPayload<{
@@ -34,6 +36,10 @@ export default async function DriverDetailsPage({ params, searchParams }: PagePr
   const currentPage = page ? Number(page) : 1;
   const pageSize = 10;
 
+  // Get company currency setting
+  const company = await db.company.findFirst();
+  const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
+
   // Fetch driver info (name, etc)
   const drivers: DriverWithOrders[] = await getDriversReport(); // Type drivers array
   const driver = drivers.find((d: DriverWithOrders) => d.id === driverId); // Use correct type for d
@@ -56,7 +62,7 @@ export default async function DriverDetailsPage({ params, searchParams }: PagePr
             <span className='px-3 py-1 rounded bg-muted text-xs'>إجمالي الطلبات: <span className='font-bold'>{driver?.driverOrders?.length || 0}</span></span>
             <span className='px-3 py-1 rounded bg-success-foreground/10 text-xs text-success-foreground'>المكتملة: <span className='font-bold'>{driver?.driverOrders?.filter((o: { status: string }) => o.status === 'DELIVERED').length || 0}</span></span>
             <span className='px-3 py-1 rounded bg-destructive-foreground/10 text-xs text-destructive-foreground'>الملغاة: <span className='font-bold'>{driver?.driverOrders?.filter((o: { status: string }) => o.status === 'CANCELED').length || 0}</span></span>
-            <span className='px-3 py-1 rounded bg-primary/10 text-xs text-primary'>الأرباح: <span className='font-bold'>{(driver?.driverOrders?.reduce((sum: number, o: { status: string; amount: number }) => sum + (o.status === 'DELIVERED' ? o.amount : 0), 0) || 0).toLocaleString('ar-EG', { minimumFractionDigits: 2 })} ر.س</span></span>
+            <span className='px-3 py-1 rounded bg-primary/10 text-xs text-primary'>الأرباح: <span className='font-bold'>{formatCurrency((driver?.driverOrders?.reduce((sum: number, o: { status: string; amount: number }) => sum + (o.status === 'DELIVERED' ? o.amount : 0), 0) || 0), currency)}</span></span>
           </div>
         </div>
         <Link
@@ -90,7 +96,7 @@ export default async function DriverDetailsPage({ params, searchParams }: PagePr
                   <TableCell className='text-right'>{order.orderNumber || order.id}</TableCell>
                   <TableCell className={`text-right font-bold ${order.status === 'DELIVERED' ? 'text-success-foreground' : order.status === 'CANCELED' ? 'text-destructive-foreground' : ''}`}>{order.status}</TableCell>
                   <TableCell className='text-right'>
-                    {order.amount?.toLocaleString('ar-EG', { minimumFractionDigits: 2 })} ر.س
+                    {formatCurrency(order.amount || 0, currency)}
                   </TableCell>
                   <TableCell className='text-right'>{order.customer?.name || '-'}</TableCell>
                   <TableCell className='text-right'>

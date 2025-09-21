@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/icons/Icon';
 import { toast } from 'sonner';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface ReturnPolicy {
     id?: string;
@@ -95,9 +97,9 @@ const DEFAULT_RETURN_POLICY_TEMPLATE = `سياسة الإرجاع والاستب
 
 11. رسوم الإرجاع
     • الإرجاع المجاني: للمنتجات المعيبة أو غير المطابقة
-    • رسوم الشحن: 25 ريال للمنتجات المرتجعة بدون سبب وجيه
-    • رسوم الفحص: 15 ريال للمنتجات الإلكترونية
-    • رسوم إعادة التغليف: 10 ريال إذا تلفت العبوة الأصلية
+    • رسوم الشحن: [رسوم الشحن] للمنتجات المرتجعة بدون سبب وجيه
+    • رسوم الفحص: [رسوم الفحص] للمنتجات الإلكترونية
+    • رسوم إعادة التغليف: [رسوم إعادة التغليف] إذا تلفت العبوة الأصلية
 
 12. الاستثناءات
     لا تنطبق هذه السياسة على:
@@ -129,7 +131,16 @@ const DEFAULT_RETURN_POLICY_TEMPLATE = `سياسة الإرجاع والاستب
 
 آخر تحديث: ${new Date().toLocaleDateString('ar-SA')}`;
 
+// Function to generate template with dynamic currency
+const generateReturnPolicyTemplate = (currency: string) => {
+    return DEFAULT_RETURN_POLICY_TEMPLATE
+        .replace('[رسوم الشحن]', formatCurrency(25, currency as any))
+        .replace('[رسوم الفحص]', formatCurrency(15, currency as any))
+        .replace('[رسوم إعادة التغليف]', formatCurrency(10, currency as any));
+};
+
 export default function ReturnPolicyPage() {
+    const { currency } = useCurrency();
     const [policy, setPolicy] = useState<ReturnPolicy>({
         title: 'سياسة الإرجاع',
         content: '',
@@ -225,7 +236,8 @@ export default function ReturnPolicyPage() {
     };
 
     const loadTemplate = () => {
-        setPolicy(prev => ({ ...prev, content: DEFAULT_RETURN_POLICY_TEMPLATE }));
+        const templateWithCurrency = generateReturnPolicyTemplate(currency);
+        setPolicy(prev => ({ ...prev, content: templateWithCurrency }));
         toast.success('تم تحميل القالب الافتراضي');
     };
 

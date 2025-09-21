@@ -130,9 +130,9 @@ export default function DashboardHomePage({ summary: initialSummary, companyData
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs md:text-sm font-medium text-muted-foreground">المبيعات اليوم</p>
-                <p className="text-xl md:text-2xl font-bold">{formatCurrency(summary.sales.today)}</p>
+                <p className="text-xl md:text-2xl font-bold">{formatCurrency(summary.sales.today, currency)}</p>
                 <p className="text-[10px] md:text-xs text-muted-foreground mt-1">
-                  من إجمالي {formatCurrency(summary.sales.total)}
+                  من إجمالي {formatCurrency(summary.sales.total, currency)}
                 </p>
               </div>
               <div className="h-10 w-10 md:h-12 md:w-12 bg-success/10 rounded-lg flex items-center justify-center">
@@ -229,7 +229,7 @@ export default function DashboardHomePage({ summary: initialSummary, companyData
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-sm">{formatCurrency(order.amount)}</p>
+                    <p className="font-medium text-sm">{formatCurrency(order.amount, currency)}</p>
                     <Badge
                       variant="secondary"
                       className={`text-xs ${statusColors[order.status] || 'bg-muted text-muted-foreground'}`}
@@ -272,7 +272,7 @@ export default function DashboardHomePage({ summary: initialSummary, companyData
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-sm">{formatCurrency(product.sales)}</p>
+                    <p className="font-medium text-sm">{formatCurrency(product.sales, currency)}</p>
                     <p className="text-xs text-muted-foreground">المبيعات</p>
                   </div>
                 </div>

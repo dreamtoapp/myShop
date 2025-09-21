@@ -4,6 +4,8 @@ import Link from '@/components/link';
 import { useRouter } from 'next/navigation';
 import { checkIsLogin } from '@/lib/check-is-login';
 import { useState } from 'react';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -33,11 +35,13 @@ interface OrderSummaryProps {
 
 // Free Shipping Banner Component
 function FreeShippingBanner({ subtotal }: { subtotal: number }) {
+  const { currency } = useCurrency();
+
   if (subtotal >= 100) return null;
 
   return (
     <div className="text-xs text-feature-commerce bg-feature-commerce-soft p-3 rounded-lg border border-feature-commerce/20">
-      أضف {(100 - subtotal).toLocaleString()} ر.س للحصول على شحن مجاني
+      أضف {formatCurrency(100 - subtotal, currency)} للحصول على شحن مجاني
     </div>
   );
 }
@@ -56,17 +60,19 @@ function OrderDetails({
   tax: number;
   taxPercentage: number;
 }) {
+  const { currency } = useCurrency();
+
   return (
     <div className="space-y-3 text-sm">
 
       <div className="flex justify-between">
         <span className="text-muted-foreground">المجموع الفرعي ({items.length} منتج)</span>
-        <span className="font-medium text-foreground">{subtotal.toLocaleString()} ر.س</span>
+        <span className="font-medium text-foreground">{formatCurrency(subtotal, currency)}</span>
       </div>
 
       <div className="flex justify-between">
         <span className="text-muted-foreground">ضريبة القيمة المضافة ({taxPercentage}%)</span>
-        <span className="font-medium text-foreground">{tax.toFixed(2)} ر.س</span>
+        <span className="font-medium text-foreground">{formatCurrency(tax, currency)}</span>
       </div>
 
       <div className="flex justify-between">
@@ -75,7 +81,7 @@ function OrderDetails({
           {shipping === 0 && <span className="text-xs bg-feature-commerce-soft text-feature-commerce px-2 py-0.5 rounded-full">مجاني</span>}
         </span>
         <span className="font-medium text-foreground">
-          {shipping === 0 ? 'مجاني' : `${shipping} ر.س`}
+          {shipping === 0 ? 'مجاني' : formatCurrency(shipping, currency)}
         </span>
       </div>
 
@@ -86,11 +92,13 @@ function OrderDetails({
 
 // Total Amount Component
 function TotalAmount({ total }: { total: number }) {
+  const { currency } = useCurrency();
+
   return (
     <div className="border-t border-feature-commerce/20 pt-4">
       <div className="flex justify-between items-center">
         <span className="text-lg font-bold text-foreground">الإجمالي</span>
-        <span className="text-2xl font-bold text-feature-commerce">{total.toLocaleString()} ر.س</span>
+        <span className="text-2xl font-bold text-feature-commerce">{formatCurrency(total, currency)}</span>
       </div>
     </div>
   );

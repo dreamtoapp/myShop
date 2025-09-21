@@ -159,7 +159,7 @@ export default function DeliveredOrdersView({
           variant={i === currentPage ? "default" : "outline"}
           size="sm"
           onClick={() => updateFilters(i)}
-          className="h-8 w-8"
+          className={`h-8 w-8 ${i === currentPage ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-background text-foreground border-border hover:bg-muted'}`}
         >
           {i}
         </Button>
@@ -173,7 +173,7 @@ export default function DeliveredOrdersView({
           size="sm"
           onClick={() => updateFilters(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 bg-background text-foreground border-border hover:bg-muted disabled:opacity-50"
         >
           <Icon name="chevron-right" className="h-4 w-4" />
         </Button>
@@ -185,7 +185,7 @@ export default function DeliveredOrdersView({
           size="sm"
           onClick={() => updateFilters(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 bg-background text-foreground border-border hover:bg-muted disabled:opacity-50"
         >
           <Icon name="chevron-left" className="h-4 w-4" />
         </Button>
@@ -215,7 +215,7 @@ export default function DeliveredOrdersView({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">إجمالي الإيرادات</p>
-                <p className="text-xl font-bold text-feature-commerce">{formatCurrency(statistics.totalRevenue)}</p>
+                <p className="text-xl font-bold text-feature-commerce">{formatCurrency(statistics.totalRevenue, currency)}</p>
               </div>
             </div>
           </CardContent>
@@ -257,7 +257,7 @@ export default function DeliveredOrdersView({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">متوسط الطلب</p>
-                <p className="text-xl font-bold text-feature-analytics">{formatCurrency(statistics.avgOrderValue)}</p>
+                <p className="text-xl font-bold text-feature-analytics">{formatCurrency(statistics.avgOrderValue, currency)}</p>
               </div>
             </div>
           </CardContent>
@@ -389,7 +389,7 @@ export default function DeliveredOrdersView({
                       <div className="flex items-center gap-4">
                         <div className="text-left">
                           <div className="text-2xl font-bold text-feature-commerce">
-                            {formatCurrency(order.amount || 0)}
+                            {formatCurrency(order.amount || 0, currency)}
                           </div>
                           <div className="text-xs text-gray-500">
                             {order.deliveredAt ? formatDate(String(order.deliveredAt)) : '—'}
@@ -429,9 +429,9 @@ export default function DeliveredOrdersView({
         </CardContent>
 
         {orders.length > 0 && (
-          <CardFooter className="border-t bg-gray-50/50">
+          <CardFooter className="border-t bg-muted/30">
             <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-4">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 عرض {((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, deliveredCount)} من {deliveredCount} طلب
               </div>
               {renderPagination()}

@@ -216,8 +216,8 @@ model Order {
   customer      User        @relation("OrderCustomer", fields: [customerId], references: [id]) // Relation to the User model
   driverId      String?     @db.ObjectId // Reference to User (was Driver)
   driver        User?       @relation("OrderDriver", fields: [driverId], references: [id]) // Updated to User, explicit relation name
-  addressId     String      @db.ObjectId
-  address       Address     @relation("AddressOrders", fields: [addressId], references: [id])
+  addressId     String?     @db.ObjectId
+  address       Address?    @relation("AddressOrders", fields: [addressId], references: [id])
   status        OrderStatus @default(PENDING)
   amount        Float       @default(0)
   resonOfcancel String?     @default("")

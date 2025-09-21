@@ -6,8 +6,11 @@ import WishlistRemoveButtonWrapper from './WishlistRemoveButtonWrapper';
 import RatingDisplay from '../../ratings/components/RatingDisplay';
 import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 export default function WishlistProductCard({ product, index, onRemove }: { product: any; index: number; onRemove?: (id: string) => void }) {
+    const { currency } = useCurrency();
     const isOutOfStock = !product.inStock;
     return (
         <Card
@@ -50,9 +53,9 @@ export default function WishlistProductCard({ product, index, onRemove }: { prod
                     )}
                 </div>
                 <div className="flex items-center gap-2 justify-center w-full">
-                    <span className="text-xl font-bold text-feature-products">{product.price.toLocaleString('ar-SA')} ر.س</span>
+                    <span className="text-xl font-bold text-feature-products">{formatCurrency(product.price, currency)}</span>
                     {product.oldPrice && (
-                        <span className="text-xs line-through text-muted-foreground">{product.oldPrice.toLocaleString('ar-SA')} ر.س</span>
+                        <span className="text-xs line-through text-muted-foreground">{formatCurrency(product.oldPrice, currency)}</span>
                     )}
                 </div>
                 {product.rating > 0 && (

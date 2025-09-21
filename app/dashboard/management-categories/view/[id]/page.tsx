@@ -12,6 +12,7 @@ import { Card } from '@/components/ui/card';
 import db from '@/lib/prisma';
 import { PageProps } from '@/types/commonTypes';
 import { categoryIncludeRelation } from '@/types/databaseTypes';
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
 
 const getCategory = async (categoryId: string) => {
   return await db.category.findUnique({
@@ -24,6 +25,10 @@ export default async function CategoryDetails({ params }: PageProps<{ id: string
   const { id } = await params;
   const category = await getCategory(id);
   if (!category) return notFound();
+
+  // Get company currency setting
+  const company = await db.company.findFirst();
+  const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
 
   return (
     <div dir="rtl" className="space-y-6 p-4">
@@ -82,11 +87,11 @@ export default async function CategoryDetails({ params }: PageProps<{ id: string
                 </p>
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-primary">
-                    {product.product.price.toLocaleString()} ر.س
+                    {formatCurrency(product.product.price, currency)}
                   </span>
                   {product.product.compareAtPrice && (
                     <span className="text-sm line-through text-muted-foreground">
-                      {product.product.compareAtPrice.toLocaleString()} ر.س
+                      {formatCurrency(product.product.compareAtPrice, currency)}
                     </span>
                   )}
                 </div>

@@ -16,6 +16,8 @@ import {
     SalesByMonthData,
 } from '@/types/analytics';
 import { Company } from '@/types/databaseTypes';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 import AnalyticsChart from './AnalyticsChart';
 import ChartTypeSwitcher from './ChartTypeSwitcher';
@@ -38,6 +40,7 @@ export default function ClientAnalyticsDashboard({
     initialFrom?: string;
     initialTo?: string;
 }) {
+    const { currency } = useCurrency();
     const router = useRouter();
     const [chartType, setChartType] = useState(initialChartType);
     const [currentFromDate, setCurrentFromDate] = useState(initialFrom || analytics.activityStartDate || '');
@@ -144,21 +147,13 @@ export default function ClientAnalyticsDashboard({
                                 <div className='rounded-md border border-border p-4'>
                                     <div className='mb-1 text-sm font-medium text-muted-foreground'>إجمالي الإيرادات</div>
                                     <div className='text-2xl font-bold text-primary'>
-                                        {Number(analytics.totalRevenue).toLocaleString(undefined, {
-                                            style: 'currency', currency: 'SAR',
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2,
-                                        })}
+                                        {formatCurrency(Number(analytics.totalRevenue), currency)}
                                     </div>
                                 </div>
                                 <div className='rounded-md border border-border p-4'>
                                     <div className='mb-1 text-sm font-medium text-muted-foreground'>إجمالي الربح</div>
                                     <div className='text-2xl font-bold text-emerald-600'>
-                                        {Number(displayTotalProfit).toLocaleString(undefined, {
-                                            style: 'currency', currency: 'SAR',
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2,
-                                        })}
+                                        {formatCurrency(Number(displayTotalProfit), currency)}
                                     </div>
                                 </div>
                                 <div className='rounded-md border border-border p-4'>

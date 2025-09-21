@@ -12,6 +12,8 @@ import { removeProductFromOffer } from '../actions/manage-products';
 import Link from '@/components/link';
 import AddImage from '@/components/AddImage';
 import { toast } from 'sonner';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 // Empty State Component
 function EmptyState() {
@@ -79,6 +81,8 @@ function ProductPrice({
     hasDiscount: boolean;
     discountPercentage?: number | null;
 }) {
+    const { currency } = useCurrency();
+
     const calculateDiscountedPrice = (price: number) => {
         if (!hasDiscount || !discountPercentage) return price;
         return price - (price * discountPercentage / 100);
@@ -90,10 +94,10 @@ function ProductPrice({
         return (
             <div className="flex items-center gap-2">
                 <span className="text-base font-bold text-emerald-600">
-                    {discountedPrice.toLocaleString()} ريال
+                    {formatCurrency(discountedPrice, currency)}
                 </span>
                 <span className="text-sm text-muted-foreground line-through">
-                    {originalPrice.toLocaleString()} ريال
+                    {formatCurrency(originalPrice, currency)}
                 </span>
             </div>
         );
@@ -101,7 +105,7 @@ function ProductPrice({
 
     return (
         <span className="text-base font-bold text-emerald-600">
-            {originalPrice.toLocaleString()} ريال
+            {formatCurrency(originalPrice, currency)}
         </span>
     );
 }

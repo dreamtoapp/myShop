@@ -1,6 +1,8 @@
 'use client';
 
 import Image from 'next/image';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface Product {
     id: string;
@@ -13,6 +15,8 @@ interface Product {
 }
 
 export default function ProductInfo({ product }: { product: Product }) {
+    const { currency } = useCurrency();
+
     if (!product) return null;
 
     return (
@@ -34,7 +38,7 @@ export default function ProductInfo({ product }: { product: Product }) {
                 <h2 className='text-lg font-semibold text-primary'>{product.name}</h2>
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
                     <InfoItem label="ID" value={product.id} />
-                    <InfoItem label="السعر" value={product.price ? `${product.price} ريال` : undefined} />
+                    <InfoItem label="السعر" value={product.price ? formatCurrency(product.price, currency) : undefined} />
                     <InfoItem label="التصنيف" value={product.category} />
                     <InfoItem label="المورد" value={product.supplier} />
                 </dl>

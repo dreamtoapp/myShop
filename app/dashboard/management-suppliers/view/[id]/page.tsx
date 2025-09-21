@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
+import { formatCurrency, CurrencyCode } from '@/lib/formatCurrency';
 
 const getSupplier = async (supplierId: string) => {
   return await db.supplier.findUnique({
@@ -19,6 +20,10 @@ export default async function SupplierDetails({ params }: PageProps<{ id: string
   const { id } = await params;
   const supplier = await getSupplier(id);
   if (!supplier) return notFound();
+
+  // Get company currency setting
+  const company = await db.company.findFirst();
+  const currency = (company?.defaultCurrency || 'SAR') as CurrencyCode;
 
   return (
     <div dir="rtl" className="space-y-6 p-4">
@@ -77,11 +82,11 @@ export default async function SupplierDetails({ params }: PageProps<{ id: string
                 </p>
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-primary">
-                    {product.price.toLocaleString()} ر.س
+                    {formatCurrency(product.price, currency)}
                   </span>
                   {product.compareAtPrice && (
                     <span className="text-sm line-through text-muted-foreground">
-                      {product.compareAtPrice.toLocaleString()} ر.س
+                      {formatCurrency(product.compareAtPrice, currency)}
                     </span>
                   )}
                 </div>

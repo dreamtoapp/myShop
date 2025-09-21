@@ -11,6 +11,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 
 import { addProductsToOffer } from '../actions/manage-products';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface Product {
     id: string;
@@ -38,6 +40,7 @@ export function ProductSelector({
     availableProducts,
     assignedProductIds
 }: ProductSelectorProps) {
+    const { currency } = useCurrency();
     const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -178,7 +181,7 @@ export function ProductSelector({
 
                                     <div className="flex items-center justify-between">
                                         <span className="text-sm font-semibold text-feature-commerce">
-                                            {product.price.toLocaleString()} ريال
+                                            {formatCurrency(product.price, currency)}
                                         </span>
 
                                     </div>

@@ -7,10 +7,12 @@ export default function SalesChart({
   salesData,
   filterSummary,
   barColor, // New prop for bar color
+  currency, // New prop for currency
 }: {
   salesData: SalesData[];
   filterSummary: string;
   barColor?: string; // Optional, with a fallback
+  currency: string; // Required currency prop
 }) {
   // Find the maximum value for scaling
   const maxValue = Math.max(...salesData.map((d) => d.value), 1);
@@ -25,7 +27,7 @@ export default function SalesChart({
             {/* Value label above the bar */}
             <span
               className='mb-1 text-xs font-bold text-primary' // Use text-primary
-              aria-label={`قيمة المبيعات: ${d.value} ر.س`}
+              aria-label={`قيمة المبيعات: ${d.value} ${currency}`}
             >
               {d.value.toLocaleString('ar-EG')}
             </span>
@@ -36,9 +38,9 @@ export default function SalesChart({
                 width: '28px',
                 backgroundColor: barColor || defaultBarColor, // Use prop or fallback
               }}
-              title={`${d.value.toLocaleString('ar-EG')} ر.س`}
+              title={`${d.value.toLocaleString('ar-EG')} ${currency}`}
               tabIndex={0}
-              aria-label={`مبيعات يوم ${d.day}: ${d.value} ر.س`}
+              aria-label={`مبيعات يوم ${d.day}: ${d.value} ${currency}`}
             ></div>
             <span className='mt-1 text-xs font-medium text-muted-foreground'>{d.day}</span> {/* Use text-muted-foreground */}
           </div>

@@ -4,6 +4,8 @@ import { Product } from '@/types/databaseTypes';
 import AddToCart from '@/app/(e-comm)/(cart-flow)/cart/cart-controller/AddToCart';
 import Image from 'next/image';
 import { Icon } from '@/components/icons/Icon';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface AddToCartModalProps {
     open: boolean;
@@ -12,6 +14,8 @@ interface AddToCartModalProps {
 }
 
 const AddToCartModal: React.FC<AddToCartModalProps> = ({ open, onClose, product }) => {
+    const { currency } = useCurrency();
+
     if (!product) return null;
 
     return (
@@ -41,7 +45,7 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({ open, onClose, product 
                         </div>
                     </div>
                     <div className="flex flex-col items-center gap-1 w-full">
-                        <div className="text-2xl font-bold text-primary">{product.price} ر.س</div>
+                        <div className="text-2xl font-bold text-primary">{formatCurrency(product.price, currency)}</div>
                         <div className="flex items-center justify-between w-full gap-1 text-xs text-yellow-500">
                             <div className="flex items-center gap-1 text-xs text-yellow-500">
                                 {[...Array(5)].map((_, i) => (

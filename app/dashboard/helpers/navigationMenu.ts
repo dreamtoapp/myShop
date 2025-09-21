@@ -88,16 +88,16 @@ export const navigationItems = [
       { label: 'دليل الاستخدام', href: '/dashboard/guidelines', icon: 'BookOpen' },
     ]
   },
-  {
-    label: 'المالية',
-    href: '/dashboard/management-expenses',
-    icon: 'DollarSign',
-    children: [
-      { label: 'المصروفات', href: '/dashboard/management-expenses', icon: 'DollarSign' },
-      { label: 'الإيرادات', href: '/dashboard/management-expenses/revenue', icon: 'TrendingUp' },
-      { label: 'التقارير المالية', href: '/dashboard/management-expenses/reports', icon: 'BarChart3' }
-    ]
-  },
+  // {
+  //   label: 'المالية',
+  //   href: '/dashboard/management-expenses',
+  //   icon: 'DollarSign',
+  //   children: [
+  //     { label: 'المصروفات', href: '/dashboard/management-expenses', icon: 'DollarSign' },
+  //     { label: 'الإيرادات', href: '/dashboard/management-expenses/revenue', icon: 'TrendingUp' },
+  //     { label: 'التقارير المالية', href: '/dashboard/management-expenses/reports', icon: 'BarChart3' }
+  //   ]
+  // },
   {
     label: 'التقارير',
     href: '/dashboard/management-reports',

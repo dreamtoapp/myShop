@@ -19,6 +19,8 @@ import {
     Sparkles,
     TrendingUp
 } from 'lucide-react';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface HeroSlide {
     id: string;
@@ -49,6 +51,7 @@ const FALLBACK_SLIDES: HeroSlide[] = [
 ];
 
 export default function HomepageHeroSlider({ slides }: HomepageHeroSliderProps) {
+    const { currency } = useCurrency();
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -199,7 +202,7 @@ export default function HomepageHeroSlider({ slides }: HomepageHeroSliderProps) 
                                 </div>
                                 <div className="flex items-center gap-2 min-h-[32px]">
                                     <Truck className="w-4 h-4" />
-                                    <span>شحن مجاني +200 ريال</span>
+                                    <span>شحن مجاني +{formatCurrency(200, currency)}</span>
                                 </div>
                             </div>
                         </div>

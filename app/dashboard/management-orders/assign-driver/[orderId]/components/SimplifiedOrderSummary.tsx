@@ -5,6 +5,8 @@ import { Icon } from '@/components/icons/Icon';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useCurrency } from '@/store/currencyStore';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 interface SimplifiedOrderSummaryProps {
     order: any;
@@ -41,6 +43,7 @@ const getStatusText = (status: string) => {
 };
 
 export default function SimplifiedOrderSummary({ order }: SimplifiedOrderSummaryProps) {
+    const { currency } = useCurrency();
     const [isExpanded, setIsExpanded] = useState(false);
 
     // Calculate total from items to ensure accuracy
@@ -71,7 +74,7 @@ export default function SimplifiedOrderSummary({ order }: SimplifiedOrderSummary
                         </Badge>
                         <div className="flex items-center gap-2 text-xs">
                             <span className="text-feature-commerce font-bold">
-                                {orderTotal.toFixed(2)} ريال
+                                {formatCurrency(orderTotal, currency)}
                             </span>
                             <span className="text-muted-foreground">•</span>
                             <span className="text-muted-foreground">
@@ -152,11 +155,11 @@ export default function SimplifiedOrderSummary({ order }: SimplifiedOrderSummary
                                             </div>
                                             <div className="text-right">
                                                 <div className="text-muted-foreground text-xs">
-                                                    {itemPrice.toFixed(2)} ريال
+                                                    {formatCurrency(itemPrice, currency)}
                                                 </div>
                                                 {itemQuantity > 1 && (
                                                     <div className="text-feature-commerce font-medium text-xs">
-                                                        {itemTotal.toFixed(2)} ريال
+                                                        {formatCurrency(itemTotal, currency)}
                                                     </div>
                                                 )}
                                             </div>
@@ -167,7 +170,7 @@ export default function SimplifiedOrderSummary({ order }: SimplifiedOrderSummary
                                 <div className="flex items-center justify-between text-xs bg-muted/30 rounded px-2 py-1 mt-2">
                                     <span className="font-medium">المجموع:</span>
                                     <span className="font-bold text-feature-commerce">
-                                        {orderTotal.toFixed(2)} ريال
+                                        {formatCurrency(orderTotal, currency)}
                                     </span>
                                 </div>
                             </div>

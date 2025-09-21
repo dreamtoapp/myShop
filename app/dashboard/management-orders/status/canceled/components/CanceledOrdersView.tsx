@@ -355,7 +355,7 @@ export default function CanceledOrdersView({
                             <div className="flex-1">
                                 <p className="text-sm font-medium text-muted-foreground mb-1">إجمالي الخسائر</p>
                                 <span className="text-2xl font-bold text-destructive font-mono">
-                                    {formatNumber(statistics.totalLoss)}
+                                    {formatCurrency(statistics.totalLoss, currency)}
                                 </span>
                             </div>
                             <div className="p-3 bg-destructive/10 rounded-xl">
@@ -409,7 +409,7 @@ export default function CanceledOrdersView({
                             <div className="flex-1">
                                 <p className="text-sm font-medium text-muted-foreground mb-1">متوسط قيمة الطلب</p>
                                 <span className="text-2xl font-bold text-feature-analytics font-mono">
-                                    {formatNumber(statistics.avgOrderValue)}
+                                    {formatCurrency(statistics.avgOrderValue, currency)}
                                 </span>
                             </div>
                             <div className="p-3 bg-feature-analytics-soft rounded-xl">
@@ -540,7 +540,7 @@ export default function CanceledOrdersView({
                                     <div className="md:col-span-2">
                                         <div className="space-y-1">
                                             <div className="text-lg font-bold text-destructive" style={{ fontFamily: 'monospace' }}>
-                                                {formatCurrency(order.amount || 0)}
+                                                {formatCurrency(order.amount || 0, currency)}
                                             </div>
                                         </div>
                                     </div>

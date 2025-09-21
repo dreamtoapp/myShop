@@ -54,6 +54,7 @@ interface SalesReportClientProps {
   initialFrom: string;
   initialTo: string;
   initialShowAll: boolean;
+  currency: string;
 }
 
 export default function SalesReportClient({
@@ -65,6 +66,7 @@ export default function SalesReportClient({
   initialFrom,
   initialTo,
   initialShowAll,
+  currency,
 }: SalesReportClientProps) {
   const printRef = useRef<HTMLDivElement>(null);
   const [from, setFrom] = useState<string>(initialFrom);
@@ -210,7 +212,7 @@ export default function SalesReportClient({
         {/* Chart */}
         <div className='w-full'>
           {chartType === 'bar' && (
-            <SalesChart salesData={salesData} filterSummary={filterSummary} barColor={barChartColor} />
+            <SalesChart salesData={salesData} filterSummary={filterSummary} barColor={barChartColor} currency={currency} />
           )}
           {chartType === 'line' && (
             <SalesLineChart salesData={salesData} filterSummary={filterSummary} lineColor={lineChartColor} />
