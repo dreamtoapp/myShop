@@ -26,7 +26,6 @@ export interface CompanyData {
   latitude?: string | null;
   longitude?: string | null;
   taxNumber?: string;
-  taxQrImage?: string;
   commercialRegistrationNumber?: string | null;
   saudiBusinessId?: string | null;
   workingHours?: string;
@@ -39,7 +38,6 @@ export interface CompanyData {
   facebook?: string;
   snapchat?: string;
   website?: string;
-  online?: boolean;
   taxPercentage?: number;
   createdAt?: Date;
   updatedAt?: Date;
@@ -98,10 +96,23 @@ const CRITICAL_FIELDS = [
 const IMPORTANT_FIELDS = [
   'taxNumber',
   'commercialRegistrationNumber',
+  'saudiBusinessId',
   'logo',
   'workingHours',
   'minShipping',
-  'shippingFee'
+  'shippingFee',
+  'taxPercentage',
+  'emailUser',
+  'emailPass',
+  'smtpHost',
+  'smtpPort',
+  'smtpUser',
+  'smtpPass',
+  'smtpFrom',
+  'cloudinaryCloudName',
+  'cloudinaryApiKey',
+  'cloudinaryApiSecret',
+  'cloudinaryUploadPreset'
 ] as const;
 
 // Optional fields that enhance the business profile (list kept in labels below)
@@ -122,9 +133,8 @@ const FIELD_LABELS: Record<string, string> = {
   minShipping: 'الحد الأدنى للشحن',
   shippingFee: 'رسوم الشحن',
   bio: 'نبذة عن المتجر',
-  profilePicture: 'صورة الملف الشخصي',
-  taxQrImage: 'صورة QR الضريبي',
-  saudiBusinessId: 'رقم الهوية التجارية السعودية',
+  profilePicture: 'صور الهيرو',
+  saudiBusinessId: 'رقم منصة الاعمال السعودية',
   twitter: 'تويتر',
   linkedin: 'لينكدإن',
   instagram: 'انستغرام',
@@ -132,7 +142,6 @@ const FIELD_LABELS: Record<string, string> = {
   facebook: 'فيسبوك',
   snapchat: 'سناب شات',
   website: 'الموقع الإلكتروني',
-  online: 'حالة المتجر',
   taxPercentage: 'نسبة الضريبة',
   createdAt: 'تاريخ الإنشاء',
   updatedAt: 'تاريخ آخر تحديث',
@@ -179,13 +188,17 @@ const FIELD_LABELS: Record<string, string> = {
 /**
  * Validates if a field value is considered "present" and valid
  */
-function isFieldPresent(value: any): boolean {
+function isFieldPresent(value: any, fieldName?: string): boolean {
   if (value === null || value === undefined) return false;
   if (typeof value === 'string') {
     const trimmed = value.trim();
     return trimmed.length > 0 && trimmed !== '';
   }
   if (typeof value === 'number') {
+    // Special case: taxPercentage can be 0 (meaning no tax calculation)
+    if (fieldName === 'taxPercentage') {
+      return value >= 0; // 0 is valid for tax percentage
+    }
     return value > 0;
   }
   return Boolean(value);
@@ -213,7 +226,7 @@ export function validateCompanyData(company: CompanyData | null | undefined): Co
 
   // Check critical fields
   CRITICAL_FIELDS.forEach(field => {
-    if (!isFieldPresent(company[field as keyof CompanyData])) {
+    if (!isFieldPresent(company[field as keyof CompanyData], field)) {
       missingFields.push(field);
       criticalMissing.push(field);
     }
@@ -221,7 +234,7 @@ export function validateCompanyData(company: CompanyData | null | undefined): Co
 
   // Check important fields
   IMPORTANT_FIELDS.forEach(field => {
-    if (!isFieldPresent(company[field as keyof CompanyData])) {
+    if (!isFieldPresent(company[field as keyof CompanyData], field)) {
       missingFields.push(field);
     }
   });

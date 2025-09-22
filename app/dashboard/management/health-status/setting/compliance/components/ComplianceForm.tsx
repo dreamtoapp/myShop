@@ -58,7 +58,7 @@ export default function ComplianceForm({ initialValues }: ComplianceFormProps) {
               </div>
               <div className="flex items-start gap-2">
                 <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
-                <span><strong>نسبة الضريبة:</strong> ضرورية لحساب الضرائب بشكل صحيح على المبيعات</span>
+                <span><strong>نسبة الضريبة:</strong> ضع 0 إذا كنت لا تحتاج لحساب الضريبة في الطلبات، أو أدخل النسبة المطلوبة (مثال: 15)</span>
               </div>
               <div className="flex items-start gap-2">
                 <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
@@ -93,6 +93,7 @@ export default function ComplianceForm({ initialValues }: ComplianceFormProps) {
                 disabled={isSubmitting}
               />
             </div>
+            <p className="text-xs text-muted-foreground mt-2">مطلوب للامتثال لنظام ضريبة القيمة المضافة (VAT) وتجنب الغرامات</p>
           </div>
 
           {/* Tax Percentage */}
@@ -105,12 +106,13 @@ export default function ComplianceForm({ initialValues }: ComplianceFormProps) {
               <Input
                 value={values.taxPercentage}
                 onChange={(e) => setValues((p) => ({ ...p, taxPercentage: e.target.value }))}
-                placeholder="مثال: 15"
+                placeholder="0 (لا ضريبة) أو 15 (15%)"
                 className="text-right pr-12"
                 dir="rtl"
                 disabled={isSubmitting}
               />
             </div>
+            <p className="text-xs text-muted-foreground mt-2">ضع 0 إذا كنت لا تحتاج لحساب الضريبة في الطلبات، أو أدخل النسبة المطلوبة</p>
           </div>
         </div>
 
@@ -132,6 +134,7 @@ export default function ComplianceForm({ initialValues }: ComplianceFormProps) {
                 disabled={isSubmitting}
               />
             </div>
+            <p className="text-xs text-muted-foreground mt-2">يثبت شرعية النشاط التجاري ويمنح الثقة للعملاء</p>
           </div>
 
           {/* Saudi Business ID */}
@@ -144,12 +147,13 @@ export default function ComplianceForm({ initialValues }: ComplianceFormProps) {
               <Input
                 value={values.saudiBusinessId}
                 onChange={(e) => setValues((p) => ({ ...p, saudiBusinessId: e.target.value }))}
-                placeholder="رقم المنشأة السعودية"
+                placeholder="رقم منصة الاعمال السعودية"
                 className="text-right pr-12"
                 dir="rtl"
                 disabled={isSubmitting}
               />
             </div>
+            <p className="text-xs text-muted-foreground mt-2">تمكن من الاستفادة من الخدمات الحكومية وتحسين الكفاءة التشغيلية</p>
           </div>
         </div>
       </div>

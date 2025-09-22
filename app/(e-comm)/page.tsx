@@ -7,6 +7,7 @@ import { SWRConfig } from 'swr';
 import ProductInfiniteGrid from './homepage/component/ProductInfiniteGrid';
 import { companyInfo } from './actions/companyDetail';
 import HomepageHeroSection from './homepage/component/hero/HomepageHeroSection';
+
 const PAGE_SIZE = 8;
 
 const CriticalCSS = dynamic(() => import('./homepage/component/CriticalCSS'), { ssr: true });

@@ -9,7 +9,6 @@ import EmailSmtpSettingsForm from './forms/EmailSmtpSettingsForm';
 import AnalyticsSettingsForm from './forms/AnalyticsSettingsForm';
 import AuthSettingsForm from './forms/AuthSettingsForm';
 import LocationSettingsForm from './forms/LocationSettingsForm';
-import CompanyInfoSettingsForm from './forms/CompanyInfoSettingsForm';
 
 interface AdvancedSettingsClientProps {
   company: any;
@@ -18,22 +17,6 @@ interface AdvancedSettingsClientProps {
 export default function AdvancedSettingsClient({ company }: AdvancedSettingsClientProps) {
   return (
     <div className="grid gap-6">
-      <Collapsible defaultOpen={true}>
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold">معلومات الشركة</h3>
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" className="group gap-2">
-              <span className="group-data-[state=open]:hidden">عرض</span>
-              <span className="hidden group-data-[state=open]:inline">إخفاء</span>
-              <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />
-            </Button>
-          </CollapsibleTrigger>
-        </div>
-        <CollapsibleContent className="pt-4">
-          <CompanyInfoSettingsForm company={company} />
-        </CollapsibleContent>
-      </Collapsible>
-
       <Collapsible defaultOpen={false}>
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">إعدادات الوسائط</h3>

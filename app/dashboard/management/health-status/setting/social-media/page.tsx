@@ -6,7 +6,7 @@ import { getSocialMedia } from './actions/getSocialMedia';
 export default async function SocialMediaPage() {
     const result = await getSocialMedia();
     const initialValues = result.ok ? (result.data as any) : {};
-    const total = 6;
+    const total = 7;
     const completed = Object.values(initialValues).filter((v: any) => (v?.trim?.() ?? '') !== '').length;
 
     return (

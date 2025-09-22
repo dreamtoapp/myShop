@@ -1,4 +1,6 @@
-import { Building2, MapPin, Phone, Mail, Clock, FileText, Image, CreditCard, Shield, Truck, Globe } from 'lucide-react';
+import { Building2, MapPin, Phone, Mail, Clock, FileText, Image, CreditCard, Shield, Truck, Globe, Twitter, Linkedin, Instagram, Facebook } from 'lucide-react';
+import TikTokIcon from '@/components/icons/TikTokIcon';
+import SnapchatIcon from '@/components/icons/SnapchatIcon';
 
 export const FIELD_BUSINESS_IMPACT = {
   fullName: { category: 'الهوية التجارية', priority: 'critical', businessImpact: 'اسم المتجر مطلوب لجميع المعاملات التجارية والفواتير', userImpact: 'العملاء يحتاجون لمعرفة اسم المتجر للثقة والاعتراف', icon: Building2, color: 'red' },
@@ -10,22 +12,20 @@ export const FIELD_BUSINESS_IMPACT = {
   longitude: { category: 'الموقع والتوصيل', priority: 'critical', businessImpact: 'إحداثيات الموقع ضرورية لحساب المسافات ورسوم التوصيل بدقة', userImpact: 'تحديد موقع دقيق للمتجر على الخرائط', icon: MapPin, color: 'red' },
   taxNumber: { category: 'الامتثال الضريبي', priority: 'critical', businessImpact: 'الرقم الضريبي مطلوب قانونياً لإصدار الفواتير الضريبية', userImpact: 'العملاء يحتاجون فواتير ضريبية صحيحة للمحاسبة', icon: CreditCard, color: 'red' },
   taxPercentage: { category: 'الامتثال الضريبي', priority: 'important', businessImpact: 'النسبة الضريبية مطلوبة لحساب إجمالي الفاتورة بشكل صحيح', userImpact: 'تضمن عرض السعر النهائي بدقة للعميل', icon: CreditCard, color: 'orange' },
-  taxQrImage: { category: 'الامتثال الضريبي', priority: 'important', businessImpact: 'رمز QR متطلب للفوترة الإلكترونية حسب الأنظمة المحلية', userImpact: 'يسهل التحقق من صحة الفاتورة من قِبل العميل', icon: CreditCard, color: 'orange' },
   commercialRegistrationNumber: { category: 'الامتثال القانوني', priority: 'critical', businessImpact: 'رقم السجل التجاري مطلوب قانونياً لممارسة النشاط التجاري', userImpact: 'يثبت شرعية المتجر وموثوقيته للعملاء', icon: Shield, color: 'red' },
-  saudiBusinessId: { category: 'الامتثال القانوني', priority: 'important', businessImpact: 'رقم المنشأة يدعم التكاملات الحكومية ويثبت الهوية المؤسسية', userImpact: 'يرفع الثقة خصوصاً للجهات والمؤسسات', icon: Shield, color: 'orange' },
+  saudiBusinessId: { category: 'الامتثال القانوني', priority: 'important', businessImpact: 'رقم منصة الاعمال السعودية يدعم التكاملات الحكومية ويثبت الهوية المؤسسية', userImpact: 'يرفع الثقة خصوصاً للجهات والمؤسسات', icon: Shield, color: 'orange' },
   logo: { category: 'الهوية البصرية', priority: 'important', businessImpact: 'الشعار ضروري للهوية البصرية والثقة التجارية', userImpact: 'العملاء يتعرفون على المتجر من خلال الشعار', icon: Image, color: 'orange' },
-  profilePicture: { category: 'الهوية البصرية', priority: 'optional', businessImpact: 'صورة الملف تعزز الهوية والموثوقية', userImpact: 'تساعد العملاء على التعرف على المتجر أو المسؤول', icon: Image, color: 'blue' },
+  profilePicture: { category: 'الهوية البصرية', priority: 'optional', businessImpact: 'صور الهيرو تعزز الهوية والموثوقية', userImpact: 'تساعد العملاء على التعرف على المتجر أو المسؤول', icon: Image, color: 'blue' },
   workingHours: { category: 'ساعات العمل', priority: 'important', businessImpact: 'ساعات العمل مهمة لإدارة التوقعات وتنظيم العمليات', userImpact: 'العملاء يحتاجون لمعرفة متى يمكنهم التواصل أو الزيارة', icon: Clock, color: 'orange' },
   minShipping: { category: 'سياسة التوصيل', priority: 'important', businessImpact: 'الحد الأدنى للشحن المجاني يؤثر على قرارات الشراء', userImpact: 'العملاء يريدون معرفة متى يحصلون على شحن مجاني', icon: Truck, color: 'orange' },
   shippingFee: { category: 'سياسة التوصيل', priority: 'important', businessImpact: 'رسوم الشحن تؤثر على تكلفة الطلب وقرارات الشراء', userImpact: 'العملاء يحتاجون معرفة تكلفة التوصيل قبل الشراء', icon: Truck, color: 'orange' },
-  online: { category: 'ساعات العمل', priority: 'important', businessImpact: 'حالة المتجر تؤثر على استقبال الطلبات والظهور', userImpact: 'توضح للعميل إن كان المتجر متاحاً الآن', icon: Clock, color: 'orange' },
   bio: { category: 'التسويق والمحتوى', priority: 'optional', businessImpact: 'نبذة عن المتجر تساعد في التسويق وبناء الثقة', userImpact: 'العملاء يريدون معرفة المزيد عن المتجر', icon: FileText, color: 'blue' },
-  twitter: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'حسابات التواصل الاجتماعي تساعد في التسويق والوصول', userImpact: 'العملاء يريدون متابعة المتجر', icon: Globe, color: 'blue' },
-  linkedin: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'لينكدإن مفيد للتواصل التجاري والعملاء المؤسسيين', userImpact: 'العملاء المؤسسيين يفضلون لينكدإن', icon: Globe, color: 'blue' },
-  instagram: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'انستغرام فعال لعرض المنتجات والوصول للشباب', userImpact: 'العملاء الشباب يفضلون متابعة المنتجات', icon: Globe, color: 'blue' },
-  facebook: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'فيسبوك منصة مهمة للوصول لجمهور أوسع', userImpact: 'العملاء يريدون متابعة المتجر على فيسبوك', icon: Globe, color: 'blue' },
-  tiktok: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'تيك توك قناة نمو قوية للفيديو القصير', userImpact: 'شريحة كبيرة تتابع العلامات على تيك توك', icon: Globe, color: 'blue' },
-  snapchat: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'سناب شات يدعم العروض السريعة والوصول لفئات شابة', userImpact: 'بعض العملاء يفضلون سناب شات', icon: Globe, color: 'blue' },
+  twitter: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'حسابات التواصل الاجتماعي تساعد في التسويق والوصول', userImpact: 'العملاء يريدون متابعة المتجر', icon: Twitter, color: 'blue' },
+  linkedin: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'لينكدإن مفيد للتواصل التجاري والعملاء المؤسسيين', userImpact: 'العملاء المؤسسيين يفضلون لينكدإن', icon: Linkedin, color: 'blue' },
+  instagram: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'انستغرام فعال لعرض المنتجات والوصول للشباب', userImpact: 'العملاء الشباب يفضلون متابعة المنتجات', icon: Instagram, color: 'blue' },
+  facebook: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'فيسبوك منصة مهمة للوصول لجمهور أوسع', userImpact: 'العملاء يريدون متابعة المتجر على فيسبوك', icon: Facebook, color: 'blue' },
+  tiktok: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'تيك توك قناة نمو قوية للفيديو القصير', userImpact: 'شريحة كبيرة تتابع العلامات على تيك توك', icon: TikTokIcon, color: 'blue' },
+  snapchat: { category: 'التسويق الرقمي', priority: 'optional', businessImpact: 'سناب شات يدعم العروض السريعة والوصول لفئات شابة', userImpact: 'بعض العملاء يفضلون سناب شات', icon: SnapchatIcon, color: 'blue' },
   website: { category: 'الحضور الرقمي', priority: 'optional', businessImpact: 'الموقع الإلكتروني يعزز المصداقية والوصول', userImpact: 'العملاء يريدون زيارة موقع المتجر', icon: Globe, color: 'blue' },
   whatsappPermanentToken: { category: 'إعدادات النظام', priority: 'optional', businessImpact: 'مطلوب لتفعيل تكامل واتساب وإرسال الإشعارات', userImpact: 'لا يؤثر مباشرة على تجربة العميل', icon: Globe, color: 'blue' },
   whatsappPhoneNumberId: { category: 'إعدادات النظام', priority: 'optional', businessImpact: 'معرّف رقم واتساب ضروري لواجهة Meta', userImpact: 'لا تأثير مباشر', icon: Globe, color: 'blue' },

@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { savePlatform } from '../actions/savePlatform';
 import { GeneralSettings } from './GeneralSettings';
 import { CurrencySettings } from './CurrencySettings';
-import { TaxSettings } from './TaxSettings';
 import { NotificationSettings } from './NotificationSettings';
 import { SaveButton } from './SaveButton';
 
@@ -16,7 +15,6 @@ interface PlatformData {
     showCustomerCount: boolean;
     showProductCount: boolean;
     showVision2030: boolean;
-    isTaxEnabled: boolean;
     emailNotifications: boolean;
     defaultCurrency: string;
 }
@@ -34,7 +32,6 @@ export default function PlatformSettingsForm({ initialData }: PlatformSettingsFo
         showCustomerCount: initialData?.showCustomerCount,
         showProductCount: initialData?.showProductCount,
         showVision2030: initialData?.showVision2030,
-        isTaxEnabled: initialData?.isTaxEnabled,
         emailNotifications: initialData?.emailNotifications,
         defaultCurrency: initialData?.defaultCurrency,
     });
@@ -46,7 +43,6 @@ export default function PlatformSettingsForm({ initialData }: PlatformSettingsFo
         showCustomerCount: initialData?.showCustomerCount ?? false,
         showProductCount: initialData?.showProductCount ?? false,
         showVision2030: initialData?.showVision2030 ?? false,
-        isTaxEnabled: initialData?.isTaxEnabled ?? false,
         emailNotifications: initialData?.emailNotifications ?? false,
         defaultCurrency: initialData?.defaultCurrency || 'SAR',
     });
@@ -90,11 +86,6 @@ export default function PlatformSettingsForm({ initialData }: PlatformSettingsFo
             <CurrencySettings
                 formData={formData}
                 onChange={handleSelectChange}
-            />
-
-            <TaxSettings
-                formData={formData}
-                onChange={handleCheckboxChange}
             />
 
             <NotificationSettings

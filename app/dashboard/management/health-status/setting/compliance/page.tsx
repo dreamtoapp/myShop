@@ -11,7 +11,13 @@ export default async function CompliancePage() {
     data?.taxPercentage,
     data?.commercialRegistrationNumber,
     data?.saudiBusinessId,
-  ].filter(Boolean).length;
+  ].filter(value => {
+    // Special handling for taxPercentage: 0 is valid
+    if (value === 0) return true;
+    // For other fields, check if they have meaningful values
+    if (typeof value === 'string') return value.trim() !== '';
+    return Boolean(value);
+  }).length;
   const progress = { current, total, isComplete: current === total };
 
   return (

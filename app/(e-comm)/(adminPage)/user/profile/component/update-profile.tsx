@@ -701,7 +701,7 @@ export default function UserProfileForm({
               <ActionAlert
                 variant='destructive'
                 title='حساب غير مفعل'
-                description='تفعيل حسابك مطلوب للوصول الكامل إلى ميزات التطبيق وتقديم الطلبات.'
+                description='تفعيل حسابك مطلوب للوصول الكامل إلى ميزات المتجر وتقديم الطلبات.'
                 buttonText='الانتقال إلى التفعيل'
                 onAction={() => router.push('/auth/verify')}
               />

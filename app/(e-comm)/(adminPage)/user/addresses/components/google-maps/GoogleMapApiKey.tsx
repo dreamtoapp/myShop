@@ -60,13 +60,13 @@ const MapOverlayLoader = ({ progress }: { progress: LocationProgress | null }) =
           <div className="w-full bg-muted rounded-full h-2">
             <div
               className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
-              style={{ width: `${(progress.attempts / 3) * 100}%` }}
+              style={{ width: `${(progress.attempts / 1) * 100}%` }}
             ></div>
           </div>
 
           {/* Accuracy info */}
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>المحاولة {progress.attempts}/3</span>
+            <span>المحاولة {progress.attempts}/1</span>
             <span>•</span>
             <span>الدقة: ±{progress.accuracy.toFixed(1)}م</span>
           </div>
@@ -389,7 +389,7 @@ export default function GoogleMapSimple({
           accuracy,
           attempts,
           isSearching: true,
-          message: `المحاولة ${attempts}/3 - الدقة: ±${accuracy.toFixed(1)}م`
+          message: `المحاولة ${attempts}/1 - الدقة: ±${accuracy.toFixed(1)}م`
         });
       }).then((result) => {
         if (result) {
@@ -438,7 +438,7 @@ export default function GoogleMapSimple({
           accuracy,
           attempts,
           isSearching: true,
-          message: `المحاولة ${attempts}/3 - الدقة: ±${accuracy.toFixed(1)}م`
+          message: `المحاولة ${attempts}/1 - الدقة: ±${accuracy.toFixed(1)}م`
         });
       });
 

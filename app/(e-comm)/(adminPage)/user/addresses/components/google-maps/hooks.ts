@@ -245,8 +245,8 @@ const getHighAccuracyLocation = async (onProgress?: (position: GeolocationPositi
   return new Promise((resolve, reject) => {
     let bestPosition: GeolocationPosition | null = null;
     let attempts = 0;
-    const maxAttempts = 3;
-    const targetAccuracy = 5; // Target 5 meters accuracy
+    const maxAttempts = 1;
+    const targetAccuracy = 10; // Target 10 meters accuracy
     let watchId = 0;
 
     // Timeout for the entire process
@@ -263,7 +263,7 @@ const getHighAccuracyLocation = async (onProgress?: (position: GeolocationPositi
 
     const options: PositionOptions = {
       enableHighAccuracy: true,
-      timeout: 8000,        // 8 seconds per attempt
+      timeout: 7000,        // 7 seconds single attempt
       maximumAge: 0         // Always get fresh location
     };
 

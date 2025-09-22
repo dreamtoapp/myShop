@@ -43,7 +43,7 @@ export default function CompanyInfoSettingsForm({ company }: CompanyInfoSettings
       <CardHeader>
         <CardTitle>معلومات الشركة</CardTitle>
         <CardDescription>
-          اسم الشركة سيتم استخدامه كاسم التطبيق في الرسائل الإلكترونية والعلامة التجارية
+          اسم الشركة سيتم استخدامه كاسم المتجر في الرسائل الإلكترونية والعلامة التجارية
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -58,7 +58,7 @@ export default function CompanyInfoSettingsForm({ company }: CompanyInfoSettings
               required
             />
             <p className="text-sm text-muted-foreground mt-1">
-              سيتم استخدام هذا الاسم كاسم التطبيق في الرسائل الإلكترونية والعلامة التجارية
+              سيتم استخدام هذا الاسم كاسم المتجر في الرسائل الإلكترونية والعلامة التجارية
             </p>
           </div>
 

@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { saveSocialMedia } from '../actions/saveSocialMedia';
-import { Facebook, Instagram, Twitter, Linkedin, Loader2 } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, Loader2, Globe } from 'lucide-react';
 import TikTokIcon from '@/components/icons/TikTokIcon';
 import SnapchatIcon from '@/components/icons/SnapchatIcon';
 
-type SocialKey = 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'tiktok' | 'snapchat';
+type SocialKey = 'website' | 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'tiktok' | 'snapchat';
 type SocialMediaLinks = Partial<Record<SocialKey, string>>;
 
 interface SocialMediaFormProps {
@@ -27,6 +27,12 @@ export default function SocialMediaForm({ initialValues }: SocialMediaFormProps)
     icon: React.ComponentType<{ className?: string }>;
   }> = useMemo(
     () => [
+      {
+        key: 'website',
+        label: 'الموقع الإلكتروني',
+        placeholder: 'https://your-website.com',
+        icon: Globe,
+      },
       {
         key: 'facebook',
         label: 'فيسبوك',
@@ -91,10 +97,11 @@ export default function SocialMediaForm({ initialValues }: SocialMediaFormProps)
     <div className="space-y-6">
       {/* Social Media Platforms */}
       <div className="grid gap-4">
-        {platforms.map(({ key, placeholder, icon: Icon }) => {
+        {platforms.map(({ key, label, placeholder, icon: Icon }) => {
           const hasValue = values[key]?.trim();
           return (
             <div key={key} className={`rounded-lg border p-4 transition-colors ${hasValue ? 'bg-primary/5 border-primary' : 'bg-muted/20 border-destructive'}`}>
+              <label className="block text-sm font-medium text-foreground mb-2">{label}</label>
               <div className="relative">
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
                   <Icon className="w-5 h-5 text-foreground" />

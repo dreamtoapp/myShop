@@ -14,7 +14,6 @@ export async function fetchPlatform() {
     showCustomerCount: data?.showCustomerCount,
     showProductCount: data?.showProductCount,
     showVision2030: data?.showVision2030,
-    isTaxEnabled: data?.isTaxEnabled,
     emailNotifications: data?.emailNotifications,
     defaultCurrency: data?.defaultCurrency,
   });

@@ -52,9 +52,6 @@ export const CompanySchema = z.object({
   showProductCount: z.boolean().optional(),
   showVision2030: z.boolean().optional(),
 
-  // Tax Settings
-  isTaxEnabled: z.boolean().optional(),
-
   // Notification Settings
   emailNotifications: z.boolean().optional(),
 

@@ -392,26 +392,25 @@ const StatusActions = ({ order }: { order: Order }) => {
         case ORDER_STATUS.PENDING:
             return (
                 <>
-                    <div className="flex gap-2 w-full" data-testid="order-status-pending">
+                    <div className="flex flex-col sm:flex-row gap-2 w-full" data-testid="order-status-pending">
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={handleAssignDriver}
-                            className="h-8 px-2 text-xs flex-1"
-                            style={{ width: '70%' }}
+                            className="h-10 px-3 text-sm flex-1 min-h-[44px]"
                             data-testid="assign-driver-btn"
                         >
-                            <Icon name="UserPlus" className="h-3 w-3 ml-1" />
+                            <Icon name="UserPlus" className="h-4 w-4 ml-2" />
                             تعيين سائق
                         </Button>
                         <Button
                             variant="destructive"
                             size="sm"
                             onClick={() => setShowCancelDialog(true)}
-                            className="h-8 px-2 text-xs"
+                            className="h-10 px-3 text-sm min-h-[44px]"
                             data-testid="cancel-order-btn"
                         >
-                            <Icon name="X" className="h-3 w-3 ml-1" />
+                            <Icon name="X" className="h-4 w-4 ml-2" />
                             إلغاء الطلبية
                         </Button>
                     </div>
@@ -462,7 +461,7 @@ const StatusActions = ({ order }: { order: Order }) => {
 
         case ORDER_STATUS.ASSIGNED:
             return (
-                <div className="flex items-center justify-between gap-2 p-2 bg-feature-suppliers/5 border border-feature-suppliers/20 rounded-md w-full" data-testid="order-status-assigned">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 bg-feature-suppliers/5 border border-feature-suppliers/20 rounded-md w-full" data-testid="order-status-assigned">
                     <div className="flex items-center gap-2">
                         <Icon name="Truck" className="h-4 w-4 text-feature-suppliers" />
                         <span className="text-sm font-medium text-feature-suppliers" data-testid="driver-name">
@@ -473,10 +472,10 @@ const StatusActions = ({ order }: { order: Order }) => {
                         variant="outline"
                         size="sm"
                         onClick={() => router.push(`/dashboard/management-orders/assign-driver/${order.id}`)}
-                        className="h-6 px-2 text-xs"
+                        className="h-10 px-3 text-sm min-h-[44px] w-full sm:w-auto"
                         data-testid="reassign-driver-btn"
                     >
-                        <Icon name="UserPlus" className="h-3 w-3 ml-1" />
+                        <Icon name="UserPlus" className="h-4 w-4 ml-2" />
                         إعادة تعيين
                     </Button>
                 </div>
@@ -484,7 +483,7 @@ const StatusActions = ({ order }: { order: Order }) => {
 
         case ORDER_STATUS.IN_TRANSIT:
             return (
-                <div className="flex items-center justify-between gap-2 p-2 bg-feature-commerce-soft border border-feature-commerce/20 rounded-md w-full" data-testid="order-status-in-transit">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 bg-feature-commerce-soft border border-feature-commerce/20 rounded-md w-full" data-testid="order-status-in-transit">
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-feature-commerce" data-testid="driver-tracking-info">
                             {order.driver?.name || 'غير معروف'} - في الطريق
@@ -492,11 +491,12 @@ const StatusActions = ({ order }: { order: Order }) => {
                     </div>
                     <Link
                         href={`/dashboard/management-tracking/${order.id}`}
-                        className="inline-flex h-6 w-6 items-center justify-center rounded-md p-0 text-feature-commerce hover:bg-feature-commerce/10 hover:text-feature-commerce transition-colors duration-150 border border-feature-commerce/30"
+                        className="inline-flex h-10 w-full sm:w-10 items-center justify-center rounded-md text-feature-commerce hover:bg-feature-commerce/10 hover:text-feature-commerce transition-colors duration-150 border border-feature-commerce/30 min-h-[44px]"
                         title="تتبع موقع السائق"
                         data-testid="track-driver-btn"
                     >
-                        <Icon name="Navigation" className="h-3 w-3" />
+                        <Icon name="Navigation" className="h-4 w-4" />
+                        <span className="sm:hidden ml-2">تتبع السائق</span>
                     </Link>
                 </div>
             );

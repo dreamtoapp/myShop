@@ -8,7 +8,6 @@ type ShippingRulesInput = {
   workingHours?: string;
   shippingFee?: number;
   minShipping?: number;
-  deliveryRadius?: number;
 };
 
 export async function saveShippingRules(input: ShippingRulesInput) {

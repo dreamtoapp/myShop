@@ -6,12 +6,11 @@ import ShippingRulesForm from './components/ShippingRulesForm';
 export default async function ShippingRulesPage() {
   const data = await fetchShippingRules();
 
-  const total = 4;
+  const total = 3;
   const current = [
     data?.workingHours,
     data?.shippingFee,
     data?.minShipping,
-    data?.deliveryRadius,
   ].filter(Boolean).length;
 
   const progress = { current, total, isComplete: current === total };

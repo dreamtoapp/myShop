@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2, Clock, Truck, MapPin, DollarSign } from 'lucide-react';
+import { Loader2, Clock, Truck, DollarSign } from 'lucide-react';
 import { saveShippingRules } from '../actions/saveShippingRules';
 import { toast } from 'sonner';
 import { useCurrency } from '@/store/currencyStore';
@@ -15,7 +15,6 @@ interface ShippingRulesFormProps {
     workingHours?: string;
     shippingFee?: number;
     minShipping?: number;
-    deliveryRadius?: number;
   };
 }
 
@@ -27,7 +26,6 @@ export default function ShippingRulesForm({ initialValues }: ShippingRulesFormPr
     workingHours: initialValues.workingHours ?? '',
     shippingFee: String(initialValues.shippingFee ?? ''),
     minShipping: String(initialValues.minShipping ?? ''),
-    deliveryRadius: String(initialValues.deliveryRadius ?? ''),
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -39,7 +37,6 @@ export default function ShippingRulesForm({ initialValues }: ShippingRulesFormPr
         ...values,
         shippingFee: Number(values.shippingFee) || 0,
         minShipping: Number(values.minShipping) || 0,
-        deliveryRadius: Number(values.deliveryRadius) || 0,
       });
       toast.success('تم حفظ قواعد الشحن والتوصيل بنجاح');
     } catch (_e) {
@@ -74,10 +71,6 @@ export default function ShippingRulesForm({ initialValues }: ShippingRulesFormPr
               <div className="flex items-start gap-2">
                 <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
                 <span><strong>حد التوصيل المجاني:</strong> الحد الأدنى للطلب للحصول على توصيل مجاني</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5"></div>
-                <span><strong>نطاق التوصيل:</strong> المسافة القصوى للتوصيل بالكيلومتر</span>
               </div>
             </div>
           </div>
@@ -142,25 +135,6 @@ export default function ShippingRulesForm({ initialValues }: ShippingRulesFormPr
                 type="number"
               />
             </div>
-          </div>
-        </div>
-
-        {/* Delivery Radius */}
-        <div className={`rounded-lg border p-4 transition-colors ${values.deliveryRadius?.trim() ? 'bg-primary/5 border-primary' : 'bg-muted/20 border-destructive'}`}>
-          <label className="block text-sm font-medium text-foreground mb-2">نطاق التوصيل (كيلومتر)</label>
-          <div className="relative">
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <MapPin className="w-5 h-5 text-foreground" />
-            </div>
-            <Input
-              value={values.deliveryRadius}
-              onChange={(e) => setValues((p) => ({ ...p, deliveryRadius: e.target.value }))}
-              placeholder="مثال: 50"
-              className="text-right pr-12"
-              dir="rtl"
-              disabled={isSubmitting}
-              type="number"
-            />
           </div>
         </div>
       </div>

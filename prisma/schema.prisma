@@ -310,7 +310,6 @@ model Company {
   address    String @default("") // Address of the company
   taxPercentage     Int    @default(15) // Tax fee
   taxNumber  String @default("") // Tax number
-  taxQrImage String @default("") // URL of the tax QR image
 
   // --- Compliance IDs ---
   commercialRegistrationNumber String? // CR number (optional)
@@ -320,7 +319,6 @@ model Company {
   minShipping  Int    @default(0)
   shippingFee  Int    @default(0)
 
-  online Boolean @default(false)
 
   latitude  String? // Latitude of the company location
   longitude String? // Longitude of the company location
@@ -377,9 +375,6 @@ model Company {
   showCustomerCount    Boolean @default(false)
   showProductCount     Boolean @default(false)
   showVision2030       Boolean @default(false)
-  
-  // Tax Settings
-  isTaxEnabled         Boolean @default(false)
   
   // Notification Settings
   emailNotifications   Boolean @default(false)

@@ -280,7 +280,7 @@ function AppRatingCard({ rating, index }: { rating: any; index: number }) {
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <div className="flex-1">
                                 <h3 className="font-semibold text-lg text-foreground">
-                                    تقييم التطبيق
+                                    تقييم المتجر
                                 </h3>
                                 <div className="text-sm text-muted-foreground">
                                     رقم الطلب: {rating.orderId} • {rating.feature}

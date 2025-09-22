@@ -105,7 +105,7 @@ export default function SimpleStatusFilter({
     ];
 
     return (
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
             {statusFilters.map((filter) => {
                 const isActive = currentStatus === filter.key || (!currentStatus && filter.key === 'all');
 
@@ -116,23 +116,25 @@ export default function SimpleStatusFilter({
                         size="sm"
                         onClick={() => handleStatusChange(filter.key)}
                         className={`
-                            gap-2 transition-all duration-200
+                            gap-2 transition-all duration-200 h-auto py-3 px-3
                             ${isActive
                                 ? `${filter.bgColor} ${filter.color} border-${filter.borderColor.split('-')[1]}-500`
                                 : 'hover:bg-muted'
                             }
                         `}
                     >
-                        <Icon name={filter.icon} className="h-4 w-4" />
-                        <span>{filter.label}</span>
-                        <Badge
-                            variant="secondary"
-                            className={`
-                                text-xs ${isActive ? 'bg-white/20' : 'bg-muted'}
-                            `}
-                        >
-                            {filter.count}
-                        </Badge>
+                        <div className="flex items-center gap-2 w-full">
+                            <Icon name={filter.icon} className="h-4 w-4 flex-shrink-0" />
+                            <span className="text-xs sm:text-sm font-medium truncate">{filter.label}</span>
+                            <Badge
+                                variant="secondary"
+                                className={`
+                                    text-xs flex-shrink-0 ${isActive ? 'bg-white/20' : 'bg-muted'}
+                                `}
+                            >
+                                {filter.count}
+                            </Badge>
+                        </div>
                     </Button>
                 );
             })}

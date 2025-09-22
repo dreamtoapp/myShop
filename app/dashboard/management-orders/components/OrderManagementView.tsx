@@ -28,17 +28,20 @@ function OrderManagementContent({ initialOrders, statusFilter, orderCounts }: Or
 
     return (
         <div className="container mx-auto py-4 space-y-4">
-            {/* Enhanced Header Section with Search and Refresh */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="h-8 w-1 bg-feature-commerce rounded-full"></div>
-                    <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-                        <Icon name="Package" className="h-6 w-6 text-feature-commerce" />
-                        إدارة الطلبات
-                    </h1>
-                    <span className="text-sm text-muted-foreground">
-                        ({total} طلب)
-                    </span>
+            {/* Enhanced Header Section with Search and Refresh - Mobile First */}
+            <div className="space-y-4">
+                {/* Main Header Row */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="h-8 w-1 bg-feature-commerce rounded-full"></div>
+                        <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2">
+                            <Icon name="Package" className="h-5 w-5 sm:h-6 sm:w-6 text-feature-commerce" />
+                            إدارة الطلبات
+                        </h1>
+                        <span className="text-sm text-muted-foreground">
+                            ({total} طلب)
+                        </span>
+                    </div>
 
                     {/* Refresh Button */}
                     <Tooltip>
@@ -60,8 +63,8 @@ function OrderManagementContent({ initialOrders, statusFilter, orderCounts }: Or
                     </Tooltip>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex items-center gap-2">
+                {/* Action Buttons Row - Mobile Optimized */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     {/* Search Dialog Button */}
                     <SearchDialog
                         totalOrders={total}
@@ -69,10 +72,11 @@ function OrderManagementContent({ initialOrders, statusFilter, orderCounts }: Or
                     />
 
                     {/* Analytics Link Button */}
-                    <Link href="/dashboard/management-orders/analytics">
-                        <Button variant="outline" className="gap-2">
+                    <Link href="/dashboard/management-orders/analytics" className="flex-1 sm:flex-none">
+                        <Button variant="outline" className="gap-2 w-full sm:w-auto">
                             <Icon name="BarChart3" className="h-4 w-4" />
-                            التحليلات التفصيلية
+                            <span className="hidden sm:inline">التحليلات التفصيلية</span>
+                            <span className="sm:hidden">التحليلات</span>
                         </Button>
                     </Link>
                 </div>

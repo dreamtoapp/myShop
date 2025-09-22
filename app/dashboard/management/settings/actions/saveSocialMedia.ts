@@ -5,6 +5,7 @@ import { auth } from '@/auth';
 import { revalidateTag } from 'next/cache';
 
 interface SocialMediaData {
+  website?: string;
   facebook?: string;
   instagram?: string;
   twitter?: string;

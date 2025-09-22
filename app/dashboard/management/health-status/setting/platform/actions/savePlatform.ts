@@ -12,9 +12,6 @@ type PlatformInput = {
   showProductCount?: boolean;
   showVision2030?: boolean;
 
-  // Tax Settings
-  isTaxEnabled?: boolean;
-
   // Notification Settings
   emailNotifications?: boolean;
 

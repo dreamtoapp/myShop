@@ -68,9 +68,10 @@ export default function SearchDialog({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 w-full sm:w-auto">
                     <Search className="h-4 w-4" />
-                    البحث في الطلبات
+                    <span className="hidden sm:inline">البحث في الطلبات</span>
+                    <span className="sm:hidden">البحث</span>
                     {searchTerm && (
                         <Badge variant="secondary" className="ml-1">
                             {filteredOrdersCount}
@@ -142,10 +143,10 @@ export default function SearchDialog({
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex flex-col sm:flex-row gap-2 pt-2">
                         <Button
                             onClick={handleSearch}
-                            className="flex-1"
+                            className="flex-1 h-12 sm:h-auto"
                             disabled={!localSearchTerm.trim()}
                         >
                             <Search className="h-4 w-4 mr-2" />
@@ -154,6 +155,7 @@ export default function SearchDialog({
                         <Button
                             variant="outline"
                             onClick={() => setIsOpen(false)}
+                            className="h-12 sm:h-auto"
                         >
                             إلغاء
                         </Button>

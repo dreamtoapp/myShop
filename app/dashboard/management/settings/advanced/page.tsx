@@ -7,7 +7,6 @@ export default async function AdvancedSettingsPage() {
   const company = await fetchCompany();
   // Compute progress: count how many advanced fields are filled
   const fields: (keyof NonNullable<typeof company>)[] = [
-    'fullName', 'website', 'email', 'phoneNumber', // Company Information
     'cloudinaryCloudName', 'cloudinaryApiKey', 'cloudinaryApiSecret', 'cloudinaryUploadPreset', 'cloudinaryClientFolder',
     'whatsappPermanentToken', 'whatsappPhoneNumberId', 'whatsappApiVersion', 'whatsappBusinessAccountId', 'whatsappWebhookVerifyToken', 'whatsappAppSecret', 'whatsappNumber',
     'emailUser', 'emailPass', 'smtpHost', 'smtpPort', 'smtpUser', 'smtpPass', 'smtpFrom',

@@ -2,7 +2,6 @@ import HeaderLink from './components/HeaderLink';
 import SidebarNav from './components/SidebarNav';
 import { getCompanyDataStatus } from './actions/getCompanyDataStatus';
 import { getProgress as getCompanyProgress } from './setting/company-profile/actions/getProgress';
-import { getProgress as getPlatformProgress } from './setting/platform/actions/getProgress';
 import { getProgress as getLocationProgress } from './setting/location/actions/getProgress';
 import { getProgress as getSocialProgress } from './setting/social-media/actions/getProgress';
 import { getProgress as getComplianceProgress } from './setting/compliance/actions/getProgress';
@@ -12,9 +11,8 @@ import { fetchCompany } from '@/app/dashboard/management/settings/actions/fetchC
 export default async function HealthStatusLayout({ children }: { children: React.ReactNode }) {
   const companyDataStatus = await getCompanyDataStatus();
   const company = await fetchCompany();
-  const [companyProgress, platform, location, social, compliance, shipping] = await Promise.all([
+  const [companyProgress, location, social, compliance, shipping] = await Promise.all([
     getCompanyProgress(),
-    getPlatformProgress(),
     getLocationProgress(),
     getSocialProgress(),
     getComplianceProgress(),
@@ -24,7 +22,7 @@ export default async function HealthStatusLayout({ children }: { children: React
     company: companyProgress.percent,
     branding: company?.logo ? 100 : 0,
     hero: company?.profilePicture ? 100 : 0,
-    platform: platform.percent,
+    platform: 100, // Platform settings are boolean toggles, always consider complete
     location: location.percent,
     social: social.percent,
     compliance: compliance.percent,

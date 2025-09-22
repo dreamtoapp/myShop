@@ -34,7 +34,7 @@ export default function AppHealthIconServer({ status }: AppHealthIconServerProps
         return {
           name: 'CheckCircle' as const,
           className: 'h-5 w-5 text-green-500',
-          title: 'التطبيق بحالة جيدة'
+          title: 'المتجر بحالة جيدة'
         };
     }
   };

@@ -14,6 +14,7 @@ export async function getSocialMedia() {
   try {
     const company = await db.company.findFirst({
       select: {
+        website: true,
         facebook: true,
         instagram: true,
         twitter: true,
@@ -30,6 +31,7 @@ export async function getSocialMedia() {
     return {
       ok: true as const,
       data: {
+        website: company.website || '',
         facebook: company.facebook || '',
         instagram: company.instagram || '',
         twitter: company.twitter || '',

@@ -10,7 +10,6 @@ interface PlatformData {
   showCustomerCount: boolean;
   showProductCount: boolean;
   showVision2030: boolean;
-  isTaxEnabled: boolean;
   emailNotifications: boolean;
   defaultCurrency: string;
 }
