@@ -275,7 +275,7 @@ const OrderContent = ({ order }: { order: Order }) => (
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Link
-                        href={`/dashboard/show-invoice/${order.id}`}
+                        href={`/dashboard/management/show-invoice/${order.id}`}
                         className={buttonVariants({
                             variant: 'outline',
                             size: 'icon',

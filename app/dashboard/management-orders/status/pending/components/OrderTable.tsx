@@ -155,7 +155,7 @@ export default function OrderTable({
             <div className="flex flex-col items-start w-full">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                <Link href={`/dashboard/show-invoice/${order.id}`} className="text-primary font-semibold">
+                <Link href={`/dashboard/management/show-invoice/${order.id}`} className="text-primary font-semibold">
                   طلب #{order.orderNumber}
                 </Link>
               </CardTitle>

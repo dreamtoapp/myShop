@@ -1,7 +1,7 @@
 // app/dashboard/shifts/actions/actions.ts
 'use server';
 
-import db from '../../../../lib/prisma';
+import db from '../../../../../lib/prisma';
 
 // Delete a shift
 export async function deleteShift(id: string): Promise<void> {

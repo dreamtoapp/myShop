@@ -114,7 +114,7 @@ export default function OrderTable({
             {orders.map((order) => (
               <TableRow key={order.id} className="hover:bg-amber-50">
                 <TableCell className="font-medium">
-                  <Link href={`/dashboard/show-invoice/${order.id}`} className="text-primary hover:underline">
+                  <Link href={`/dashboard/management/show-invoice/${order.id}`} className="text-primary hover:underline">
                     #{order.id.substring(0, 8)}
                   </Link>
                 </TableCell>
@@ -143,7 +143,7 @@ export default function OrderTable({
                       Restore
                     </Button>
                     <Link
-                      href={`/dashboard/show-invoice/${order.id}`}
+                      href={`/dashboard/management/show-invoice/${order.id}`}
                       className={cn(
                         "inline-flex h-8 w-8 items-center justify-center rounded-md p-0 text-sm font-medium transition-colors",
                         "text-gray-600 hover:bg-gray-100 hover:text-gray-900"

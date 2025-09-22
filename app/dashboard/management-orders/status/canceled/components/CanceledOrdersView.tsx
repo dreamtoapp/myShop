@@ -566,7 +566,7 @@ export default function CanceledOrdersView({
                                                 <Icon name="RefreshCw" className={cn("h-4 w-4", loading && "animate-spin")} />
                                                 استعادة
                                             </Button>
-                                            <Link href={`/dashboard/show-invoice/${order.id}`}>
+                                            <Link href={`/dashboard/management/show-invoice/${order.id}`}>
                                                 <Button variant="outline" size="sm" className="gap-2">
                                                     <Icon name="Eye" className="h-4 w-4" />
                                                     تفاصيل

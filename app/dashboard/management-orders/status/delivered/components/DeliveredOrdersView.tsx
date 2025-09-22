@@ -398,7 +398,7 @@ export default function DeliveredOrdersView({
 
                         <div className="flex gap-2">
                           <Link
-                            href={`/dashboard/show-invoice/${order.id}`}
+                            href={`/dashboard/management/show-invoice/${order.id}`}
                             className="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium text-white bg-feature-commerce rounded-md hover:bg-feature-commerce/90 transition-colors"
                           >
                             <Icon name="eye" className="h-3 w-3" />

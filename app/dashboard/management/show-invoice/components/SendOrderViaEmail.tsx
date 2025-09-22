@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { sendInvoiceEmail } from '@/app/dashboard/show-invoice/actions/sendInvoiceEmail';
+import { sendInvoiceEmail } from '@/app/dashboard/management/show-invoice/actions/sendInvoiceEmail';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

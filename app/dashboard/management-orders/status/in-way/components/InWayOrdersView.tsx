@@ -113,7 +113,7 @@ function OrderCard({ order, currency }: OrderCardProps & { currency: CurrencyCod
           <CardTitle className="flex items-center gap-2 text-base">
             <Icon name="FileText" className="h-4 w-4 text-muted-foreground icon-enhanced" />
             <Link
-              href={`/dashboard/show-invoice/${order.id}`}
+              href={`/dashboard/management/show-invoice/${order.id}`}
               className="text-primary hover:text-primary/90 font-semibold hover:underline transition-colors duration-150"
             >
               طلب #{order.orderNumber}
@@ -225,7 +225,7 @@ function OrderCard({ order, currency }: OrderCardProps & { currency: CurrencyCod
 
       <CardFooter className="flex items-center justify-between gap-3 pt-3 border-t bg-muted/30 p-4">
         <Link
-          href={`/dashboard/show-invoice/${order.id}`}
+          href={`/dashboard/management/show-invoice/${order.id}`}
           className="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md gap-2 flex-1"
         >
           <Icon name="Search" className="h-4 w-4" />

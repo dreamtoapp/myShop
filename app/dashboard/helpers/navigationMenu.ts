@@ -111,7 +111,7 @@ export const navigationItems = [
     icon: 'Building2',
     children: [
       { label: 'من نحن', href: '/dashboard/management/about', icon: 'Info' },
-      { label: 'المناوبات', href: '/dashboard/shifts', icon: 'Clock' },
+      { label: 'المناوبات', href: '/dashboard/management/shifts', icon: 'Clock' },
       { label: 'سياسة الموقع', href: '/dashboard/management/policies/website', icon: 'Globe' },
       { label: 'سياسة الإرجاع', href: '/dashboard/management/policies/return', icon: 'Undo' },
       { label: 'سياسة الخصوصية', href: '/dashboard/management/policies/privacy', icon: 'Shield' },

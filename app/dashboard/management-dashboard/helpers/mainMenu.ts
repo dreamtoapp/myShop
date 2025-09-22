@@ -53,7 +53,7 @@ export const menuGroups = [
       { title: 'المشرفون', url: '/dashboard/management-users/admin', icon: 'ShieldCheck' },
       { title: 'التسويق', url: '/dashboard/management-users/marketer', icon: 'Megaphone' },
       { title: 'السائقون', url: '/dashboard/management-users/drivers', icon: 'Truck' },
-      { title: 'المناوبات', url: '/dashboard/shifts', icon: 'CalendarClock' },
+      { title: 'المناوبات', url: '/dashboard/management/shifts', icon: 'CalendarClock' },
     ],
   },
   {
