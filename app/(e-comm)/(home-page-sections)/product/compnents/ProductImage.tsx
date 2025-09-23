@@ -18,6 +18,8 @@ export default function ProductImage({ src, alt, className = '' }: ProductImageP
         src={imgSrc}
         alt={alt}
         fill
+        priority
+        fetchPriority="high"
         className='object-cover'
         onError={() => {
           setImgSrc('/fallback/dreamToApp2-dark.png');

@@ -9,6 +9,10 @@ import ProductCardAdapter from '@/app/(e-comm)/(home-page-sections)/product/card
 import { getOfferWithProducts } from '../actions/getOfferWithProducts';
 import { PageProps } from '@/types/commonTypes';
 
+// SEO helpers
+import { buildCanonical } from '@/helpers/seo/canonical';
+import { buildItemListJsonLd } from '@/helpers/seo/jsonld/itemList';
+
 export async function generateMetadata({ params }: PageProps<{ slug: string }>): Promise<Metadata> {
     const resolvedParams = await params;
     const { slug } = resolvedParams;
@@ -16,13 +20,16 @@ export async function generateMetadata({ params }: PageProps<{ slug: string }>):
     if (!offer || !offer.offer) {
         return { title: 'العرض غير موجود' };
     }
+    const canonical = await buildCanonical(`/offers/${slug}`);
     return {
         title: offer.offer.name,
         description: offer.offer.description || `تصفح المنتجات ضمن عرض ${offer.offer.name}`,
+        alternates: { canonical },
         openGraph: {
             title: offer.offer.name,
             description: offer.offer.description || `تصفح المنتجات ضمن عرض ${offer.offer.name}`,
             images: offer.offer.bannerImage ? [{ url: offer.offer.bannerImage, alt: offer.offer.name }] : [],
+            url: canonical,
         },
     };
 }
@@ -34,8 +41,20 @@ export default async function OfferPage({ params }: PageProps<{ slug: string }>)
     if (!data || !data.offer) notFound();
     const { offer, products } = data;
 
+    // JSON-LD ItemList for offer products
+    const base = (await buildCanonical('/')).replace(/\/$/, '');
+    const itemList = buildItemListJsonLd(
+        products.slice(0, Math.min(products.length, 50)).map((p: any, idx: number) => ({
+            position: idx + 1,
+            url: `${base}/product/${p.slug}`,
+            name: p.name,
+            image: p.imageUrl,
+        }))
+    );
+
     return (
         <div className="container mx-auto bg-background px-4 py-8 text-foreground">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList) }} />
             <Card className="shadow-lg border-l-4 border-feature-commerce card-hover-effect card-border-glow mt-6">
                 <CardHeader className="pb-4">
                     <CardTitle className="flex items-center gap-2 text-xl">

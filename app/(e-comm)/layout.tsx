@@ -7,6 +7,17 @@ import RealtimeNotificationListener from './(adminPage)/user/notifications/compo
 import { CurrencyInitializer } from '@/components/CurrencyInitializer';
 // import NotificationTest from '@/app/components/NotificationTest';
 
+// SEO helpers
+import { buildMetadata } from '@/helpers/seo/metadata';
+import { buildOrganizationJsonLd } from '@/helpers/seo/jsonld/organization';
+import { buildWebsiteJsonLd } from '@/helpers/seo/jsonld/website';
+import type { Metadata } from 'next';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const meta = await buildMetadata({});
+  return meta;
+}
+
 export default async function EcommerceLayout({ children }: { children: React.ReactNode }) {
   try {
     const {
@@ -22,9 +33,15 @@ export default async function EcommerceLayout({ children }: { children: React.Re
     } = await fetchEcommLayoutData();
     const typedCompanyData = companyData as any;
 
+    // JSON-LD (Organization & WebSite)
+    const orgJsonLd = await buildOrganizationJsonLd();
+    const siteJsonLd = await buildWebsiteJsonLd();
 
     return (
       <div className="flex flex-col min-h-screen">
+        {/* Structured Data */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }} />
         <HeaderUnified
           user={userSummary}
           unreadCount={notificationCount}

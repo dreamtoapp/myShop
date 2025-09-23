@@ -116,7 +116,7 @@ export const navigationItems = [
       { label: 'سياسة الإرجاع', href: '/dashboard/management/policies/return', icon: 'Undo' },
       { label: 'سياسة الخصوصية', href: '/dashboard/management/policies/privacy', icon: 'Shield' },
       { label: 'سياسة الشحن', href: '/dashboard/management/policies/shipping', icon: 'Truck' },
-      { label: 'دليل الاستخدام', href: '/dashboard/guidelines', icon: 'BookOpen' },
+      { label: 'دليل الاستخدام', href: '/dashboard/management/guidelines', icon: 'BookOpen' },
       { label: 'صحة المتجر', href: '/dashboard/health-status', icon: 'Activity' }
     ]
   },

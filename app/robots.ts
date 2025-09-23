@@ -1,8 +1,8 @@
 import { MetadataRoute } from 'next';
-import { getNextAuthURL } from '@/lib/auth-dynamic-config';
+import { getCanonicalBase } from '@/helpers/seo/canonical';
 
-export default function robots(): MetadataRoute.Robots {
-  const BASE_URL = getNextAuthURL();
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const BASE_URL = await getCanonicalBase();
 
   return {
     rules: [
@@ -32,6 +32,10 @@ export default function robots(): MetadataRoute.Robots {
           '/admin/*',
           '/dashboard',
           '/dashboard/*',
+
+          // API endpoints
+          '/api',
+          '/api/*',
 
           // Internal search and query params
           '/search',

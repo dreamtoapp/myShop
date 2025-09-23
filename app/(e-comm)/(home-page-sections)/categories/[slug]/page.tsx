@@ -1,3 +1,4 @@
+export const revalidate = 60;
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from '@/components/link';
@@ -8,9 +9,15 @@ import { Separator } from '@/components/ui/separator';
 import { PageProps } from '@/types/commonTypes';
 import ProductCardAdapter from '@/app/(e-comm)/(home-page-sections)/product/cards/ProductCardAdapter';
 
-export async function generateMetadata({ params }: PageProps<{ slug: string }>): Promise<Metadata> {
+// SEO helpers
+import { buildCanonical, buildCanonicalWithParams } from '@/helpers/seo/canonical';
+import { buildItemListJsonLd } from '@/helpers/seo/jsonld/itemList';
+
+export async function generateMetadata({ params, searchParams }: PageProps<{ slug: string }, { page?: string }>): Promise<Metadata> {
   const { slug } = await params;
-  const categoryResult = await getCategoryPageData(slug, 1, 1); // Assuming 1 page, 1 product for metadata
+  const qp = await searchParams;
+  const currentPage = qp?.page ? Math.max(1, parseInt(qp.page, 10) || 1) : 1;
+  const categoryResult = await getCategoryPageData(slug, 1, 1); // Lightweight fetch for meta (gets totals)
 
   if (!categoryResult.success || !categoryResult.category) {
     return {
@@ -18,13 +25,36 @@ export async function generateMetadata({ params }: PageProps<{ slug: string }>):
     };
   }
   const category = categoryResult.category;
+  const totalPages: number | undefined = (categoryResult as any).totalPages;
+  const totalProducts: number | undefined = (categoryResult as any).totalProducts;
+  const canonical = await buildCanonicalWithParams(`/categories/${slug}`, (qp as any) || {}, ['page']);
+
+  // Build pagination alternates if we know total pages
+  const alternates: Metadata['alternates'] = { canonical };
+  if (typeof totalPages === 'number' && totalPages > 1) {
+    const prev = currentPage > 1 ? await buildCanonicalWithParams(`/categories/${slug}`, { page: String(currentPage - 1) }, ['page']) : undefined;
+    const next = currentPage < totalPages ? await buildCanonicalWithParams(`/categories/${slug}`, { page: String(currentPage + 1) }, ['page']) : undefined;
+    (alternates as any).types = undefined; // keep clean
+    (alternates as any).languages = undefined;
+    (alternates as any).media = undefined;
+    ;
+    (alternates as any).pagination = {
+      current: canonical,
+      previous: prev,
+      next,
+    };
+  }
+  const robots = typeof totalProducts === 'number' && totalProducts === 0 ? 'noindex, follow' : undefined;
   return {
     title: category.name,
     description: category.description || `Browse products in the ${category.name} category.`,
+    alternates,
+    robots,
     openGraph: {
       title: category.name,
       description: category.description || `Browse products in the ${category.name} category.`,
       images: category.imageUrl ? [{ url: category.imageUrl, alt: category.name }] : [],
+      url: canonical,
     },
   };
 }
@@ -56,6 +86,17 @@ export default async function CategoryPage({ params, searchParams }: PageProps<{
   };
   const allCategories = data.allCategories;
 
+  // Build ItemList JSON-LD for this category page
+  const baseCanonical = (await buildCanonical('/')).replace(/\/$/, '');
+  const itemList = buildItemListJsonLd(
+    data.products.slice(0, Math.min(data.products.length, 50)).map((p: any, idx: number) => ({
+      position: idx + 1,
+      url: `${baseCanonical}/product/${p.slug}`,
+      name: p.name,
+      image: p.imageUrl,
+    }))
+  );
+
   // Get related categories (excluding current one) - FIXED
   const relatedCategories = allCategories
     .filter((c: any) => c.slug !== decodedSlug)  // Use decoded slug for comparison
@@ -63,6 +104,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps<{
 
   return (
     <div className="container mx-auto bg-background px-4 py-8 text-foreground">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList) }} />
       {/* Breadcrumb navigation */}
       <nav className="mb-6 flex items-center text-sm">
         <Link href="/" className="text-muted-foreground hover:text-foreground">
@@ -111,6 +153,9 @@ export default async function CategoryPage({ params, searchParams }: PageProps<{
       </header>
 
       {/* Products grid */}
+      <p className="mb-4 text-sm text-muted-foreground">
+        تصفح أفضل منتجات {category.name} مع أسعار وتخفيضات مميزة.
+      </p>
       <h2 className="mb-6 text-2xl font-bold">منتجات {category.name}</h2>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {data.products.map((product, idx) => (

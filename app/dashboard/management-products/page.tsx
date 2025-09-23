@@ -6,6 +6,7 @@ import PaginationControls from './components/PaginationControls';
 import ProductCard from './components/ProductCard';
 import ProductFilterForm from './components/ProductFilterForm';
 import Link from '@/components/link';
+import { hasAnyCategory } from './actions/checkCategories';
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -16,6 +17,7 @@ function getStringParam(param: string | string[] | undefined): string {
 
 export default async function ProductsControlPage(props: { searchParams: SearchParams }) {
   const searchParams = await props.searchParams;
+  const categoriesExist = await hasAnyCategory();
 
   // Parse filters and pagination from searchParams
   const name = getStringParam(searchParams.name);
@@ -55,13 +57,39 @@ export default async function ProductsControlPage(props: { searchParams: SearchP
         </div>
 
         {/* Enhanced Add Product Button */}
-        <Button asChild className="btn-add gap-2 shadow-lg card-hover-effect">
-          <Link href="/dashboard/management-products/new">
+        {categoriesExist ? (
+          <Button asChild className="btn-add gap-2 shadow-lg card-hover-effect">
+            <Link href="/dashboard/management-products/new">
+              <Icon name="Plus" className="h-5 w-5 icon-enhanced" />
+              إضافة منتج جديد
+            </Link>
+          </Button>
+        ) : (
+          <Button className="btn-add gap-2 shadow-lg card-hover-effect opacity-60 cursor-not-allowed" disabled>
             <Icon name="Plus" className="h-5 w-5 icon-enhanced" />
             إضافة منتج جديد
-          </Link>
-        </Button>
+          </Button>
+        )}
       </div>
+
+      {/* Hint when no categories exist */}
+      {!categoriesExist && (
+        <Card className="shadow-lg border-l-4 border-l-warning-soft-bg card-hover-effect mb-6">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <Icon name="AlertTriangle" className="h-5 w-5 text-warning-fg mt-0.5" />
+              <div className="text-sm text-muted-foreground">
+                لا يمكن إضافة منتج بدون وجود أصناف. الرجاء إضافة صنف أولاً من صفحة إدارة الأصناف.
+                <div className="mt-3">
+                  <Button asChild variant="outline" className="btn-cancel-outline">
+                    <Link href="/dashboard/management-categories">الذهاب إلى إدارة الأصناف</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Enhanced Filters Card */}
       <Card className="shadow-lg border-l-4 border-l-feature-products card-hover-effect mb-8">
@@ -108,12 +136,19 @@ export default async function ProductsControlPage(props: { searchParams: SearchP
               }
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button asChild className="btn-add gap-2">
-                <Link href="/dashboard/management-products/new">
+              {categoriesExist ? (
+                <Button asChild className="btn-add gap-2">
+                  <Link href="/dashboard/management-products/new">
+                    <Icon name="Plus" className="h-4 w-4" />
+                    إضافة منتج جديد
+                  </Link>
+                </Button>
+              ) : (
+                <Button className="btn-add gap-2 opacity-60 cursor-not-allowed" disabled>
                   <Icon name="Plus" className="h-4 w-4" />
                   إضافة منتج جديد
-                </Link>
-              </Button>
+                </Button>
+              )}
               {(name || status !== 'all' || type !== 'all' || stock !== 'all') && (
                 <Button asChild variant="outline" className="btn-cancel-outline">
                   <Link href="/dashboard/management-products">

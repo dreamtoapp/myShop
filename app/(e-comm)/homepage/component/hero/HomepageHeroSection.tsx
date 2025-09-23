@@ -24,6 +24,7 @@ export default function HomepageHeroSection({
         alt="Hero Image"
         fill
         priority
+        fetchPriority="high"
         sizes="100vw"
         placeholder="blur"
         blurDataURL={blurDataURL}
