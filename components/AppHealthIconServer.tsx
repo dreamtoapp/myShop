@@ -43,7 +43,7 @@ export default function AppHealthIconServer({ status }: AppHealthIconServerProps
 
   return (
     <Link
-      href="/dashboard/health-status"
+      href="/dashboard/management/health-status"
       className="flex items-center relative group"
     >
       <Icon name={iconProps.name} className={iconProps.className} />

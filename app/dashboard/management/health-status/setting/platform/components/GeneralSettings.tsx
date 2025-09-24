@@ -30,7 +30,7 @@ export function GeneralSettings({ formData, onChange }: GeneralSettingsProps) {
       <CardContent className="space-y-4">
         <CheckboxField
           label="عرض صورة الهيرو"
-          description="إظهار صورة الهيرو في الصفحة الرئيسية"
+          description="إظهار عارض صور الهيرو (Slider) في الصفحة الرئيسية"
           checked={formData.showHeroImage}
           onChange={(checked) => onChange('showHeroImage', checked)}
         />

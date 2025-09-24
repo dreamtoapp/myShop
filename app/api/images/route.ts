@@ -125,8 +125,11 @@ export async function POST(req: NextRequest) {
 
     // Upload to Cloudinary
     let imageUrl;
+    let publicId: string | undefined;
     try {
-      imageUrl = await uploadImageToCloudinary(dataUri, finalPreset, finalFolder);
+      const uploaded = await uploadImageToCloudinary(dataUri, finalPreset, finalFolder);
+      imageUrl = uploaded.url;
+      publicId = uploaded.publicId;
       console.log('[CLOUDINARY UPLOAD SUCCESS]', {
         imageUrl,
         preset: finalPreset,
@@ -189,7 +192,7 @@ export async function POST(req: NextRequest) {
       console.log(`[UPLOAD ONLY MODE] Image uploaded to Cloudinary: ${imageUrl}`);
     }
 
-    return NextResponse.json({ imageUrl });
+    return NextResponse.json({ imageUrl, publicId });
   } catch (error) {
     console.error('[UNHANDLED ERROR]', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

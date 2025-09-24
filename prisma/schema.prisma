@@ -371,6 +371,7 @@ model Company {
 
   // Platform Display Settings
   showHeroImage        Boolean @default(false)
+  useHeroSlider        Boolean @default(false)
   showStoreLocation    Boolean @default(false)
   showCustomerCount    Boolean @default(false)
   showProductCount     Boolean @default(false)
@@ -381,6 +382,10 @@ model Company {
   
   // Currency Settings
   defaultCurrency      String  @default("SAR")
+
+  // Homepage Hero Slider (additive-only, backward compatible)
+  heroImages  String[] @default([])
+  heroSlides  Json[]   @default([])
 }
 
 model NewLetter {

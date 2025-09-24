@@ -7,7 +7,7 @@ export async function uploadImageToCloudinary(
   filePath: string,
   preset: string,
   folder: string,
-): Promise<string> {
+): Promise<{ url: string; publicId: string }> {
   // Ensure Cloudinary SDK is initialized from the centralized config (DB or env)
   const { error } = await initCloudinary();
   if (error) {
@@ -44,7 +44,7 @@ export async function uploadImageToCloudinary(
   }
 
   // Generate an optimized URL with auto format, quality, and responsive width
-  return cloudinary.v2.url(result.public_id, {
+  const url = cloudinary.v2.url(result.public_id, {
     secure: true,
     transformation: [
       { quality: 'auto' },
@@ -52,4 +52,5 @@ export async function uploadImageToCloudinary(
       { width: 'auto', crop: 'scale' },
     ],
   });
+  return { url, publicId: result.public_id };
 }

@@ -23,7 +23,7 @@ export default function CompanyDataAlert({ status, className = '' }: CompanyData
         <AlertTitle className="text-green-800">معلومات المتجر مكتملة</AlertTitle>
         <AlertDescription className="text-green-700">
           جميع المعلومات الأساسية للمتجر مكتملة.{' '}
-          <Link href="/dashboard/health-status" className="underline font-medium">
+          <Link href="/dashboard/management/health-status" className="underline font-medium">
             عرض تقرير الصحة
           </Link>
         </AlertDescription>
@@ -134,7 +134,7 @@ export default function CompanyDataAlert({ status, className = '' }: CompanyData
             </div>
           </div>
           <Link
-            href="/dashboard/health-status"
+            href="/dashboard/management/health-status"
             className={`${priority === 'critical'
               ? 'inline-flex items-center rounded-md bg-red-600 text-white hover:bg-red-700 px-3 py-1.5 text-xs'
               : priority === 'warning'

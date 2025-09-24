@@ -6,7 +6,7 @@ import FeaturedPromotions from './homepage/component/offer/FeaturedPromotions';
 import { SWRConfig } from 'swr';
 import ProductInfiniteGrid from './homepage/component/ProductInfiniteGrid';
 import { companyInfo } from './actions/companyDetail';
-import HomepageHeroSection from './homepage/component/hero/HomepageHeroSection';
+import HomepageHeroSlider from './homepage/component/slider/HomepageHeroSlider';
 
 // SEO helpers
 import type { Metadata } from 'next';
@@ -84,10 +84,19 @@ export default async function HomePage(props: { searchParams: Promise<{ slug?: s
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList) }} />
       <CriticalCSS />
-      <HomepageHeroSection
-        showHeroImage={company?.showHeroImage || false}
-        profilePicture={company?.profilePicture}
-      />
+      {company?.showHeroImage && Array.isArray(company?.heroSlides) && company.heroSlides.length > 0 ? (
+        <HomepageHeroSlider
+          slides={company.heroSlides.map((s: any, idx: number) => ({
+            id: `hero-${idx}`,
+            header: undefined,
+            subheader: undefined,
+            imageUrl: s.url,
+            ctaText: 'تسوق الآن',
+            ctaLink: '/categories',
+            isActive: true,
+          }))}
+        />
+      ) : null}
       <div className='container mx-auto flex flex-col gap-8 bg-background text-foreground px-4 sm:px-6 lg:px-8'>
         {/* Brief intro for SEO/context without altering layout significantly */}
         <p className="text-sm text-muted-foreground mt-4">

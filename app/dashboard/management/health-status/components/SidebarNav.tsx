@@ -2,13 +2,13 @@
 
 import Link from '@/components/link';
 import { usePathname } from 'next/navigation';
-import { Building2, MapPin, Share2, Palette, Scale, Settings, Check, X, Image as ImageIcon, Truck } from 'lucide-react';
+import { Building2, MapPin, Share2, Palette, Scale, Settings, Check, X, Images, Truck } from 'lucide-react';
 
 const links = [
   // Identity first
   { href: '/dashboard/management/health-status/setting/company-profile', label: 'معلومات المتجر', Icon: Building2 },
   { href: '/dashboard/management/health-status/setting/branding', label: 'صورة الشعار', Icon: Palette },
-  { href: '/dashboard/management/health-status/setting/hero-image', label: 'صورة الهيرو', Icon: ImageIcon },
+  { href: '/dashboard/management/health-status/setting/hero-image', label: 'صور الهيرو (Slider)', Icon: Images },
   { href: '/dashboard/management/health-status/setting/social-media', label: 'الروابط الاجتماعية', Icon: Share2 },
   // Platform configuration
   { href: '/dashboard/management/health-status/setting/shipping-rules', label: ' الشحن والتوصيل', Icon: Truck },

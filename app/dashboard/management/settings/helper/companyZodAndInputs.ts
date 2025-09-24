@@ -47,6 +47,7 @@ export const CompanySchema = z.object({
 
   // Platform Display Settings
   showHeroImage: z.boolean().optional(),
+  useHeroSlider: z.boolean().optional(),
   showStoreLocation: z.boolean().optional(),
   showCustomerCount: z.boolean().optional(),
   showProductCount: z.boolean().optional(),
@@ -57,6 +58,13 @@ export const CompanySchema = z.object({
 
   // Currency Settings
   defaultCurrency: z.enum(['SAR', 'USD', 'EGP', 'AED']).optional(),
+
+  // Homepage Hero Slider (additive, optional)
+  heroImages: z.array(z.string().url('رابط الصورة غير صالح')).optional(),
+  heroSlides: z.array(z.object({
+    url: z.string().url('رابط الصورة غير صالح'),
+    publicId: z.string().optional(),
+  })).optional(),
 
   // Cloudinary Settings (advanced UI)
   cloudinaryCloudName: z.string().trim().optional().or(z.literal('')),
