@@ -1,5 +1,4 @@
 import { ImageResponse } from 'next/og';
-import { companyInfo } from './(e-comm)/actions/companyDetail';
 
 // Apple icon metadata (180x180 is recommended for iOS)
 export const size = {
@@ -11,51 +10,7 @@ export const contentType = 'image/png';
 
 // Apple touch icon generation
 export default async function AppleIcon() {
-  try {
-    // Try to get company logo from database
-    const company = await companyInfo();
-    const logoUrl = company?.logo || company?.profilePicture;
-
-    if (logoUrl && logoUrl.trim() !== '') {
-      // Use company logo if available
-      return new ImageResponse(
-        (
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'white',
-              borderRadius: '22px',
-              overflow: 'hidden',
-              padding: '20px',
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={logoUrl}
-              alt="Company Logo"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-              }}
-            />
-          </div>
-        ),
-        {
-          ...size,
-        }
-      );
-    }
-  } catch (error) {
-    // Fallback to default icon if logo fetch fails
-    console.warn('Failed to fetch company logo for apple icon:', error);
-  }
-
-  // Fallback: Generate a default Apple touch icon
+  // Safety-first: avoid fetching remote images during prerender to prevent build failures
   return new ImageResponse(
     (
       <div
